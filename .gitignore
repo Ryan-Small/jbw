@@ -1,20 +1,12 @@
 
-# /
-/bin
+/target
+/release
 
-# /dependencies/include/
-
-# /release/
-/release/*.dll
-/release/*.jbwta
-/release/jnibwapi.jar
-
-# /src/c/
 /src/c/*.opensdf
 /src/c/*.sdf
 /src/c/*.suo
 /src/c/*.user
 /src/c/ipch
 
-# /src/java/jnibwapi/util/
-/target
+*.jbwta
+
