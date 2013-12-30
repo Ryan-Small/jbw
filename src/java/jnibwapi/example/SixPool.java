@@ -8,21 +8,21 @@ import jnibwapi.model.Unit;
 import jnibwapi.types.UnitType.UnitTypes;
 
 public class SixPool implements BWAPIEventListener {
-	
-	protected final JNIBWAPI bwapi = new JNIBWAPI(this, true);
-	
+
+    protected final JNIBWAPI bwapi = new JNIBWAPI(this, true);
+
     private final HashSet<Integer> claimed = new HashSet<Integer>();
     private int droneCount = 4;
     private int supplyCap = 0;
     private final int poolDrone = -1;
-    
+
     public static void main(final String[] args) {
-    	new SixPool().launchBwapi();
+        new SixPool().launchBwapi();
     }
 
     public SixPool() {
     }
-    
+
     private void launchBwapi() {
         /* Start BWAPI on a separate thread to prevent blocking. */
         final Runnable bwapiRunnable = new Runnable() {
@@ -133,83 +133,86 @@ public class SixPool implements BWAPIEventListener {
         }
     }
 
-	@Override
-	public void connected() {
-	}
+    @Override
+    public void connected() {
+    }
 
-	@Override
-	public void matchStart() {
-	}
+    @Override
+    public void matchStart() {
+        bwapi.setGameSpeed(10);
+        bwapi.enableUserInput();
+        bwapi.enablePerfectInformation();
+    }
 
-	@Override
-	public void matchEnd(boolean winner) {
-	}
+    @Override
+    public void matchEnd(final boolean winner) {
+    }
 
-	@Override
-	public void keyPressed(int keyCode) {
-	}
+    @Override
+    public void keyPressed(final int keyCode) {
+    }
 
-	@Override
-	public void sendText(String text) {
-	}
+    @Override
+    public void sendText(final String text) {
+    }
 
-	@Override
-	public void receiveText(String text) {
-	}
+    @Override
+    public void receiveText(final String text) {
+    }
 
-	@Override
-	public void playerLeft(int playerID) {
-	}
+    @Override
+    public void playerLeft(final int playerID) {
+    }
 
-	@Override
-	public void nukeDetect(int x, int y) {
-	}
+    @Override
+    public void nukeDetect(final int x, final int y) {
+    }
 
-	@Override
-	public void nukeDetect() {
-	}
+    @Override
+    public void nukeDetect() {
+    }
 
-	@Override
-	public void unitDiscover(int unitID) {
-	}
+    @Override
+    public void unitDiscover(final int unitID) {
+    }
 
-	@Override
-	public void unitEvade(int unitID) {
-	}
+    @Override
+    public void unitEvade(final int unitID) {
+    }
 
-	@Override
-	public void unitShow(int unitID) {
-	}
+    @Override
+    public void unitShow(final int unitID) {
+    }
 
-	@Override
-	public void unitHide(int unitID) {
-	}
+    @Override
+    public void unitHide(final int unitID) {
+    }
 
-	@Override
-	public void unitCreate(int unitID) {
-	}
+    @Override
+    public void unitCreate(final int unitID) {
+    }
 
-	@Override
-	public void unitDestroy(int unitID) {
-	}
+    @Override
+    public void unitDestroy(final int unitID) {
+    }
 
-	@Override
-	public void unitMorph(int unitID) {		
-	}
+    @Override
+    public void unitMorph(final int unitID) {
+    }
 
-	@Override
-	public void unitRenegade(int unitID) {
-	}
+    @Override
+    public void unitRenegade(final int unitID) {
+    }
 
-	@Override
-	public void saveGame(String gameName) {
-	}
+    @Override
+    public void saveGame(final String gameName) {
+    }
 
-	@Override
-	public void unitComplete(int unitID) {
-	}
+    @Override
+    public void unitComplete(final int unitID) {
+    }
 
-	@Override
-	public void playerDropped(int playerID) {
-	}
+    @Override
+    public void playerDropped(final int playerID) {
+    }
 }
