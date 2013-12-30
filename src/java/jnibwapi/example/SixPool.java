@@ -7,13 +7,20 @@ import jnibwapi.JNIBWAPI;
 import jnibwapi.model.Unit;
 import jnibwapi.types.UnitType.UnitTypes;
 
-public class SixPool implements BWAPIEventListener {
+public class SixPool extends BWAPIEventListener.Adaptor {
 
     protected final JNIBWAPI bwapi = new JNIBWAPI(this, true);
 
+    /** Used for mineral splits. */
     private final HashSet<Integer> claimed = new HashSet<Integer>();
+
+    /** Number of drones. Game starts with four. */
     private int droneCount = 4;
+
+    /** When should the next Overlord be spawned? */
     private int supplyCap = 0;
+
+    /** Has a drone been assigned to building a pool? */
     private final int poolDrone = -1;
 
     public static void main(final String[] args) {
@@ -134,85 +141,9 @@ public class SixPool implements BWAPIEventListener {
     }
 
     @Override
-    public void connected() {
-    }
-
-    @Override
     public void matchStart() {
         bwapi.setGameSpeed(10);
         bwapi.enableUserInput();
         bwapi.enablePerfectInformation();
-    }
-
-    @Override
-    public void matchEnd(final boolean winner) {
-    }
-
-    @Override
-    public void keyPressed(final int keyCode) {
-    }
-
-    @Override
-    public void sendText(final String text) {
-    }
-
-    @Override
-    public void receiveText(final String text) {
-    }
-
-    @Override
-    public void playerLeft(final int playerID) {
-    }
-
-    @Override
-    public void nukeDetect(final int x, final int y) {
-    }
-
-    @Override
-    public void nukeDetect() {
-    }
-
-    @Override
-    public void unitDiscover(final int unitID) {
-    }
-
-    @Override
-    public void unitEvade(final int unitID) {
-    }
-
-    @Override
-    public void unitShow(final int unitID) {
-    }
-
-    @Override
-    public void unitHide(final int unitID) {
-    }
-
-    @Override
-    public void unitCreate(final int unitID) {
-    }
-
-    @Override
-    public void unitDestroy(final int unitID) {
-    }
-
-    @Override
-    public void unitMorph(final int unitID) {
-    }
-
-    @Override
-    public void unitRenegade(final int unitID) {
-    }
-
-    @Override
-    public void saveGame(final String gameName) {
-    }
-
-    @Override
-    public void unitComplete(final int unitID) {
-    }
-
-    @Override
-    public void playerDropped(final int playerID) {
     }
 }
