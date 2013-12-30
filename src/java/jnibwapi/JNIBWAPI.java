@@ -43,17 +43,18 @@ public class JNIBWAPI {
 	
 	// load the BWAPI client library
 	static {
+//		final String clientBridgeDll = "client-bridge-" + System.getProperty("os.arch");
+		final String clientBridgeDll = "client-bridge-x86";
 		try {
-			System.loadLibrary("client-bridge-" + System.getProperty("os.arch"));
-			System.out.println("Loaded client bridge library.");
-		} catch (UnsatisfiedLinkError e) {
-			// Help beginners put the DLL in the correct place (although anywhere on the path will
-			// work)
-			File dll = new File("client-bridge-" + System.getProperty("os.arch") + ".dll");
+			System.loadLibrary(clientBridgeDll);
+			
+		} catch (UnsatisfiedLinkError ex) {
+			// Help beginners put the DLL in the correct place (although anywhere on the path will work)
+			File dll = new File(clientBridgeDll + ".dll");
 			if (!dll.exists()) {
 				System.err.println("Native code library not found: " + dll.getAbsolutePath());
 			}
-			System.err.println("Native code library failed to load: " + e.toString());
+			System.err.println("Native code library failed to load: " + ex.toString());
 		}
 	}
 	
