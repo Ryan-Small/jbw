@@ -1,9 +1,9 @@
 package jnibwapi;
 
 /**
- * Interface for BWAPI callback methods;
+ * This is the interface that an agent needs to implement to be notified of game events.
  * 
- * For BWAPI specific events see: http://code.google.com/p/bwapi/wiki/AIModule
+ * Create -> Discover -> Show -> Complete -> Hide -> Evade -> Destroy
  */
 public interface BWAPIEventListener {
 
@@ -13,8 +13,8 @@ public interface BWAPIEventListener {
     public void connected();
 
     /**
-     * Called only once at the beginning of a game. Using the {@code JNIBWAPI} interface before this
-     * function is called can produce undefined behavior and crash your agent.
+     * Called only once at the beginning of a game (frame 0). Using the {@code JNIBWAPI} interface
+     * before this function is called can produce undefined behavior and crash your agent.
      * 
      * <p>
      * The agent can do any initializes here.
@@ -36,52 +36,75 @@ public interface BWAPIEventListener {
      *            {@code true} if the agent won; {@false} if the agent lost or if the game
      *            was a replay
      */
-    public void matchEnd(boolean isWinner);
+    public void matchEnd(final boolean isWinner);
 
-    /** keyPressed from within StarCraft */
     /**
+     * Called when the state of the Broodwar game is saved to a file.
      * 
-     * 
-     * @param keyCode
+     * @param fileName
+     *            name of the file the game was saved as
      */
-    public void keyPressed(int keyCode);
+    public void saveGame(final String fileName);
 
     /**
-     * Called when the user attempts to sends a message in-game. This method is not invoked if
-     * {@link JNIBWAPI#enableUserInput()} was not invoked prior to the message being sent.
+     * Called when the user hits a key in-game. This method is not invoked if user input has not
+     * been {@link JNIBWAPI#enableUserInput() enabled}.
      * 
      * <p>
-     * Users can send messages to the agent for various purposes (i.e. debugging, controlling, etc).
+     * This method enables the user to interact with the agent for various purposes (e.g. debugging,
+     * controlling).
+     * 
+     * @param keyCode
+     *            key pressed by the user
+     */
+    public void keyPressed(final int keyCode);
+
+    /**
+     * Called when the user attempts to sends a message in-game. This method is not invoked if user
+     * input has not been {@link JNIBWAPI#enableUserInput() enabled}.
+     * 
+     * <p>
+     * This method enables the user to interact with the agent for various purposes (e.g. debugging,
+     * controlling).
      * 
      * @param message
-     *            the message sent by the user
+     *            message sent by the user
      */
-    public void sendText(String message);
+    public void sendText(final String message);
 
     /**
      * Called when the agent receives a message from another {@code Player}. Messages sent by the
      * agent itself will never invoke this method.
      * 
      * <p>
-     * Other players or agents can send messages to the agent for various purposes (i.e. information
-     * sharing).
+     * This method enables other players or agent to interact with the agent for various purposes
+     * (e.g. debugging, controlling).
      * 
      * @param message
-     *            the message sent by another player or agent
+     *            message sent by another player or agent
      */
-    public void receiveText(String message);
+    public void receiveText(final String message);
 
     /**
      * Called when a {@code Player} leaves the game. All of their units are automatically given to
      * the neutral player with their color and alliance parameters preserved.
      * 
      * @param playerId
-     *            id of the player that left the game
+     *            id of the player that has sleft the game
      */
-    public void playerLeft(int playerId);
+    public void playerLeft(final int playerId);
 
     /**
-     * Called when a nuke has been launched and the location is known.
+     * Called when a {@code PLayer} has been dropped from the game. All of their units are
+     * automatically given to the neutral player with their color and alliance parameters preserved.
+     * 
+     * @param playerId
+     *            id of the player that has been dropped from the game
+     */
+    public void playerDropped(final int playerId);
+
+    /**
+     * Called when a nuke has been launched and the location is visible.
      * 
      * @param x
      *            x coordinate of the nuke
@@ -89,28 +112,48 @@ public interface BWAPIEventListener {
      * @param y
      *            y coordinate of the nuke
      */
-    public void nukeDetect(int x, int y);
+    public void nukeDetect(final int x, final int y);
 
     /**
-     * Called when a nuke has been launched and the location is unknown.
+     * Called when a nuke has been launched and the location is not visible.
      */
     public void nukeDetect();
 
     /**
-     * Called when a {@code Unit} becomes accessible.
+     * Called only when an accessible unit is created. This method will not be called for enemy
+     * units if perfect information is disabled, Zerg units morphing, and the construction of
+     * structures over a Geyser.
+     * 
+     * @param unitId
+     *            id of the unit that has been created
+     */
+    public void unitCreate(final int unitId);
+
+    /**
+     * Called when an accessible {@code Unit} changes its {@code UnitType}.
+     * 
+     * <p>
+     * Examples of morphing events:
+     * <ul>
+     * <li>Larva becomes an egg</li>
+     * <li>Egg becomes Drone</li>
+     * <li>Drone becomes a Hatchery</li>
+     * <li>Geyser becomes Refinery</li>
+     * <li>SiegeTank using SiegeMode</li>
+     * </ul>
+     * 
+     * @param unitId
+     *            id of the unit that has had its {@code UnitType} changed
+     */
+    public void unitMorph(final int unitId);
+
+    /**
+     * Called every time a previously inaccessible {@code Unit} becomes accessible.
      * 
      * @param unitId
      *            id of the unit that is now accessible
      */
-    public void unitDiscover(int unitId);
-
-    /**
-     * Called when a {@code Unit} becomes inaccessible.
-     * 
-     * @param unitId
-     *            id of the unit that is now inaccessible
-     */
-    public void unitEvade(int unitId);
+    public void unitDiscover(final int unitId);
 
     /**
      * Called when a previously invisible {@code Unit} becomes visible.
@@ -118,7 +161,15 @@ public interface BWAPIEventListener {
      * @param unitId
      *            id of the unit that is becoming visible
      */
-    public void unitShow(int unitId);
+    public void unitShow(final int unitId);
+
+    /**
+     * Called when the state of a unit changes from incomplete to complete.
+     * 
+     * @param unitId
+     *            id of the unit that just finished training or being constructed
+     */
+    public void unitComplete(final int unitId);
 
     /**
      * Called when a previously visible {@code Unit} becomes invisible.
@@ -126,80 +177,33 @@ public interface BWAPIEventListener {
      * @param unitId
      *            id of the unit that is becoming invisible
      */
-    public void unitHide(int unitId);
+    public void unitHide(final int unitId);
 
     /**
-     * Called when a unit is created. If the unit is not accessible at the time of creation, (i.e.
-     * if the unit is invisible and perfect information wasn't enabled), then this method will not
-     * be called. If the unit is visible at the time of creation, {@link #unitShow(int)} will also
-     * be called.
-     * 
-     * <p>
-     * Due to the internal workings of Broodwar, this method excludes Zerg units morphing and the
-     * construction of structures over a Geyser.
+     * Called when a previously accessible {@code Unit} becomes inaccessible.
      * 
      * @param unitId
-     *            id of the unit that has been created
+     *            id of the unit that is now inaccessible
      */
-    public void unitCreate(int unitId);
+    public void unitEvade(final int unitId);
 
     /**
-     * Called when a unit is removed from the game either through death or other means. If the unit
-     * is not accessible at the time of destruction, (i.e. if the unit is invisible and perfect
-     * information wasn't enabled), then this method will not be called. If the unit was visible at
-     * the time of destruction, {@link #unitHide(int)} will also be called.
-     * 
-     * <p>
-     * Due to the internal workings of Broodwar, when a Drone morphs into an Extractor, the Drone is
-     * removed from the game and the Geyser morphs into and Extractor.
+     * Called when an accessible unit is removed from the game either through death or other means
+     * (e.g. mined out mineral patch, Drone becomes Extractor).
      * 
      * @param unitId
      *            id of the unit that has been destroyed
      */
-    public void unitDestroy(int unitId);
+    public void unitDestroy(final int unitId);
 
     /**
-     * Called when a {@code Unit} changes its {@code UnitType}. This is not called when a
-     * {@code Unit} changes to or from {@code UnitTypes.Unknown}.
-     * 
-     * <p>
-     * For example:
-     * <ul>
-     * <li>Drone transforms into a Hatchery</li>
-     * <li>SiegeTank using SiegeMode</li>
-     * <li>Geyser becomes Refinery</li>
-     * </ul>
-     * 
-     * @param unitId
-     *            id of the unit that has had its UnitType changed
-     */
-    public void unitMorph(int unitId);
-
-    /**
-     * Called when a unit changes ownership.
+     * Called when a unit changes ownership (e.g. through Dark Archon's Mind Control, Geyser when an
+     * assimilator is built on it).
      * 
      * @param unitId
      *            id of the unit that has changed ownership
      */
-    public void unitRenegade(int unitId);
-
-    /**
-     * Called when the state of the Broodwar game is saved to a file.
-     * 
-     * @param gameName
-     *            name of the file the game was saved as
-     */
-    public void saveGame(String gameName);
-
-    /**
-     * Called when the state of a unit changes from incomplete to complete.
-     * 
-     * @param unitID
-     *            id of the unit that just finished training or being constructed
-     */
-    public void unitComplete(int unitID);
-
-    public void playerDropped(int playerID);
+    public void unitRenegade(final int unitId);
 
     /**
      * An adaptor for the {@code BWAPIEventListener}.
@@ -231,7 +235,7 @@ public interface BWAPIEventListener {
          * {@inheritDoc}
          */
         @Override
-        public void matchEnd(final boolean winner) {
+        public void matchEnd(final boolean isWinner) {
         }
 
         /**
@@ -245,21 +249,21 @@ public interface BWAPIEventListener {
          * {@inheritDoc}
          */
         @Override
-        public void sendText(final String text) {
+        public void sendText(final String message) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void receiveText(final String text) {
+        public void receiveText(final String message) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void playerLeft(final int playerID) {
+        public void playerLeft(final int playerId) {
         }
 
         /**
@@ -280,77 +284,77 @@ public interface BWAPIEventListener {
          * {@inheritDoc}
          */
         @Override
-        public void unitDiscover(final int unitID) {
+        public void unitDiscover(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitEvade(final int unitID) {
+        public void unitEvade(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitShow(final int unitID) {
+        public void unitShow(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitHide(final int unitID) {
+        public void unitHide(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitCreate(final int unitID) {
+        public void unitCreate(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitDestroy(final int unitID) {
+        public void unitDestroy(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitMorph(final int unitID) {
+        public void unitMorph(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitRenegade(final int unitID) {
+        public void unitRenegade(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void saveGame(final String gameName) {
+        public void saveGame(final String fileName) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void unitComplete(final int unitID) {
+        public void unitComplete(final int unitId) {
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void playerDropped(final int playerID) {
+        public void playerDropped(final int playerId) {
         }
     }
 }

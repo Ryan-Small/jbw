@@ -9,7 +9,7 @@ import jnibwapi.types.UnitType.UnitTypes;
 
 public class SixPool extends BWAPIEventListener.Adaptor {
 
-    protected final JNIBWAPI bwapi = new JNIBWAPI(this, true);
+    private final JNIBWAPI bwapi = new JNIBWAPI(this, true);
 
     /** Used for mineral splits. */
     private final HashSet<Integer> claimed = new HashSet<Integer>();
