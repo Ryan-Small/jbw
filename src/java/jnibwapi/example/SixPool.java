@@ -43,13 +43,11 @@ public class SixPool extends BWAPIEventListener.Adaptor {
         bwapiThread.start();
     }
 
-    private boolean haveSpawningPool() {
-        for (final Unit unit : bwapi.getMyUnits()) {
-            if (unit.getTypeID() == UnitTypes.Zerg_Spawning_Pool.ordinal()) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public void matchStart() {
+        bwapi.setGameSpeed(10);
+        bwapi.enableUserInput();
+        bwapi.enablePerfectInformation();
     }
 
     @Override
@@ -140,10 +138,12 @@ public class SixPool extends BWAPIEventListener.Adaptor {
         }
     }
 
-    @Override
-    public void matchStart() {
-        bwapi.setGameSpeed(10);
-        bwapi.enableUserInput();
-        bwapi.enablePerfectInformation();
+    private boolean haveSpawningPool() {
+        for (final Unit unit : bwapi.getMyUnits()) {
+            if (unit.getTypeID() == UnitTypes.Zerg_Spawning_Pool.ordinal()) {
+                return true;
+            }
+        }
+        return false;
     }
 }
