@@ -2,14 +2,11 @@ package jnibwapi.example;
 
 import java.util.HashSet;
 
-import jnibwapi.BWAPIEventListener;
-import jnibwapi.JNIBWAPI;
+import jnibwapi.AbstractAgent;
 import jnibwapi.model.Unit;
 import jnibwapi.types.UnitType.UnitTypes;
 
-public class SixPool extends BWAPIEventListener.Adaptor {
-
-    private final JNIBWAPI bwapi = new JNIBWAPI(this, true);
+public class SixPool extends AbstractAgent {
 
     /** Used for mineral splits. */
     private final HashSet<Integer> claimed = new HashSet<Integer>();
@@ -24,39 +21,27 @@ public class SixPool extends BWAPIEventListener.Adaptor {
     private final int poolDrone = -1;
 
     public static void main(final String[] args) {
-        new SixPool().launchBwapi();
+        new SixPool(true).start();
     }
 
-    public SixPool() {
-    }
-
-    private void launchBwapi() {
-        /* Start BWAPI on a separate thread to prevent blocking. */
-        final Runnable bwapiRunnable = new Runnable() {
-
-            @Override
-            public void run() {
-                bwapi.start();
-            }
-        };
-        final Thread bwapiThread = new Thread(bwapiRunnable);
-        bwapiThread.start();
+    public SixPool(final boolean enableBwta) {
+        super(enableBwta);
     }
 
     @Override
     public void matchStart() {
-        bwapi.setGameSpeed(10);
-        bwapi.enableUserInput();
-        bwapi.enablePerfectInformation();
+        game.setGameSpeed(10);
+        game.enableUserInput();
+        game.enablePerfectInformation();
     }
 
     @Override
     public void matchFrame() {
         // spawn a drone
-        if ((droneCount < 6) && (bwapi.canMake(UnitTypes.Zerg_Drone.ordinal()))) {
-            for (final Unit unit : bwapi.getMyUnits()) {
+        if ((droneCount < 6) && (game.canMake(UnitTypes.Zerg_Drone.ordinal()))) {
+            for (final Unit unit : game.getMyUnits()) {
                 if (unit.getTypeID() == UnitTypes.Zerg_Larva.getID()) {
-                    if (bwapi.morph(unit.getID(), UnitTypes.Zerg_Drone.getID())) {
+                    if (game.morph(unit.getID(), UnitTypes.Zerg_Drone.getID())) {
                         droneCount++;
                     }
                 }
@@ -64,10 +49,10 @@ public class SixPool extends BWAPIEventListener.Adaptor {
         }
 
         // collect minerals
-        for (final Unit unit : bwapi.getMyUnits()) {
+        for (final Unit unit : game.getMyUnits()) {
             if (unit.getTypeID() == UnitTypes.Zerg_Drone.ordinal()) {
                 if (unit.isIdle() && (unit.getID() != poolDrone)) {
-                    for (final Unit minerals : bwapi.getNeutralUnits()) {
+                    for (final Unit minerals : game.getNeutralUnits()) {
                         if ((minerals.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal())
                                 && !claimed.contains(minerals.getID())) {
                             final double distance =
@@ -75,7 +60,7 @@ public class SixPool extends BWAPIEventListener.Adaptor {
                                             + Math.pow(minerals.getY() - unit.getY(), 2));
 
                             if (distance < 300) {
-                                bwapi.rightClick(unit.getID(), minerals.getID());
+                                game.rightClick(unit.getID(), minerals.getID());
                                 claimed.add(minerals.getID());
                                 break;
                             }
@@ -86,12 +71,12 @@ public class SixPool extends BWAPIEventListener.Adaptor {
         }
 
         // build a spawning pool
-        if (!haveSpawningPool() && bwapi.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
-            for (final Unit potentialDrone : bwapi.getMyUnits()) {
+        if (!haveSpawningPool() && game.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
+            for (final Unit potentialDrone : game.getMyUnits()) {
                 if (potentialDrone.getTypeID() == UnitTypes.Zerg_Drone.ordinal()) {
-                    for (final Unit unit : bwapi.getMyUnits()) {
+                    for (final Unit unit : game.getMyUnits()) {
                         if (unit.getTypeID() == UnitTypes.Zerg_Overlord.ordinal()) {
-                            bwapi.build(potentialDrone.getID(), unit.getTileX(), unit.getTileY(),
+                            game.build(potentialDrone.getID(), unit.getTileX(), unit.getTileY(),
                                     UnitTypes.Zerg_Spawning_Pool.getID());
                             break;
                         }
@@ -102,25 +87,25 @@ public class SixPool extends BWAPIEventListener.Adaptor {
         }
 
         // spawn overlords
-        if (((bwapi.getSelf().getSupplyUsed() + 2) >= bwapi.getSelf().getSupplyTotal())
-                && (bwapi.getSelf().getSupplyTotal() > supplyCap)) {
-            if (bwapi.canMake(UnitTypes.Zerg_Overlord.ordinal())) {
-                for (final Unit larva : bwapi.getMyUnits()) {
+        if (((game.getSelf().getSupplyUsed() + 2) >= game.getSelf().getSupplyTotal())
+                && (game.getSelf().getSupplyTotal() > supplyCap)) {
+            if (game.canMake(UnitTypes.Zerg_Overlord.ordinal())) {
+                for (final Unit larva : game.getMyUnits()) {
                     if (larva.getTypeID() == UnitTypes.Zerg_Larva.getID()) {
-                        bwapi.morph(larva.getID(), UnitTypes.Zerg_Overlord.getID());
-                        supplyCap = bwapi.getSelf().getSupplyTotal();
+                        game.morph(larva.getID(), UnitTypes.Zerg_Overlord.getID());
+                        supplyCap = game.getSelf().getSupplyTotal();
                     }
                 }
             }
         }
         // spawn zerglings
-        else if (bwapi.canMake(UnitTypes.Zerg_Zergling.ordinal())) {
-            for (final Unit unit : bwapi.getMyUnits()) {
+        else if (game.canMake(UnitTypes.Zerg_Zergling.ordinal())) {
+            for (final Unit unit : game.getMyUnits()) {
                 if ((unit.getTypeID() == UnitTypes.Zerg_Spawning_Pool.getID())
                         && unit.isCompleted()) {
-                    for (final Unit larva : bwapi.getMyUnits()) {
+                    for (final Unit larva : game.getMyUnits()) {
                         if (larva.getTypeID() == UnitTypes.Zerg_Larva.getID()) {
-                            bwapi.morph(larva.getID(), UnitTypes.Zerg_Zergling.getID());
+                            game.morph(larva.getID(), UnitTypes.Zerg_Zergling.getID());
                         }
                     }
                 }
@@ -128,10 +113,10 @@ public class SixPool extends BWAPIEventListener.Adaptor {
         }
 
         // attack
-        for (final Unit unit : bwapi.getMyUnits()) {
+        for (final Unit unit : game.getMyUnits()) {
             if ((unit.getTypeID() == UnitTypes.Zerg_Zergling.getID()) && unit.isIdle()) {
-                for (final Unit enemy : bwapi.getEnemyUnits()) {
-                    bwapi.attack(unit.getID(), enemy.getX(), enemy.getY());
+                for (final Unit enemy : game.getEnemyUnits()) {
+                    game.attack(unit.getID(), enemy.getX(), enemy.getY());
                     break;
                 }
             }
@@ -139,7 +124,7 @@ public class SixPool extends BWAPIEventListener.Adaptor {
     }
 
     private boolean haveSpawningPool() {
-        for (final Unit unit : bwapi.getMyUnits()) {
+        for (final Unit unit : game.getMyUnits()) {
             if (unit.getTypeID() == UnitTypes.Zerg_Spawning_Pool.ordinal()) {
                 return true;
             }

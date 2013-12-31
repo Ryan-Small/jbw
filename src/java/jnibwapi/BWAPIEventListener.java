@@ -13,8 +13,7 @@ public interface BWAPIEventListener {
     public void connected();
 
     /**
-     * Called only once at the beginning of a game (frame 0). Using the {@code JNIBWAPI} interface
-     * before this function is called can produce undefined behavior and crash your agent.
+     * Called only once at the beginning of a game (frame 0).
      * 
      * <p>
      * The agent can do any initializes here.
