@@ -310,7 +310,7 @@ public class UnitType {
 		Undefined231, // Buildings (BWAPI4)
 		Undefined232, // Factories (BWAPI4)
 		Unknown;
-		public int getID() {
+		public int getId() {
 			return ordinal();
 		}
 	}

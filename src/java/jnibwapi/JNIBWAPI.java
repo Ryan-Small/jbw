@@ -12,6 +12,9 @@ import jnibwapi.model.Player;
 import jnibwapi.model.Region;
 import jnibwapi.model.Unit;
 import jnibwapi.types.*;
+import jnibwapi.types.TechType.TechTypes;
+import jnibwapi.types.UnitType.UnitTypes;
+import jnibwapi.types.UpgradeType.UpgradeTypes;
 
 /**
  * JNI interface for the Brood War API.<br>
@@ -30,7 +33,7 @@ import jnibwapi.types.*;
  */
 public class JNIBWAPI {
 
-    // load the BWAPI client library
+    /* Load the JNI library. */
     static {
         // final String clientBridgeDll = "client-bridge-" + System.getProperty("os.arch");
         final String clientBridgeDll = "client-bridge-x86";
@@ -38,8 +41,6 @@ public class JNIBWAPI {
             System.loadLibrary(clientBridgeDll);
 
         } catch (final UnsatisfiedLinkError ex) {
-            // Help beginners put the DLL in the correct place (although anywhere on the path will
-            // work)
             final File dll = new File(clientBridgeDll + ".dll");
             if (!dll.exists()) {
                 System.err.println("Native code library not found: " + dll.getAbsolutePath());
@@ -48,65 +49,79 @@ public class JNIBWAPI {
         }
     }
 
-    /** callback listener for BWAPI events */
+    /** The listener for BWAPI callback events */
     private final BWAPIEventListener listener;
 
-    /** whether to use BWTA for map analysis */
+    /** Indicates of BWTA should be enabled */
     private final boolean enableBWTA;
 
+    /** The character set to use when decoding Strings. */
     private Charset charset;
+
+    private int gameFrame = 0;
+
+    private Map map;
+
+    private final HashMap<Integer, Unit> units = new HashMap<>();
+    private final List<Unit> playerUnits = new ArrayList<>();
+    private final List<Unit> alliedUnits = new ArrayList<>();
+    private final List<Unit> enemyUnits = new ArrayList<>();
+    private final List<Unit> neutralUnits = new ArrayList<>();
+
+    private Player self;
+    private Player neutralPlayer;
+
+    private final Set<Integer> allyIds = new HashSet<>();
+    private final Set<Integer> enemyIds = new HashSet<>();
+
+    private final HashMap<Integer, Player> players = new HashMap<>();
+    private final List<Player> allies = new ArrayList<>();
+    private final List<Player> enemies = new ArrayList<>();
+
+    private final HashMap<Integer, UnitType> unitTypes = new HashMap<>();
+    private final HashMap<Integer, RaceType> raceTypes = new HashMap<>();
+    private final HashMap<Integer, TechType> techTypes = new HashMap<>();
+    private final HashMap<Integer, UpgradeType> upgradeTypes = new HashMap<>();
+    private final HashMap<Integer, WeaponType> weaponTypes = new HashMap<>();
+    private final HashMap<Integer, UnitSizeType> unitSizeTypes = new HashMap<>();
+    private final HashMap<Integer, BulletType> bulletTypes = new HashMap<>();
+    private final HashMap<Integer, DamageType> damageTypes = new HashMap<>();
+    private final HashMap<Integer, ExplosionType> explosionTypes = new HashMap<>();
+    private final HashMap<Integer, UnitCommandType> unitCommandTypes = new HashMap<>();
+    private final HashMap<Integer, OrderType> orderTypes = new HashMap<>();
+    private final HashMap<Integer, EventType> eventTypes = new HashMap<>();
 
     /**
      * Instantiates a BWAPI instance, but does not connect to the bridge. To connect, the start
      * method must be invoked.
      * 
      * @param listener
-     *            - listener for BWAPI callback events.
+     *            listener for BWAPI callback events.
+     * 
      * @param enableBWTA
-     *            - whether to use BWTA for map analysis
+     *            {@code true} if BWTA should be enabled; {@code false} otherwise
      */
     public JNIBWAPI(final BWAPIEventListener listener, final boolean enableBWTA) {
         this.listener = listener;
         this.enableBWTA = enableBWTA;
+
         try {
-            // Using the Korean character set for decoding byte[]s into Strings will allow Korean
-            // characters to be parsed correctly.
             charset = Charset.forName("Cp949");
         } catch (final UnsupportedCharsetException e) {
-            System.out
-                    .println("Korean character set not available. Some characters may not be read properly");
             charset = StandardCharsets.ISO_8859_1;
+            System.err.println("Korean character set not available.");
         }
     }
 
     /**
-     * Invokes the native library which will connect to the bridge and then invoke callback
-     * functions.
+     * Connects the client to BWAPI.
      * 
-     * Note: this method never returns, it should be invoked from a separate thread if concurrent
-     * java processing is needed.
+     * <p>
+     * This method will block until Broodwar has been closed.
      */
     public void start() {
         startClient(this);
     }
-
-    // game state
-    private int gameFrame = 0;
-    private Map map;
-    private final HashMap<Integer, Unit> units = new HashMap<Integer, Unit>();
-    private ArrayList<Unit> playerUnits = new ArrayList<Unit>();
-    private ArrayList<Unit> alliedUnits = new ArrayList<Unit>();
-    private ArrayList<Unit> enemyUnits = new ArrayList<Unit>();
-    private ArrayList<Unit> neutralUnits = new ArrayList<Unit>();
-
-    // player lists
-    private Player self;
-    private Player neutralPlayer;
-    private final HashSet<Integer> allyIDs = new HashSet<Integer>();
-    private final HashSet<Integer> enemyIDs = new HashSet<Integer>();
-    private final HashMap<Integer, Player> players = new HashMap<Integer, Player>();
-    private final ArrayList<Player> allies = new ArrayList<Player>();
-    private final ArrayList<Player> enemies = new ArrayList<Player>();
 
     // invokes the main native method
     private native void startClient(JNIBWAPI jniBWAPI);
@@ -177,7 +192,6 @@ public class JNIBWAPI {
 
     private native int[] getUnitIdsOnTile(int tx, int ty);
 
-    // map data
     private native void analyzeTerrain();
 
     private native int getMapWidth();
@@ -209,91 +223,265 @@ public class JNIBWAPI {
     private native int[] getBaseLocations();
 
     // unit commands: http://code.google.com/p/bwapi/wiki/Unit
-    public native boolean attack(int unitID, int x, int y);
+    public boolean attack(final Unit unit, final int x, final int y) {
+        return attack(unit.getId(), x, y);
+    }
 
-    public native boolean attack(int unitID, int targetID);
+    private native boolean attack(final int unitId, final int x, final int y);
 
-    public native boolean build(int unitID, int tx, int ty, int typeID);
+    public boolean attack(final Unit unit, final Unit target) {
+        return attack(unit.getId(), target.getId());
+    }
 
-    public native boolean buildAddon(int unitID, int typeID);
+    private native boolean attack(final int unitId, final int targetId);
 
-    public native boolean train(int unitID, int typeID);
+    // TODO: Change parameter order.
+    public boolean build(final Unit builder, final int tx, final int ty, final UnitTypes building) {
+        return build(builder.getId(), tx, ty, building.getId());
+    }
 
-    public native boolean morph(int unitID, int typeID);
+    private native boolean build(final int builderId, final int tx, final int ty,
+            final int buildingId);
 
-    public native boolean research(int unitID, int techID);
+    public boolean buildAddon(final Unit building, final Unit addon) {
+        return buildAddon(building.getId(), addon.getId());
+    }
 
-    public native boolean upgrade(int unitID, int updateID);
+    private native boolean buildAddon(final int buildingId, final int addonId);
 
-    public native boolean setRallyPoint(int unitID, int x, int y);
+    public boolean train(final Unit trainer, final UnitTypes unit) {
+        return train(trainer.getId(), unit.getId());
+    }
 
-    public native boolean setRallyPoint(int unitID, int targetID);
+    private native boolean train(int buildingId, int addonId);
 
-    public native boolean move(int unitID, int x, int y);
+    public boolean morph(final Unit unit, final UnitTypes target) {
+        return morph(unit.getId(), target.getId());
+    }
 
-    public native boolean patrol(int unitID, int x, int y);
+    private native boolean morph(final int unitId, final int targetId);
 
-    public native boolean holdPosition(int unitID);
+    public boolean research(final Unit researcher, final TechTypes tech) {
+        return research(researcher.getId(), tech.getId());
+    }
 
-    public native boolean stop(int unitID);
+    private native boolean research(final int researcherId, final int techId);
 
-    public native boolean follow(int unitID, int targetID);
+    public boolean upgrade(final Unit upgrader, final UpgradeTypes upgrade) {
+        return upgrade(upgrader.getId(), upgrade.getID());
+    }
 
-    public native boolean gather(int unitID, int targetID);
+    private native boolean upgrade(int unitId, int updateId);
 
-    public native boolean returnCargo(int unitID);
+    public boolean setRallyPoint(final Unit building, final int x, final int y) {
+        return setRallyPoint(building, x, y);
+    }
 
-    public native boolean repair(int unitID, int targetID);
+    private native boolean setRallyPoint(int unitId, int x, int y);
 
-    public native boolean burrow(int unitID);
+    public boolean setRallyPoint(final Unit building, final Unit target) {
+        return setRallyPoint(building.getId(), target.getId());
+    }
 
-    public native boolean unburrow(int unitID);
+    private native boolean setRallyPoint(int unitId, int targetId);
 
-    public native boolean cloak(int unitID);
+    public boolean move(final Unit unit, final int x, final int y) {
+        return move(unit, x, y);
+    }
 
-    public native boolean decloak(int unitID);
+    private native boolean move(int unitId, int x, int y);
 
-    public native boolean siege(int unitID);
+    public boolean patrol(final Unit unit, final int x, final int y) {
+        return patrol(unit, x, y);
+    }
 
-    public native boolean unsiege(int unitID);
+    private native boolean patrol(int unitId, int x, int y);
 
-    public native boolean lift(int unitID);
+    public boolean holdPosition(final Unit unit) {
+        return holdPosition(unit.getId());
+    }
 
-    public native boolean land(int unitID, int tx, int ty);
+    private native boolean holdPosition(int unitId);
 
-    public native boolean load(int unitID, int targetID);
+    public boolean stop(final Unit unit) {
+        return stop(unit.getId());
+    }
 
-    public native boolean unload(int unitID, int targetID);
+    private native boolean stop(int unitId);
 
-    public native boolean unloadAll(int unitID);
+    public boolean follow(final Unit unit, final Unit target) {
+        return follow(unit.getId(), target.getId());
+    }
 
-    public native boolean unloadAll(int unitID, int x, int y);
+    public native boolean follow(int unitId, int targetId);
 
-    public native boolean rightClick(int unitID, int x, int y);
+    public boolean gather(final Unit unit, final Unit target) {
+        return gather(unit.getId(), target.getId());
+    }
 
-    public native boolean rightClick(int unitID, int targetID);
+    private native boolean gather(int unitId, int targetId);
 
-    public native boolean haltConstruction(int unitID);
+    public boolean returnCargo(final Unit unit) {
+        return returnCargo(unit.getId());
+    }
 
-    public native boolean cancelConstruction(int unitID);
+    private native boolean returnCargo(int unitId);
 
-    public native boolean cancelAddon(int unitID);
+    public boolean repair(final Unit unit, final Unit target) {
+        return repair(unit.getId(), target.getId());
+    }
 
-    public native boolean cancelTrain(int unitID, int slot);
+    private native boolean repair(int unitId, int targetId);
 
-    public native boolean cancelMorph(int unitID);
+    public boolean burrow(final Unit unit) {
+        return burrow(unit.getId());
+    }
 
-    public native boolean cancelResearch(int unitID);
+    private native boolean burrow(int unitId);
 
-    public native boolean cancelUpgrade(int unitID);
+    public boolean unburrow(final Unit unit) {
+        return unburrow(unit.getId());
+    }
 
-    public native boolean useTech(int unitID, int typeID);
+    private native boolean unburrow(int unitId);
 
-    public native boolean useTech(int unitID, int typeID, int x, int y);
+    public boolean cloak(final Unit unit) {
+        return cloak(unit.getId());
+    }
 
-    public native boolean useTech(int unitID, int typeID, int targetID);
+    private native boolean cloak(int unitId);
 
-    public native boolean placeCOP(int unitID, int tx, int ty);
+    public boolean decloak(final Unit unit) {
+        return decloak(unit.getId());
+    }
+
+    private native boolean decloak(int unitId);
+
+    public boolean siege(final Unit unit) {
+        return siege(unit.getId());
+    }
+
+    private native boolean siege(int unitId);
+
+    public boolean unsiege(final Unit unit) {
+        return unsiege(unit.getId());
+    }
+
+    private native boolean unsiege(int unitId);
+
+    public boolean lift(final Unit unit) {
+        return lift(unit.getId());
+    }
+
+    private native boolean lift(int unitId);
+
+    public boolean land(final Unit unit, final int tx, final int ty) {
+        return land(unit.getId(), tx, ty);
+    }
+
+    private native boolean land(int unitId, int tx, int ty);
+
+    public boolean load(final Unit unit, final Unit target) {
+        return load(unit, target);
+    }
+
+    private native boolean load(int unitId, int targetId);
+
+    public boolean unload(final Unit unit, final Unit target) {
+        return unload(unit.getId(), target.getId());
+    }
+
+    private native boolean unload(int unitId, int targetId);
+
+    public boolean unloadAll(final Unit unit) {
+        return unloadAll(unit.getId());
+    }
+
+    private native boolean unloadAll(int unitId);
+
+    public boolean unloadAll(final Unit unit, final int x, final int y) {
+        return unloadAll(unit.getId(), x, y);
+    }
+
+    private native boolean unloadAll(int unitId, int x, int y);
+
+    public boolean rightClick(final Unit unit, final int x, final int y) {
+        return rightClick(unit.getId(), x, y);
+    }
+
+    private native boolean rightClick(int unitId, int x, int y);
+
+    public boolean rightClick(final Unit unit, final Unit target) {
+        return rightClick(unit.getId(), target.getId());
+    }
+
+    private native boolean rightClick(int unitId, int targetId);
+
+    public boolean haltConstruction(final Unit unit) {
+        return haltConstruction(unit.getId());
+    }
+
+    private native boolean haltConstruction(int unitId);
+
+    public boolean cancelConstruction(final Unit unit) {
+        return cancelConstruction(unit.getId());
+    }
+
+    private native boolean cancelConstruction(int unitId);
+
+    public boolean cancelAddon(final Unit unit) {
+        return cancelAddon(unit.getId());
+    }
+
+    private native boolean cancelAddon(int unitId);
+
+    public boolean cancelTrain(final Unit unit, final int slot) {
+        return cancelTrain(unit.getId(), slot);
+    }
+
+    private native boolean cancelTrain(int unitId, int slot);
+
+    public boolean cancelMorph(final Unit unit) {
+        return cancelMorph(unit.getId());
+    }
+
+    private native boolean cancelMorph(int unitId);
+
+    public boolean cancelResearch(final Unit unit) {
+        return cancelResearch(unit.getId());
+    }
+
+    private native boolean cancelResearch(int unitId);
+
+    public boolean cancelUpgrade(final Unit unit) {
+        return cancelUpgrade(unit.getId());
+    }
+
+    private native boolean cancelUpgrade(int unitId);
+
+    public boolean useTech(final Unit unit, final TechTypes tech) {
+        return useTech(unit.getId(), tech.getId());
+    }
+
+    private native boolean useTech(int unitID, int typeID);
+
+    public boolean useTech(final Unit unit, final TechTypes tech, final int x, final int y) {
+        return useTech(unit.getId(), tech.getId(), x, y);
+    }
+
+    private native boolean useTech(int unitID, int typeID, int x, int y);
+
+    public boolean useTech(final Unit unit, final Unit target) {
+        return useTech(unit.getId(), target.getId());
+    }
+
+    private native boolean useTech(int unitID, int typeID, int targetID);
+
+    public boolean placeCop(final Unit unit, final int tx, final int ty) {
+        return placeCOP(unit.getId(), tx, ty);
+    }
+
+    private native boolean placeCOP(int unitID, int tx, int ty);
 
     // utility commands
     public native void drawHealth(boolean enable);
@@ -370,9 +558,17 @@ public class JNIBWAPI {
     public native boolean canBuildHere(int unitID, int tileX, int tileY, int unitTypeID,
             boolean checkExplored);
 
+    public boolean canMake(final UnitTypes unitType) {
+        return canMake(unitType.ordinal());
+    }
+
     public native boolean canMake(int unitTypeID);
 
     public native boolean canMake(int unitID, int unitTypeID);
+
+    public boolean canResearch(final TechTypes techType) {
+        return canResearch(techType.ordinal());
+    }
 
     public native boolean canResearch(int techTypeID);
 
@@ -393,73 +589,55 @@ public class JNIBWAPI {
     private native boolean isVisibleToPlayer(int unitID, int playerID);
 
     public boolean isVisibleToPlayer(final Unit u, final Player p) {
-        return isVisibleToPlayer(u.getID(), p.getID());
+        return isVisibleToPlayer(u.getId(), p.getId());
     }
 
     public native int getLastError();
 
     public native int getRemainingLatencyFrames();
 
-    // type data
-    private final HashMap<Integer, UnitType> unitTypes = new HashMap<Integer, UnitType>();
-    private final HashMap<Integer, RaceType> raceTypes = new HashMap<Integer, RaceType>();
-    private final HashMap<Integer, TechType> techTypes = new HashMap<Integer, TechType>();
-    private final HashMap<Integer, UpgradeType> upgradeTypes = new HashMap<Integer, UpgradeType>();
-    private final HashMap<Integer, WeaponType> weaponTypes = new HashMap<Integer, WeaponType>();
-    private final HashMap<Integer, UnitSizeType> unitSizeTypes =
-            new HashMap<Integer, UnitSizeType>();
-    private final HashMap<Integer, BulletType> bulletTypes = new HashMap<Integer, BulletType>();
-    private final HashMap<Integer, DamageType> damageTypes = new HashMap<Integer, DamageType>();
-    private final HashMap<Integer, ExplosionType> explosionTypes =
-            new HashMap<Integer, ExplosionType>();
-    private final HashMap<Integer, UnitCommandType> unitCommandTypes =
-            new HashMap<Integer, UnitCommandType>();
-    private final HashMap<Integer, OrderType> orderTypes = new HashMap<Integer, OrderType>();
-    private final HashMap<Integer, EventType> eventTypes = new HashMap<Integer, EventType>();
-
-    // type data accessors
-    public UnitType getUnitType(final int typeID) {
-        return unitTypes.get(typeID);
+    public UnitType getUnitType(final int typeId) {
+        return unitTypes.get(typeId);
     }
 
-    public RaceType getRaceType(final int typeID) {
-        return raceTypes.get(typeID);
+    public RaceType getRaceType(final int typeId) {
+        return raceTypes.get(typeId);
     }
 
-    public TechType getTechType(final int typeID) {
-        return techTypes.get(typeID);
+    public TechType getTechType(final int typeId) {
+        return techTypes.get(typeId);
     }
 
-    public UpgradeType getUpgradeType(final int upgradeID) {
-        return upgradeTypes.get(upgradeID);
+    public UpgradeType getUpgradeType(final int upgradeId) {
+        return upgradeTypes.get(upgradeId);
     }
 
-    public WeaponType getWeaponType(final int weaponID) {
-        return weaponTypes.get(weaponID);
+    public WeaponType getWeaponType(final int weaponId) {
+        return weaponTypes.get(weaponId);
     }
 
-    public UnitSizeType getUnitSizeType(final int sizeID) {
-        return unitSizeTypes.get(sizeID);
+    public UnitSizeType getUnitSizeType(final int sizeId) {
+        return unitSizeTypes.get(sizeId);
     }
 
-    public BulletType getBulletType(final int bulletID) {
-        return bulletTypes.get(bulletID);
+    public BulletType getBulletType(final int bulletId) {
+        return bulletTypes.get(bulletId);
     }
 
-    public DamageType getDamageType(final int damageID) {
-        return damageTypes.get(damageID);
+    public DamageType getDamageType(final int damageId) {
+        return damageTypes.get(damageId);
     }
 
-    public ExplosionType getExplosionType(final int explosionID) {
-        return explosionTypes.get(explosionID);
+    public ExplosionType getExplosionType(final int explosionId) {
+        return explosionTypes.get(explosionId);
     }
 
-    public UnitCommandType getUnitCommandType(final int unitCommandID) {
-        return unitCommandTypes.get(unitCommandID);
+    public UnitCommandType getUnitCommandType(final int unitCommandId) {
+        return unitCommandTypes.get(unitCommandId);
     }
 
-    public OrderType getOrderType(final int orderID) {
-        return orderTypes.get(orderID);
+    public OrderType getOrderType(final int orderId) {
+        return orderTypes.get(orderId);
     }
 
     public Collection<UnitType> unitTypes() {
@@ -506,7 +684,6 @@ public class JNIBWAPI {
         return Collections.unmodifiableCollection(orderTypes.values());
     }
 
-    // game state accessors
     public int getFrameCount() {
         return gameFrame;
     }
@@ -519,8 +696,8 @@ public class JNIBWAPI {
         return neutralPlayer;
     }
 
-    public Player getPlayer(final int playerID) {
-        return players.get(playerID);
+    public Player getPlayer(final int playerId) {
+        return players.get(playerId);
     }
 
     public Collection<Player> getPlayers() {
@@ -562,24 +739,26 @@ public class JNIBWAPI {
     public List<Unit> getUnits(final Player p) {
         final List<Unit> pUnits = new ArrayList<Unit>();
         for (final Unit u : units.values()) {
-            if (u.getPlayerID() == p.getID()) {
+            if (u.getPlayerId() == p.getId()) {
                 pUnits.add(u);
             }
         }
-        return pUnits;
+        return Collections.unmodifiableList(pUnits);
     }
 
-    public List<Unit> getUnitsOnTile(final int tx, final int ty) {
+    public List<Unit> getUnitsOnTile(final int x, final int y) {
         // Often will have 0 or few units on tile
         final List<Unit> units = new ArrayList<Unit>(0);
-        for (final int id : getUnitIdsOnTile(tx, ty)) {
+        for (final int id : getUnitIdsOnTile(x, y)) {
             units.add(getUnit(id));
         }
         return units;
     }
 
     /**
-     * Returns the map.
+     * Returns the map currently being used.
+     * 
+     * @return the map currently being used
      */
     public Map getMap() {
         return map;
@@ -687,28 +866,27 @@ public class JNIBWAPI {
 
     /**
      * Loads map data and (if enableBWTA is true) BWTA data.
-     * 
-     * TODO: figure out how to use BWTA's internal map storage
      */
     private void loadMapData() {
         final String mapName = new String(getMapName(), charset);
         map =
                 new Map(getMapWidth(), getMapHeight(), mapName, getMapFileName(), getMapHash(),
                         getHeightData(), getBuildableData(), getWalkableData());
+
         if (!enableBWTA) {
             return;
         }
 
-        // get region and choke point data
-        final File bwtaFile = new File(map.getHash() + ".jbwta");
+        final File bwtaDir = new File("bwta/");
+        final File bwtaFile = new File(bwtaDir, map.getName() + ".jbwta");
         final boolean analyzed = bwtaFile.exists();
+
         int[] regionMapData = null;
         int[] regionData = null;
         int[] chokePointData = null;
         int[] baseLocationData = null;
         final HashMap<Integer, int[]> polygons = new HashMap<Integer, int[]>();
 
-        // run BWTA
         if (!analyzed) {
             analyzeTerrain();
             regionMapData = getRegionMap();
@@ -720,8 +898,10 @@ public class JNIBWAPI {
                 polygons.put(id, getPolygon(id));
             }
 
-            // store the results to a local file (bwta directory)
             try {
+                if (!bwtaDir.exists()) {
+                    bwtaDir.mkdirs();
+                }
                 final BufferedWriter writer = new BufferedWriter(new FileWriter(bwtaFile));
 
                 writeMapData(writer, regionMapData);
@@ -734,12 +914,11 @@ public class JNIBWAPI {
                 }
 
                 writer.close();
-            } catch (final Exception e) {
-                e.printStackTrace();
+            } catch (final Exception ex) {
+                ex.printStackTrace();
             }
-        }
-        // load from file
-        else {
+
+        } else {
             try {
                 final BufferedReader reader = new BufferedReader(new FileReader(bwtaFile));
 
@@ -747,6 +926,7 @@ public class JNIBWAPI {
                 regionData = readMapData(reader);
                 chokePointData = readMapData(reader);
                 baseLocationData = readMapData(reader);
+
                 // polygons (first integer is ID)
                 int[] polygonData;
                 while ((polygonData = readMapData(reader)) != null) {
@@ -757,15 +937,26 @@ public class JNIBWAPI {
                 }
 
                 reader.close();
-            } catch (final Exception e) {
-                e.printStackTrace();
+            } catch (final Exception ex) {
+                ex.printStackTrace();
             }
         }
 
         map.initialize(regionMapData, regionData, polygons, chokePointData, baseLocationData);
     }
 
-    /** Convenience method to write out each part of BWTA map data to a stream */
+    /**
+     * Convenience method to write integers to a out each part of BWTA map data to a stream.
+     * 
+     * @param writer
+     *            {@code BufferedWriter} to write to
+     * 
+     * @param data
+     *            integers to write
+     * 
+     * @throws IOException
+     *             if the data cannot be written
+     */
     private static void writeMapData(final BufferedWriter writer, final int[] data)
             throws IOException {
         boolean first = true;
@@ -781,16 +972,24 @@ public class JNIBWAPI {
     }
 
     /**
-     * Convenience method to read each part of BWTA map data from a stream
+     * Convenience method to read a line of integers.
      * 
-     * @return null when end of stream is reached, otherwise an int array (possibly empty)
+     * @param reader
+     *            {@code BufferedReader} to read from
+     * 
+     * @return integers that were read from the line or {@code null} when end-of-stream is reached
+     * 
+     * @throws IOException
+     *             if the data cannot be read
      */
     private static int[] readMapData(final BufferedReader reader) throws IOException {
         int[] data = new int[0];
+
         final String line = reader.readLine();
         if (line == null) {
             return null;
         }
+
         final String[] stringData = line.split(",");
         if ((stringData.length > 0) && !stringData[0].equals("")) {
             data = new int[stringData.length];
@@ -802,280 +1001,306 @@ public class JNIBWAPI {
     }
 
     /**
-     * C++ callback function.<br>
-     * 
      * Utility function for printing to the java console from C++.
+     * 
+     * <p>
+     * C++ callback function.
      */
     private void javaPrint(final String msg) {
-        try {
-            System.out.println("Bridge: " + msg);
-        } catch (final Throwable t) {
-            t.printStackTrace();
-        }
+        // TODO: Allow agent to decide how best to print the message.
+        System.out.println("Bridge: " + msg);
     }
 
     /**
-     * C++ callback function.<br>
-     * 
      * Notifies the client and event listener that a connection has been formed to the bridge.
+     * 
+     * <p>
+     * C++ callback function.
      */
     private void connected() {
-        try {
-            loadTypeData();
-            listener.connected();
-        } catch (final Throwable t) {
-            t.printStackTrace();
-        }
+        loadTypeData();
+        listener.connected();
     }
 
     /**
-     * C++ callback function.<br>
+     * Notifies the client that a game has started. This method is always called before
+     * {@code BWAPIEventListener.matchStart()}, and is meant as a way of notifying the client to
+     * initialize state.
      * 
-     * Notifies the client that a game has started. Not passed on to the event listener.<br>
+     * <p>
+     * The listener is not notified of this invocation.
+     * 
+     * <p>
+     * C++ callback function.
      * 
      * Note: this is always called before the matchStarted event, and is meant as a way of notifying
      * the AI client to clear up state.
      */
     private void gameStarted() {
-        try {
-            // get the players
-            self = null;
-            allies.clear();
-            allyIDs.clear();
-            enemies.clear();
-            enemyIDs.clear();
-            players.clear();
+        self = null;
+        allies.clear();
+        allyIds.clear();
+        enemies.clear();
+        enemyIds.clear();
+        players.clear();
 
-            final int[] playerData = getPlayersData();
-            for (int index = 0; index < playerData.length; index += Player.numAttributes) {
-                final String name = new String(getPlayerName(playerData[index]), charset);
-                final Player player = new Player(playerData, index, name);
+        final int[] playerData = getPlayersData();
+        for (int index = 0; index < playerData.length; index += Player.numAttributes) {
+            final String name = new String(getPlayerName(playerData[index]), charset);
+            final Player player = new Player(playerData, index, name);
 
-                players.put(player.getID(), player);
+            players.put(player.getId(), player);
 
-                if (player.isSelf()) {
-                    self = player;
-                } else if (player.isAlly()) {
-                    allies.add(player);
-                    allyIDs.add(player.getID());
-                } else if (player.isEnemy()) {
-                    enemies.add(player);
-                    enemyIDs.add(player.getID());
-                } else if (player.isNeutral()) {
-                    neutralPlayer = player;
-                }
+            if (player.isSelf()) {
+                self = player;
+            } else if (player.isAlly()) {
+                allies.add(player);
+                allyIds.add(player.getId());
+            } else if (player.isEnemy()) {
+                enemies.add(player);
+                enemyIds.add(player.getId());
+            } else if (player.isNeutral()) {
+                neutralPlayer = player;
+            }
+        }
+
+        units.clear();
+        playerUnits.clear();
+        alliedUnits.clear();
+        enemyUnits.clear();
+        neutralUnits.clear();
+        final int[] unitData = getAllUnitsData();
+
+        for (int index = 0; index < unitData.length; index += Unit.numAttributes) {
+            final int id = unitData[index];
+            final Unit unit = new Unit(id);
+            unit.update(unitData, index);
+
+            units.put(id, unit);
+            if ((self != null) && (unit.getPlayerId() == self.getId())) {
+                playerUnits.add(unit);
+            } else if (allyIds.contains(unit.getPlayerId())) {
+                alliedUnits.add(unit);
+            } else if (enemyIds.contains(unit.getPlayerId())) {
+                enemyUnits.add(unit);
+            } else {
+                neutralUnits.add(unit);
+            }
+        }
+        gameFrame = getFrame();
+        loadMapData();
+    }
+
+    /**
+     * Notifies the client that game data has been updated. This method is always called before
+     * {@code BWAPIEventListener.matchFrame()}, and is meant as a way of notifying the client to
+     * update the game state.
+     * 
+     * <p>
+     * The listener is not notified of this invocation.
+     * 
+     * <p>
+     * C++ callback function.
+     */
+    private void gameUpdate() {
+        gameFrame = getFrame();
+
+        if (!isReplay()) {
+            self.update(getPlayerUpdate(self.getId()));
+            self.updateResearch(getResearchStatus(self.getId()), getUpgradeStatus(self.getId()));
+
+        } else {
+            for (final Integer playerId : players.keySet()) {
+                players.get(playerId).update(getPlayerUpdate(playerId));
+                players.get(playerId).updateResearch(getResearchStatus(playerId),
+                        getUpgradeStatus(playerId));
+            }
+        }
+
+        final int[] unitData = getAllUnitsData();
+        final HashSet<Integer> deadUnits = new HashSet<Integer>(units.keySet());
+
+        playerUnits.clear();
+        alliedUnits.clear();
+        enemyUnits.clear();
+        neutralUnits.clear();
+
+        for (int index = 0; index < unitData.length; index += Unit.numAttributes) {
+            final int id = unitData[index];
+
+            deadUnits.remove(id);
+
+            Unit unit = units.get(id);
+            if (unit == null) {
+                unit = new Unit(id);
+                units.put(id, unit);
             }
 
-            // get unit data
-            units.clear();
-            playerUnits.clear();
-            alliedUnits.clear();
-            enemyUnits.clear();
-            neutralUnits.clear();
-            final int[] unitData = getAllUnitsData();
+            unit.update(unitData, index);
 
-            for (int index = 0; index < unitData.length; index += Unit.numAttributes) {
-                final int id = unitData[index];
-                final Unit unit = new Unit(id);
-                unit.update(unitData, index);
-
-                units.put(id, unit);
-                if ((self != null) && (unit.getPlayerID() == self.getID())) {
+            if (self != null) {
+                if (unit.getPlayerId() == self.getId()) {
                     playerUnits.add(unit);
-                } else if (allyIDs.contains(unit.getPlayerID())) {
+
+                } else if (allyIds.contains(unit.getPlayerId())) {
                     alliedUnits.add(unit);
-                } else if (enemyIDs.contains(unit.getPlayerID())) {
+
+                } else if (enemyIds.contains(unit.getPlayerId())) {
                     enemyUnits.add(unit);
+
                 } else {
                     neutralUnits.add(unit);
                 }
-            }
-            gameFrame = getFrame();
-            loadMapData();
+            } else if (allyIds.contains(unit.getPlayerId())) {
+                alliedUnits.add(unit);
 
-        } catch (final Throwable t) {
-            t.printStackTrace();
-        }
-    }
+            } else if (enemyIds.contains(unit.getPlayerId())) {
+                enemyUnits.add(unit);
 
-    /**
-     * C++ callback function.<br>
-     * 
-     * Notifies the client that game data has been updated. Not passed on to the event listener.<br>
-     * 
-     * Note: this is always called before the events each frame, and is meant as a way of notifying
-     * the AI client to update state.
-     */
-    private void gameUpdate() {
-        try {
-            // update game state
-            gameFrame = getFrame();
-            if (!isReplay()) {
-                self.update(getPlayerUpdate(self.getID()));
-                self.updateResearch(getResearchStatus(self.getID()), getUpgradeStatus(self.getID()));
             } else {
-                for (final Integer playerID : players.keySet()) {
-                    players.get(playerID).update(getPlayerUpdate(playerID));
-                    players.get(playerID).updateResearch(getResearchStatus(playerID),
-                            getUpgradeStatus(playerID));
-                }
+                neutralUnits.add(unit);
             }
-            // update units
-            final int[] unitData = getAllUnitsData();
-            final HashSet<Integer> deadUnits = new HashSet<Integer>(units.keySet());
-            final ArrayList<Unit> playerList = new ArrayList<Unit>();
-            final ArrayList<Unit> alliedList = new ArrayList<Unit>();
-            final ArrayList<Unit> enemyList = new ArrayList<Unit>();
-            final ArrayList<Unit> neutralList = new ArrayList<Unit>();
+        }
 
-            for (int index = 0; index < unitData.length; index += Unit.numAttributes) {
-                final int id = unitData[index];
-
-                // bugfix - unit list was emptying itself every second frame
-                deadUnits.remove(id);
-
-                Unit unit = units.get(id);
-                if (unit == null) {
-                    unit = new Unit(id);
-                    units.put(id, unit);
-                }
-
-                unit.update(unitData, index);
-
-                if (self != null) {
-                    if (unit.getPlayerID() == self.getID()) {
-                        playerList.add(unit);
-                    } else if (allyIDs.contains(unit.getPlayerID())) {
-                        alliedList.add(unit);
-                    } else if (enemyIDs.contains(unit.getPlayerID())) {
-                        enemyList.add(unit);
-                    } else {
-                        neutralList.add(unit);
-                    }
-                } else if (allyIDs.contains(unit.getPlayerID())) {
-                    alliedList.add(unit);
-                } else if (enemyIDs.contains(unit.getPlayerID())) {
-                    enemyList.add(unit);
-                } else {
-                    neutralList.add(unit);
-                }
-            }
-
-            // update the unit lists
-            playerUnits = playerList;
-            alliedUnits = alliedList;
-            enemyUnits = enemyList;
-            neutralUnits = neutralList;
-            for (final Integer unitID : deadUnits) {
-                units.get(unitID).setDestroyed();
-                units.remove(unitID);
-            }
-        } catch (final Throwable t) {
-            t.printStackTrace();
+        for (final Integer unitID : deadUnits) {
+            units.get(unitID).setDestroyed();
+            units.remove(unitID);
         }
     }
 
     /**
-     * C++ callback function.<br>
+     * Notifies the event listener that the game has terminated.
      * 
-     * Notifies the event listener that the game has terminated.<br>
-     * 
-     * Note: this is always called after the matchEnded event, and is meant as a way of notifying
-     * the AI client to clear up state.
+     * <p>
+     * C++ callback function.
      */
     private void gameEnded() {
+        // TODO: Implement gameEnded for listener.
     }
 
     /**
-     * C++ callback function.<br>
-     * 
      * Sends BWAPI callback events to the event listener.
+     * 
+     * <p>
+     * The meaning of the parameters is dependent on the event type itself. In some cases, none of
+     * the parameters are used.
+     * 
+     * <p>
+     * C++ callback function.
+     * 
+     * @param eventTypeId
+     *            id of the event that occurred
+     * 
+     * @param p1
+     *            first parameter for the event
+     * 
+     * @param p2
+     *            second parameter for the event
+     * 
+     * @param p3
+     *            third parameter for the event
      */
-    private void eventOccurred(final int eventTypeID, final int param1, final int param2,
-            final String param3) {
-        try {
-            final EventType event = eventTypes.get(eventTypeID);
-            switch (event) {
-                case MatchStart :
-                    listener.matchStart();
-                    break;
-                case MatchEnd :
-                    listener.matchEnd(param1 == 1);
-                    break;
-                case MatchFrame :
-                    listener.matchFrame();
-                    break;
-                case MenuFrame :
-                    // Unused?
-                    break;
-                case SendText :
-                    listener.sendText(param3);
-                    break;
-                case ReceiveText :
-                    listener.receiveText(param3);
-                    break;
-                case PlayerLeft :
-                    listener.playerLeft(param1);
-                    break;
-                case NukeDetect :
-                    if (param1 == -1) {
-                        listener.nukeDetect();
-                    } else {
-                        listener.nukeDetect(param1, param2);
-                    }
-                    break;
-                case UnitDiscover :
-                    listener.unitDiscover(param1);
-                    break;
-                case UnitEvade :
-                    listener.unitEvade(param1);
-                    break;
-                case UnitShow :
-                    listener.unitShow(param1);
-                    break;
-                case UnitHide :
-                    listener.unitHide(param1);
-                    break;
-                case UnitCreate :
-                    listener.unitCreate(param1);
-                    break;
-                case UnitDestroy :
-                    listener.unitDestroy(param1);
-                    break;
-                case UnitMorph :
-                    listener.unitMorph(param1);
-                    break;
-                case UnitRenegade :
-                    listener.unitRenegade(param1);
-                    break;
-                case SaveGame :
-                    listener.saveGame(param3);
-                    break;
-                case UnitComplete :
-                    listener.unitComplete(param1);
-                    break;
-                case PlayerDropped :
-                    listener.playerDropped(param1);
-                    break;
-                case None :
-                    // Unused?
-                    break;
-            }
-        } catch (final Throwable t) {
-            t.printStackTrace();
+    private void eventOccurred(final int eventTypeId, final int p1, final int p2, final String p3) {
+
+        final EventType event = eventTypes.get(eventTypeId);
+        switch (event) {
+            case MatchStart :
+                listener.matchStart();
+                break;
+
+            case MatchEnd :
+                listener.matchEnd(p1 == 1);
+                break;
+
+            case MatchFrame :
+                listener.matchFrame();
+                break;
+
+            case MenuFrame :
+                // Unused?
+                break;
+
+            case SendText :
+                listener.sendText(p3);
+                System.out.println("send text in switch");
+                break;
+
+            case ReceiveText :
+                listener.receiveText(p3);
+                break;
+
+            case PlayerLeft :
+                listener.playerLeft(p1);
+                break;
+
+            case NukeDetect :
+                if (p1 == -1) {
+                    listener.nukeDetect();
+                } else {
+                    listener.nukeDetect(p1, p2);
+                }
+                break;
+
+            case UnitDiscover :
+                listener.unitDiscover(p1);
+                break;
+
+            case UnitEvade :
+                listener.unitEvade(p1);
+                break;
+
+            case UnitShow :
+                listener.unitShow(p1);
+                break;
+
+            case UnitHide :
+                listener.unitHide(p1);
+                break;
+
+            case UnitCreate :
+                listener.unitCreate(p1);
+                break;
+
+            case UnitDestroy :
+                listener.unitDestroy(p1);
+                break;
+
+            case UnitMorph :
+                listener.unitMorph(p1);
+                break;
+
+            case UnitRenegade :
+                listener.unitRenegade(p1);
+                break;
+
+            case SaveGame :
+                listener.saveGame(p3);
+                break;
+
+            case UnitComplete :
+                listener.unitComplete(p1);
+                break;
+
+            case PlayerDropped :
+                listener.playerDropped(p1);
+                break;
+
+            case None :
+                // Unused?
+                break;
         }
     }
 
     /**
-     * C++ callback function.<br>
-     * 
      * Notifies the event listener that a key was pressed.
+     * 
+     * <p>
+     * C++ callback function.
+     * 
+     * @param keyCode
+     *            key pressed by the user
      */
-    public void keyPressed(final int keyCode) {
-        try {
-            listener.keyPressed(keyCode);
-        } catch (final Throwable t) {
-            t.printStackTrace();
-        }
+    private void keyPressed(final int keyCode) {
+        listener.keyPressed(keyCode);
     }
 }

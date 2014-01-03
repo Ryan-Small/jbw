@@ -87,7 +87,7 @@ public class Player {
 		}
 	}
 	
-	public int getID() {
+	public int getId() {
 		return ID;
 	}
 	

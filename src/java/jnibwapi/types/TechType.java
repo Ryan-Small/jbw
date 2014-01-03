@@ -69,7 +69,7 @@ public class TechType {
 		None,
 		Unknown,
 		Nuclear_Strike;
-		public int getID() {
+		public int getId() {
 			return ordinal();
 		}
 	}
