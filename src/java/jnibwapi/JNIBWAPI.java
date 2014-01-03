@@ -223,6 +223,14 @@ public class JNIBWAPI {
     private native int[] getBaseLocations();
 
     // unit commands: http://code.google.com/p/bwapi/wiki/Unit
+    /**
+     * 
+     * 
+     * @param unit
+     * @param x
+     * @param y
+     * @return
+     */
     public boolean attack(final Unit unit, final int x, final int y) {
         return attack(unit.getId(), x, y);
     }
@@ -268,7 +276,7 @@ public class JNIBWAPI {
     private native boolean research(final int researcherId, final int techId);
 
     public boolean upgrade(final Unit upgrader, final UpgradeTypes upgrade) {
-        return upgrade(upgrader.getId(), upgrade.getID());
+        return upgrade(upgrader.getId(), upgrade.getId());
     }
 
     private native boolean upgrade(int unitId, int updateId);
@@ -770,48 +778,48 @@ public class JNIBWAPI {
     private void loadTypeData() {
         // race types
         final int[] raceTypeData = getRaceTypes();
-        for (int index = 0; index < raceTypeData.length; index += RaceType.numAttributes) {
+        for (int index = 0; index < raceTypeData.length; index += RaceType.NUM_ATTRIBUTES) {
             final RaceType type = new RaceType(raceTypeData, index);
-            type.setName(getRaceTypeName(type.getID()));
-            raceTypes.put(type.getID(), type);
+            type.setName(getRaceTypeName(type.getId()));
+            raceTypes.put(type.getId(), type);
         }
 
         // unit types
         final int[] unitTypeData = getUnitTypes();
-        for (int index = 0; index < unitTypeData.length; index += UnitType.numAttributes) {
+        for (int index = 0; index < unitTypeData.length; index += UnitType.NUM_ATTRIBUTES) {
             final String name = getUnitTypeName(unitTypeData[index]);
             final int[] requiredUnits = getRequiredUnits(unitTypeData[index]);
             final UnitType type = new UnitType(unitTypeData, index, name, requiredUnits);
-            unitTypes.put(type.getID(), type);
+            unitTypes.put(type.getId(), type);
         }
 
         // tech types
         final int[] techTypeData = getTechTypes();
-        for (int index = 0; index < techTypeData.length; index += TechType.numAttributes) {
+        for (int index = 0; index < techTypeData.length; index += TechType.NUM_ATTRIBUTES) {
             final TechType type = new TechType(techTypeData, index);
-            type.setName(getTechTypeName(type.getID()));
-            techTypes.put(type.getID(), type);
+            type.setName(getTechTypeName(type.getId()));
+            techTypes.put(type.getId(), type);
         }
 
         // upgrade types
         final int[] upgradeTypeData = getUpgradeTypes();
-        for (int index = 0; index < upgradeTypeData.length; index += UpgradeType.numAttributes) {
+        for (int index = 0; index < upgradeTypeData.length; index += UpgradeType.NUM_ATTRIBUTES) {
             final UpgradeType type = new UpgradeType(upgradeTypeData, index);
-            type.setName(getUpgradeTypeName(type.getID()));
-            upgradeTypes.put(type.getID(), type);
+            type.setName(getUpgradeTypeName(type.getId()));
+            upgradeTypes.put(type.getId(), type);
         }
 
         // weapon types
         final int[] weaponTypeData = getWeaponTypes();
-        for (int index = 0; index < weaponTypeData.length; index += WeaponType.numAttributes) {
+        for (int index = 0; index < weaponTypeData.length; index += WeaponType.NUM_ATTRIBUTES) {
             final WeaponType type = new WeaponType(weaponTypeData, index);
-            type.setName(getWeaponTypeName(type.getID()));
-            weaponTypes.put(type.getID(), type);
+            type.setName(getWeaponTypeName(type.getId()));
+            weaponTypes.put(type.getId(), type);
         }
 
         // unit size types
         final int[] unitSizeTypeData = getUnitSizeTypes();
-        for (int index = 0; index < unitSizeTypeData.length; index += UnitSizeType.numAttributes) {
+        for (int index = 0; index < unitSizeTypeData.length; index += UnitSizeType.NUM_ATTRIBUTES) {
             final UnitSizeType type = new UnitSizeType(unitSizeTypeData, index);
             type.setName(getUnitSizeTypeName(type.getID()));
             unitSizeTypes.put(type.getID(), type);
@@ -819,48 +827,48 @@ public class JNIBWAPI {
 
         // bullet types
         final int[] bulletTypeData = getBulletTypes();
-        for (int index = 0; index < bulletTypeData.length; index += BulletType.numAttributes) {
+        for (int index = 0; index < bulletTypeData.length; index += BulletType.NUM_ATTRIBUTES) {
             final BulletType type = new BulletType(bulletTypeData, index);
-            type.setName(getBulletTypeName(type.getID()));
-            bulletTypes.put(type.getID(), type);
+            type.setName(getBulletTypeName(type.getId()));
+            bulletTypes.put(type.getId(), type);
         }
 
         // damage types
         final int[] damageTypeData = getDamageTypes();
-        for (int index = 0; index < damageTypeData.length; index += DamageType.numAttributes) {
+        for (int index = 0; index < damageTypeData.length; index += DamageType.NUM_ATTRIBUTES) {
             final DamageType type = new DamageType(damageTypeData, index);
-            type.setName(getDamageTypeName(type.getID()));
-            damageTypes.put(type.getID(), type);
+            type.setName(getDamageTypeName(type.getId()));
+            damageTypes.put(type.getId(), type);
         }
 
         // explosion types
         final int[] explosionTypeData = getExplosionTypes();
-        for (int index = 0; index < explosionTypeData.length; index += ExplosionType.numAttributes) {
+        for (int index = 0; index < explosionTypeData.length; index += ExplosionType.NUM_ATTRIBUTES) {
             final ExplosionType type = new ExplosionType(explosionTypeData, index);
-            type.setName(getExplosionTypeName(type.getID()));
-            explosionTypes.put(type.getID(), type);
+            type.setName(getExplosionTypeName(type.getId()));
+            explosionTypes.put(type.getId(), type);
         }
 
         // unitCommand types
         final int[] unitCommandTypeData = getUnitCommandTypes();
         for (int index = 0; index < unitCommandTypeData.length; index +=
-                UnitCommandType.numAttributes) {
+                UnitCommandType.NUM_ATTRIBUTES) {
             final UnitCommandType type = new UnitCommandType(unitCommandTypeData, index);
-            type.setName(getUnitCommandTypeName(type.getID()));
-            unitCommandTypes.put(type.getID(), type);
+            type.setName(getUnitCommandTypeName(type.getId()));
+            unitCommandTypes.put(type.getId(), type);
         }
 
         // order types
         final int[] orderTypeData = getOrderTypes();
-        for (int index = 0; index < orderTypeData.length; index += OrderType.numAttributes) {
+        for (int index = 0; index < orderTypeData.length; index += OrderType.NUM_ATTRIBUTES) {
             final OrderType type = new OrderType(orderTypeData, index);
-            type.setName(getOrderTypeName(type.getID()));
-            orderTypes.put(type.getID(), type);
+            type.setName(getOrderTypeName(type.getId()));
+            orderTypes.put(type.getId(), type);
         }
 
         // event types - no extra data to load
         for (final EventType type : EventType.values()) {
-            eventTypes.put(type.getID(), type);
+            eventTypes.put(type.getId(), type);
         }
     }
 
