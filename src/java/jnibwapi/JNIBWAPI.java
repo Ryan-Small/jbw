@@ -14,7 +14,6 @@ import jnibwapi.model.Unit;
 import jnibwapi.types.*;
 import jnibwapi.types.TechType.TechTypes;
 import jnibwapi.types.UnitType.UnitTypes;
-import jnibwapi.types.UpgradeType.UpgradeTypes;
 
 /**
  * JNI interface for the Brood War API.<br>
@@ -126,7 +125,6 @@ public class JNIBWAPI {
     // invokes the main native method
     private native void startClient(JNIBWAPI jniBWAPI);
 
-    // query methods
     private native int getFrame();
 
     public native int getReplayFrameTotal();
@@ -223,273 +221,6 @@ public class JNIBWAPI {
     private native int[] getBaseLocations();
 
     // unit commands: http://code.google.com/p/bwapi/wiki/Unit
-    /**
-     * 
-     * 
-     * @param unit
-     * @param x
-     * @param y
-     * @return
-     */
-    public boolean attack(final Unit unit, final int x, final int y) {
-        return attack(unit.getId(), x, y);
-    }
-
-    private native boolean attack(final int unitId, final int x, final int y);
-
-    public boolean attack(final Unit unit, final Unit target) {
-        return attack(unit.getId(), target.getId());
-    }
-
-    private native boolean attack(final int unitId, final int targetId);
-
-    // TODO: Change parameter order.
-    public boolean build(final Unit builder, final int tx, final int ty, final UnitTypes building) {
-        return build(builder.getId(), tx, ty, building.getId());
-    }
-
-    private native boolean build(final int builderId, final int tx, final int ty,
-            final int buildingId);
-
-    public boolean buildAddon(final Unit building, final Unit addon) {
-        return buildAddon(building.getId(), addon.getId());
-    }
-
-    private native boolean buildAddon(final int buildingId, final int addonId);
-
-    public boolean train(final Unit trainer, final UnitTypes unit) {
-        return train(trainer.getId(), unit.getId());
-    }
-
-    private native boolean train(int buildingId, int addonId);
-
-    public boolean morph(final Unit unit, final UnitTypes target) {
-        return morph(unit.getId(), target.getId());
-    }
-
-    private native boolean morph(final int unitId, final int targetId);
-
-    public boolean research(final Unit researcher, final TechTypes tech) {
-        return research(researcher.getId(), tech.getId());
-    }
-
-    private native boolean research(final int researcherId, final int techId);
-
-    public boolean upgrade(final Unit upgrader, final UpgradeTypes upgrade) {
-        return upgrade(upgrader.getId(), upgrade.getId());
-    }
-
-    private native boolean upgrade(int unitId, int updateId);
-
-    public boolean setRallyPoint(final Unit building, final int x, final int y) {
-        return setRallyPoint(building, x, y);
-    }
-
-    private native boolean setRallyPoint(int unitId, int x, int y);
-
-    public boolean setRallyPoint(final Unit building, final Unit target) {
-        return setRallyPoint(building.getId(), target.getId());
-    }
-
-    private native boolean setRallyPoint(int unitId, int targetId);
-
-    public boolean move(final Unit unit, final int x, final int y) {
-        return move(unit, x, y);
-    }
-
-    private native boolean move(int unitId, int x, int y);
-
-    public boolean patrol(final Unit unit, final int x, final int y) {
-        return patrol(unit, x, y);
-    }
-
-    private native boolean patrol(int unitId, int x, int y);
-
-    public boolean holdPosition(final Unit unit) {
-        return holdPosition(unit.getId());
-    }
-
-    private native boolean holdPosition(int unitId);
-
-    public boolean stop(final Unit unit) {
-        return stop(unit.getId());
-    }
-
-    private native boolean stop(int unitId);
-
-    public boolean follow(final Unit unit, final Unit target) {
-        return follow(unit.getId(), target.getId());
-    }
-
-    public native boolean follow(int unitId, int targetId);
-
-    public boolean gather(final Unit unit, final Unit target) {
-        return gather(unit.getId(), target.getId());
-    }
-
-    private native boolean gather(int unitId, int targetId);
-
-    public boolean returnCargo(final Unit unit) {
-        return returnCargo(unit.getId());
-    }
-
-    private native boolean returnCargo(int unitId);
-
-    public boolean repair(final Unit unit, final Unit target) {
-        return repair(unit.getId(), target.getId());
-    }
-
-    private native boolean repair(int unitId, int targetId);
-
-    public boolean burrow(final Unit unit) {
-        return burrow(unit.getId());
-    }
-
-    private native boolean burrow(int unitId);
-
-    public boolean unburrow(final Unit unit) {
-        return unburrow(unit.getId());
-    }
-
-    private native boolean unburrow(int unitId);
-
-    public boolean cloak(final Unit unit) {
-        return cloak(unit.getId());
-    }
-
-    private native boolean cloak(int unitId);
-
-    public boolean decloak(final Unit unit) {
-        return decloak(unit.getId());
-    }
-
-    private native boolean decloak(int unitId);
-
-    public boolean siege(final Unit unit) {
-        return siege(unit.getId());
-    }
-
-    private native boolean siege(int unitId);
-
-    public boolean unsiege(final Unit unit) {
-        return unsiege(unit.getId());
-    }
-
-    private native boolean unsiege(int unitId);
-
-    public boolean lift(final Unit unit) {
-        return lift(unit.getId());
-    }
-
-    private native boolean lift(int unitId);
-
-    public boolean land(final Unit unit, final int tx, final int ty) {
-        return land(unit.getId(), tx, ty);
-    }
-
-    private native boolean land(int unitId, int tx, int ty);
-
-    public boolean load(final Unit unit, final Unit target) {
-        return load(unit, target);
-    }
-
-    private native boolean load(int unitId, int targetId);
-
-    public boolean unload(final Unit unit, final Unit target) {
-        return unload(unit.getId(), target.getId());
-    }
-
-    private native boolean unload(int unitId, int targetId);
-
-    public boolean unloadAll(final Unit unit) {
-        return unloadAll(unit.getId());
-    }
-
-    private native boolean unloadAll(int unitId);
-
-    public boolean unloadAll(final Unit unit, final int x, final int y) {
-        return unloadAll(unit.getId(), x, y);
-    }
-
-    private native boolean unloadAll(int unitId, int x, int y);
-
-    public boolean rightClick(final Unit unit, final int x, final int y) {
-        return rightClick(unit.getId(), x, y);
-    }
-
-    private native boolean rightClick(int unitId, int x, int y);
-
-    public boolean rightClick(final Unit unit, final Unit target) {
-        return rightClick(unit.getId(), target.getId());
-    }
-
-    private native boolean rightClick(int unitId, int targetId);
-
-    public boolean haltConstruction(final Unit unit) {
-        return haltConstruction(unit.getId());
-    }
-
-    private native boolean haltConstruction(int unitId);
-
-    public boolean cancelConstruction(final Unit unit) {
-        return cancelConstruction(unit.getId());
-    }
-
-    private native boolean cancelConstruction(int unitId);
-
-    public boolean cancelAddon(final Unit unit) {
-        return cancelAddon(unit.getId());
-    }
-
-    private native boolean cancelAddon(int unitId);
-
-    public boolean cancelTrain(final Unit unit, final int slot) {
-        return cancelTrain(unit.getId(), slot);
-    }
-
-    private native boolean cancelTrain(int unitId, int slot);
-
-    public boolean cancelMorph(final Unit unit) {
-        return cancelMorph(unit.getId());
-    }
-
-    private native boolean cancelMorph(int unitId);
-
-    public boolean cancelResearch(final Unit unit) {
-        return cancelResearch(unit.getId());
-    }
-
-    private native boolean cancelResearch(int unitId);
-
-    public boolean cancelUpgrade(final Unit unit) {
-        return cancelUpgrade(unit.getId());
-    }
-
-    private native boolean cancelUpgrade(int unitId);
-
-    public boolean useTech(final Unit unit, final TechTypes tech) {
-        return useTech(unit.getId(), tech.getId());
-    }
-
-    private native boolean useTech(int unitID, int typeID);
-
-    public boolean useTech(final Unit unit, final TechTypes tech, final int x, final int y) {
-        return useTech(unit.getId(), tech.getId(), x, y);
-    }
-
-    private native boolean useTech(int unitID, int typeID, int x, int y);
-
-    public boolean useTech(final Unit unit, final Unit target) {
-        return useTech(unit.getId(), target.getId());
-    }
-
-    private native boolean useTech(int unitID, int typeID, int targetID);
-
-    public boolean placeCop(final Unit unit, final int tx, final int ty) {
-        return placeCOP(unit.getId(), tx, ty);
-    }
-
-    private native boolean placeCOP(int unitID, int tx, int ty);
 
     // utility commands
     public native void drawHealth(boolean enable);
@@ -604,7 +335,7 @@ public class JNIBWAPI {
 
     public native int getRemainingLatencyFrames();
 
-    public UnitType getUnitType(final int typeId) {
+    public UnitType getUnitType(final UnitTypes typeId) {
         return unitTypes.get(typeId);
     }
 
@@ -747,7 +478,7 @@ public class JNIBWAPI {
     public List<Unit> getUnits(final Player p) {
         final List<Unit> pUnits = new ArrayList<Unit>();
         for (final Unit u : units.values()) {
-            if (u.getPlayerId() == p.getId()) {
+            if (u.getOwner().getId() == p.getId()) {
                 pUnits.add(u);
             }
         }
@@ -1079,17 +810,17 @@ public class JNIBWAPI {
         neutralUnits.clear();
         final int[] unitData = getAllUnitsData();
 
-        for (int index = 0; index < unitData.length; index += Unit.numAttributes) {
+        for (int index = 0; index < unitData.length; index += Unit.NUMBER_OF_ATTRIBUTES) {
             final int id = unitData[index];
             final Unit unit = new Unit(id);
-            unit.update(unitData, index);
+            unit.update(unitData, index, this);
 
             units.put(id, unit);
-            if ((self != null) && (unit.getPlayerId() == self.getId())) {
+            if ((self != null) && (unit.getOwner().getId() == self.getId())) {
                 playerUnits.add(unit);
-            } else if (allyIds.contains(unit.getPlayerId())) {
+            } else if (allyIds.contains(unit.getOwner().getId())) {
                 alliedUnits.add(unit);
-            } else if (enemyIds.contains(unit.getPlayerId())) {
+            } else if (enemyIds.contains(unit.getOwner().getId())) {
                 enemyUnits.add(unit);
             } else {
                 neutralUnits.add(unit);
@@ -1133,7 +864,7 @@ public class JNIBWAPI {
         enemyUnits.clear();
         neutralUnits.clear();
 
-        for (int index = 0; index < unitData.length; index += Unit.numAttributes) {
+        for (int index = 0; index < unitData.length; index += Unit.NUMBER_OF_ATTRIBUTES) {
             final int id = unitData[index];
 
             deadUnits.remove(id);
@@ -1144,25 +875,25 @@ public class JNIBWAPI {
                 units.put(id, unit);
             }
 
-            unit.update(unitData, index);
+            unit.update(unitData, index, this);
 
             if (self != null) {
-                if (unit.getPlayerId() == self.getId()) {
+                if (unit.getOwner().getId() == self.getId()) {
                     playerUnits.add(unit);
 
-                } else if (allyIds.contains(unit.getPlayerId())) {
+                } else if (allyIds.contains(unit.getOwner().getId())) {
                     alliedUnits.add(unit);
 
-                } else if (enemyIds.contains(unit.getPlayerId())) {
+                } else if (enemyIds.contains(unit.getOwner().getId())) {
                     enemyUnits.add(unit);
 
                 } else {
                     neutralUnits.add(unit);
                 }
-            } else if (allyIds.contains(unit.getPlayerId())) {
+            } else if (allyIds.contains(unit.getOwner().getId())) {
                 alliedUnits.add(unit);
 
-            } else if (enemyIds.contains(unit.getPlayerId())) {
+            } else if (enemyIds.contains(unit.getOwner().getId())) {
                 enemyUnits.add(unit);
 
             } else {

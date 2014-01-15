@@ -385,6 +385,350 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getBaseLocations
 
 /*
  * Class:     jnibwapi_JNIBWAPI
+ * Method:    attack
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_attack__III
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    attack
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_attack__II
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    build
+ * Signature: (IIII)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_build
+  (JNIEnv *, jobject, jint, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    buildAddon
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_buildAddon
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    train
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_train
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    morph
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_morph
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    research
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_research
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    upgrade
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_upgrade
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    setRallyPoint
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_setRallyPoint__III
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    setRallyPoint
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_setRallyPoint__II
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    move
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_move
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    patrol
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_patrol
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    holdPosition
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_holdPosition
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    stop
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_stop
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    follow
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_follow
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    gather
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_gather
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    returnCargo
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_returnCargo
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    repair
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_repair
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    burrow
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_burrow
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    unburrow
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_unburrow
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    cloak
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_cloak
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    decloak
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_decloak
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    siege
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_siege
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    unsiege
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_unsiege
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    lift
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_lift
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    land
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_land
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    load
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_load
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    unload
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_unload
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    unloadAll
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_unloadAll__I
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    unloadAll
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_unloadAll__III
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    rightClick
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_rightClick__III
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    rightClick
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_rightClick__II
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    haltConstruction
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_haltConstruction
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    cancelConstruction
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_cancelConstruction
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    cancelAddon
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_cancelAddon
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    cancelTrain
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_cancelTrain
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    cancelMorph
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_cancelMorph
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    cancelResearch
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_cancelResearch
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    cancelUpgrade
+ * Signature: (I)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_cancelUpgrade
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    useTech
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_useTech__II
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    useTech
+ * Signature: (IIII)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_useTech__IIII
+  (JNIEnv *, jobject, jint, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    useTech
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_useTech__III
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
+ * Method:    placeCOP
+ * Signature: (III)Z
+ */
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_placeCOP
+  (JNIEnv *, jobject, jint, jint, jint);
+
+/*
+ * Class:     jnibwapi_JNIBWAPI
  * Method:    drawHealth
  * Signature: (Z)V
  */
