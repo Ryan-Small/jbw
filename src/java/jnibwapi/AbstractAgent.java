@@ -16,7 +16,7 @@ public abstract class AbstractAgent extends BWAPIEventListener.Adaptor {
      * Using this object before {@link #matchStart()} is called can produce undefined behavior and
      * crash the agent.
      */
-    protected final JNIBWAPI game;
+    protected final JNIBWAPI broodwar;
 
     /**
      * Constructs the agent.
@@ -26,7 +26,7 @@ public abstract class AbstractAgent extends BWAPIEventListener.Adaptor {
      *            duration); {@code false} otherwise
      */
     public AbstractAgent(final boolean enableBwta) {
-        game = new JNIBWAPI(this, enableBwta);
+        broodwar = new JNIBWAPI(this, enableBwta);
     }
 
     /**
@@ -37,7 +37,7 @@ public abstract class AbstractAgent extends BWAPIEventListener.Adaptor {
 
             @Override
             public void run() {
-                game.start();
+                broodwar.start();
             }
         };
         final Thread bwapiThread = new Thread(bwapiRunnable);

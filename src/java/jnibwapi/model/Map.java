@@ -91,7 +91,7 @@ public class Map {
 		// choke points
 		chokePoints = new ArrayList<>();
 		if (chokePointData != null) {
-			for (int index = 0; index < chokePointData.length; index += ChokePoint.numAttributes) {
+			for (int index = 0; index < chokePointData.length; index += ChokePoint.NUM_ATTRIBUTES) {
 				ChokePoint chokePoint = new ChokePoint(chokePointData, index, idToRegion);
 				chokePoints.add(chokePoint);
 			}
@@ -100,7 +100,7 @@ public class Map {
 		// base locations
 		baseLocations = new ArrayList<>();
 		if (baseLocationData != null) {
-			for (int index = 0; index < baseLocationData.length; index += BaseLocation.numAttributes) {
+			for (int index = 0; index < baseLocationData.length; index += BaseLocation.NUM_ATTRIBUTES) {
 				BaseLocation baseLocation = new BaseLocation(baseLocationData, index);
 				baseLocations.add(baseLocation);
 			}

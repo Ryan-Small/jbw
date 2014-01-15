@@ -3,7 +3,9 @@ package jnibwapi.example;
 import java.util.HashSet;
 
 import jnibwapi.AbstractAgent;
+import jnibwapi.model.Location;
 import jnibwapi.model.Unit;
+import jnibwapi.types.UnitType;
 import jnibwapi.types.UnitType.UnitTypes;
 
 public class SixPool extends AbstractAgent {
@@ -30,18 +32,18 @@ public class SixPool extends AbstractAgent {
 
     @Override
     public void matchStart() {
-        game.setGameSpeed(10);
-        game.enableUserInput();
-        game.enablePerfectInformation();
+        // broodwar.setGameSpeed(0);
+        broodwar.enableUserInput();
+        broodwar.enablePerfectInformation();
     }
 
     @Override
     public void matchFrame() {
         // spawn a drone
-        if ((droneCount < 6) && (game.canMake(UnitTypes.Zerg_Drone.ordinal()))) {
-            for (final Unit unit : game.getMyUnits()) {
-                if (unit.getTypeID() == UnitTypes.Zerg_Larva.getID()) {
-                    if (game.morph(unit.getID(), UnitTypes.Zerg_Drone.getID())) {
+        if ((droneCount < 6) && (broodwar.canMake(UnitTypes.Zerg_Drone))) {
+            for (final Unit unit : broodwar.getMyUnits()) {
+                if (unit.getTypeId().getId() == UnitTypes.Zerg_Larva.getId()) {
+                    if (unit.morph(UnitTypes.Zerg_Drone)) {
                         droneCount++;
                     }
                 }
@@ -49,19 +51,24 @@ public class SixPool extends AbstractAgent {
         }
 
         // collect minerals
-        for (final Unit unit : game.getMyUnits()) {
-            if (unit.getTypeID() == UnitTypes.Zerg_Drone.ordinal()) {
-                if (unit.isIdle() && (unit.getID() != poolDrone)) {
-                    for (final Unit minerals : game.getNeutralUnits()) {
-                        if ((minerals.getTypeID() == UnitTypes.Resource_Mineral_Field.ordinal())
-                                && !claimed.contains(minerals.getID())) {
+
+        for (final Unit unit : broodwar.getMyUnits()) {
+            if (unit.getTypeId() == UnitTypes.Zerg_Drone) {
+                if (unit.isIdle() && (unit.getId() != poolDrone)) {
+                    for (final Unit minerals : broodwar.getNeutralUnits()) {
+                        if ((minerals.getTypeId() == UnitTypes.Resource_Mineral_Field)
+                                && !claimed.contains(minerals.getId())) {
+                            final int mineralsX = minerals.getLocation().x;
+                            final int mineralsY = minerals.getLocation().y;
+                            final int unitX = unit.getLocation().x;
+                            final int unitY = unit.getLocation().y;
                             final double distance =
-                                    Math.sqrt(Math.pow(minerals.getX() - unit.getX(), 2)
-                                            + Math.pow(minerals.getY() - unit.getY(), 2));
+                                    Math.sqrt(Math.pow(mineralsX - unitX, 2)
+                                            + Math.pow(mineralsY - unitY, 2));
 
                             if (distance < 300) {
-                                game.rightClick(unit.getID(), minerals.getID());
-                                claimed.add(minerals.getID());
+                                unit.rightClick(minerals);
+                                claimed.add(minerals.getId());
                                 break;
                             }
                         }
@@ -71,13 +78,15 @@ public class SixPool extends AbstractAgent {
         }
 
         // build a spawning pool
-        if (!haveSpawningPool() && game.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
-            for (final Unit potentialDrone : game.getMyUnits()) {
-                if (potentialDrone.getTypeID() == UnitTypes.Zerg_Drone.ordinal()) {
-                    for (final Unit unit : game.getMyUnits()) {
-                        if (unit.getTypeID() == UnitTypes.Zerg_Overlord.ordinal()) {
-                            game.build(potentialDrone.getID(), unit.getTileX(), unit.getTileY(),
-                                    UnitTypes.Zerg_Spawning_Pool.getID());
+        if (!haveSpawningPool() && broodwar.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
+            for (final Unit potentialDrone : broodwar.getMyUnits()) {
+                if (potentialDrone.getTypeId() == UnitTypes.Zerg_Drone) {
+                    for (final Unit unit : broodwar.getMyUnits()) {
+                        if (unit.getTypeId() == UnitTypes.Zerg_Overlord) {
+                            final int x = unit.getTileLocation().x;
+                            final int y = unit.getTileLocation().y;
+                            final Location.Tile position = new Location.Tile(x, y);
+                            potentialDrone.build(UnitTypes.Zerg_Spawning_Pool, position);
                             break;
                         }
                     }
@@ -87,25 +96,24 @@ public class SixPool extends AbstractAgent {
         }
 
         // spawn overlords
-        if (((game.getSelf().getSupplyUsed() + 2) >= game.getSelf().getSupplyTotal())
-                && (game.getSelf().getSupplyTotal() > supplyCap)) {
-            if (game.canMake(UnitTypes.Zerg_Overlord.ordinal())) {
-                for (final Unit larva : game.getMyUnits()) {
-                    if (larva.getTypeID() == UnitTypes.Zerg_Larva.getID()) {
-                        game.morph(larva.getID(), UnitTypes.Zerg_Overlord.getID());
-                        supplyCap = game.getSelf().getSupplyTotal();
+        if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf().getSupplyTotal())
+                && (broodwar.getSelf().getSupplyTotal() > supplyCap)) {
+            if (broodwar.canMake(UnitTypes.Zerg_Overlord.ordinal())) {
+                for (final Unit larva : broodwar.getMyUnits()) {
+                    if (larva.getTypeId() == UnitTypes.Zerg_Larva) {
+                        larva.morph(UnitTypes.Zerg_Overlord);
+                        supplyCap = broodwar.getSelf().getSupplyTotal();
                     }
                 }
             }
         }
         // spawn zerglings
-        else if (game.canMake(UnitTypes.Zerg_Zergling.ordinal())) {
-            for (final Unit unit : game.getMyUnits()) {
-                if ((unit.getTypeID() == UnitTypes.Zerg_Spawning_Pool.getID())
-                        && unit.isCompleted()) {
-                    for (final Unit larva : game.getMyUnits()) {
-                        if (larva.getTypeID() == UnitTypes.Zerg_Larva.getID()) {
-                            game.morph(larva.getID(), UnitTypes.Zerg_Zergling.getID());
+        else if (broodwar.canMake(UnitTypes.Zerg_Zergling.ordinal())) {
+            for (final Unit unit : broodwar.getMyUnits()) {
+                if ((unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool) && unit.isCompleted()) {
+                    for (final Unit larva : broodwar.getMyUnits()) {
+                        if (larva.getTypeId() == UnitTypes.Zerg_Larva) {
+                            larva.morph(UnitTypes.Zerg_Zergling);
                         }
                     }
                 }
@@ -113,10 +121,13 @@ public class SixPool extends AbstractAgent {
         }
 
         // attack
-        for (final Unit unit : game.getMyUnits()) {
-            if ((unit.getTypeID() == UnitTypes.Zerg_Zergling.getID()) && unit.isIdle()) {
-                for (final Unit enemy : game.getEnemyUnits()) {
-                    game.attack(unit.getID(), enemy.getX(), enemy.getY());
+        for (final Unit unit : broodwar.getMyUnits()) {
+            if ((unit.getTypeId() == UnitTypes.Zerg_Zergling) && unit.isIdle()) {
+                for (final Unit enemy : broodwar.getEnemyUnits()) {
+                    final int x = enemy.getTileLocation().x;
+                    final int y = enemy.getTileLocation().y;
+                    final Location position = new Location(x, y);
+                    unit.attack(position);
                     break;
                 }
             }
@@ -124,11 +135,23 @@ public class SixPool extends AbstractAgent {
     }
 
     private boolean haveSpawningPool() {
-        for (final Unit unit : game.getMyUnits()) {
-            if (unit.getTypeID() == UnitTypes.Zerg_Spawning_Pool.ordinal()) {
+        for (final Unit unit : broodwar.getMyUnits()) {
+            if (unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool) {
                 return true;
             }
         }
         return false;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void unitDiscover(final int unitId) {
+        final Unit unit = broodwar.getUnit(unitId);
+        final UnitTypes typeId = unit.getTypeId();
+        final UnitType type = broodwar.getUnitType(typeId);
+        System.out.println(unitId + "\t" + type.getName() + "\t" + unit.getReplayId());
+    }
+
 }
