@@ -1,38 +1,43 @@
 package jnibwapi.model;
 
-import jnibwapi.JNIBWAPI;
+import jnibwapi.Broodwar;
 import jnibwapi.types.TechType.TechTypes;
 import jnibwapi.types.UnitType.UnitTypes;
 import jnibwapi.types.UpgradeType.UpgradeTypes;
 
 /**
- * This class is used to get information about individual units as well as issue order to units.
- * Each unit in the game has a unique Unit object, and Unit objects are not deleted until the end of
- * the match.
+ * This class is used to get information about individual units as well as issue
+ * order to units. Each unit in the game has a unique Unit object, and Unit
+ * objects are not deleted until the end of the match.
  * 
  * <p>
- * Every Unit in the game is either accessible or inaccessible. To determine if an AI can access a
- * particular unit, BWAPI checks to see if Flag::CompleteMapInformation is enabled. So there are two
- * cases to consider - either the flag is enabled, or it is disabled:
+ * Every Unit in the game is either accessible or inaccessible. To determine if
+ * an AI can access a particular unit, BWAPI checks to see if
+ * Flag::CompleteMapInformation is enabled. So there are two cases to consider -
+ * either the flag is enabled, or it is disabled:
  * 
  * <p>
- * If Flag::CompleteMapInformation is disabled, then a unit is accessible if and only if it is
- * visible. Some properties of visible enemy units will not be made available to the AI (such as the
- * contents of visible enemy dropships). If a unit is not visible, UnitInterface::exists will return
- * false, regardless of whether or not the unit exists. This is because absolutely no state
- * information on invisible enemy units is made available. To determine if an enemy unit has been
- * destroyed, the agent must watch for AIModule::onUnitDestroy messages from BWAPI, which is only
- * called for visible units which get destroyed.
+ * If Flag::CompleteMapInformation is disabled, then a unit is accessible if and
+ * only if it is visible. Some properties of visible enemy units will not be
+ * made available to the AI (such as the contents of visible enemy dropships).
+ * If a unit is not visible, UnitInterface::exists will return false, regardless
+ * of whether or not the unit exists. This is because absolutely no state
+ * information on invisible enemy units is made available. To determine if an
+ * enemy unit has been destroyed, the agent must watch for
+ * AIModule::onUnitDestroy messages from BWAPI, which is only called for visible
+ * units which get destroyed.
  * 
  * <p>
- * If Flag::CompleteMapInformation is enabled, then all units that exist in the game are accessible,
- * and UnitInterface::exists is accurate for all units. Similarly AIModule::onUnitDestroy messages
- * are generated for all units that get destroyed, not just visible ones.
+ * If Flag::CompleteMapInformation is enabled, then all units that exist in the
+ * game are accessible, and UnitInterface::exists is accurate for all units.
+ * Similarly AIModule::onUnitDestroy messages are generated for all units that
+ * get destroyed, not just visible ones.
  * 
  * <p>
- * If a Unit is not accessible, then only the getInitial__ functions will be available to the agent.
- * However for units that were owned by the player, getPlayer and getType will continue to work for
- * units that have been destroyed.
+ * If a Unit is not accessible, then only the getInitial__ functions will be
+ * available to the agent. However for units that were owned by the player,
+ * getPlayer and getType will continue to work for units that have been
+ * destroyed.
  * 
  * For a description of fields see: http://code.google.com/p/bwapi/wiki/Unit
  */
@@ -168,8 +173,9 @@ public class Unit {
         exists = false;
     }
 
-    public void update(final int[] data, int index, final JNIBWAPI broodwar) {
-        index++; // the first element is the id, which will be supplied during construction
+    public void update(final int[] data, int index, final Broodwar broodwar) {
+        index++; // the first element is the id, which will be supplied during
+                 // construction
         replayId = data[index++];
         owner = broodwar.getPlayer(data[index++]);
         typeId = UnitTypes.values()[data[index++]];
@@ -757,13 +763,14 @@ public class Unit {
     }
 
     /**
-     * Orders this unit to attack move to a location. After issuing, orders will become
-     * {@code OrderTypes.AttackMove}.
+     * Orders this unit to attack move to a location. After issuing, orders will
+     * become {@code OrderTypes.AttackMove}.
      * 
      * @param location
      *            location to move to
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean attack(final Location location) {
         return attack(getId(), location.x, location.y);
@@ -772,13 +779,14 @@ public class Unit {
     private native boolean attack(final int unitId, final int x, final int y);
 
     /**
-     * Orders this unit to attack another unit. After issuing, orders will become
-     * {@code OrderTypes.AttackUnit}.
+     * Orders this unit to attack another unit. After issuing, orders will
+     * become {@code OrderTypes.AttackUnit}.
      * 
      * @param target
      *            unit to attack
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean attack(final Unit target) {
         return attack(getId(), target.getId());
@@ -795,14 +803,15 @@ public class Unit {
      * @param location
      *            location to build at
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean build(final UnitTypes building, final Location.Tile location) {
         return build(getId(), building.getId(), location.x, location.y);
     }
 
-    private native boolean build(final int builderId, final int buildingId, final int tx,
-            final int ty);
+    private native boolean build(final int builderId, final int buildingId,
+            final int tx, final int ty);
 
 /**
      * Orders this unit to build an addon.
@@ -823,13 +832,14 @@ public class Unit {
     private native boolean buildAddon(final int buildingId, final int addonId);
 
     /**
-     * Orders this unit to add the specified unit type to the training queue. This command can also
-     * be used to make interceptors and scarabs.
+     * Orders this unit to add the specified unit type to the training queue.
+     * This command can also be used to make interceptors and scarabs.
      * 
      * @param unit
      *            unit to train
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean train(final UnitTypes unit) {
         return train(getId(), unit.getId());
@@ -843,7 +853,8 @@ public class Unit {
      * @param target
      *            unit to build
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean morph(final UnitTypes target) {
         return morph(getId(), target.getId());
@@ -857,7 +868,8 @@ public class Unit {
      * @param tech
      *            tech to research
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean research(final TechTypes tech) {
         return research(getId(), tech.getId());
@@ -871,7 +883,8 @@ public class Unit {
      * @param upgrade
      *            upgrade to start
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean upgrade(final UpgradeTypes upgrade) {
         return upgrade(getId(), upgrade.getId());
@@ -885,13 +898,15 @@ public class Unit {
      * @param location
      *            location to rally to
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean setRallyPoint(final Location location) {
         return setRallyPoint(getId(), location.x, location.y);
     }
 
-    private native boolean setRallyPoint(final int unitId, final int x, final int y);
+    private native boolean setRallyPoint(final int unitId, final int x,
+            final int y);
 
     /**
      * Orders this unit to set its rally point to the specified target.
@@ -899,7 +914,8 @@ public class Unit {
      * @param target
      *            target to rally to
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean setRallyPoint(final Unit target) {
         return setRallyPoint(getId(), target.getId());
@@ -908,13 +924,14 @@ public class Unit {
     private native boolean setRallyPoint(final int unitId, final int targetId);
 
     /**
-     * Orders this unit to move to the specified location. After issuing, the orders will become
-     * {@code OrderTypes.Move}.
+     * Orders this unit to move to the specified location. After issuing, the
+     * orders will become {@code OrderTypes.Move}.
      * 
      * @param location
      *            location to move to
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean move(final Location location) {
         return move(getId(), location.x, location.y);
@@ -923,13 +940,14 @@ public class Unit {
     private native boolean move(final int unitId, final int x, final int y);
 
     /**
-     * Orders this unit to patrol between its current position and the specified location. After
-     * issuing, the orders will become {@code OrderTpes.Patrol}.
+     * Orders this unit to patrol between its current position and the specified
+     * location. After issuing, the orders will become {@code OrderTpes.Patrol}.
      * 
      * @param location
      *            location to patrol to
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean patrol(final Location location) {
         return patrol(getId(), location.x, location.y);
@@ -942,9 +960,11 @@ public class Unit {
      * {@code OrderTypes.HoldPosition} while transitioning.
      * 
      * <p>
-     * Reavers and Carriers can only hold position if they have at least one Scarab or Interceptor.
+     * Reavers and Carriers can only hold position if they have at least one
+     * Scarab or Interceptor.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean holdPosition() {
         return holdPosition(getId());
@@ -953,9 +973,11 @@ public class Unit {
     private native boolean holdPosition(final int unitId);
 
     /**
-     * Orders this unit to stop. After issuing, the orders will become {@code OrderTypes.Stop}.
+     * Orders this unit to stop. After issuing, the orders will become
+     * {@code OrderTypes.Stop}.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean stop() {
         return stop(getId());
@@ -964,13 +986,14 @@ public class Unit {
     private native boolean stop(final int unitId);
 
     /**
-     * Orders this unit to follow the specified unit. After issuing, the orders will become
-     * {@code OrderTypes.Follow}.
+     * Orders this unit to follow the specified unit. After issuing, the orders
+     * will become {@code OrderTypes.Follow}.
      * 
      * @param target
      *            target unit to follow
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean follow(final Unit target) {
         return follow(getId(), target.getId());
@@ -982,13 +1005,14 @@ public class Unit {
      * Orders this unit to gather the specified unit.
      * 
      * <p>
-     * This unit should be an Drone, Probe, or SCV. The target should be a mineral patch, Refinery,
-     * Assimilator, or Extractor.
+     * This unit should be an Drone, Probe, or SCV. The target should be a
+     * mineral patch, Refinery, Assimilator, or Extractor.
      * 
      * @param target
      *            target to gather
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean gather(final Unit target) {
         return gather(getId(), target.getId());
@@ -997,10 +1021,12 @@ public class Unit {
     private native boolean gather(final int unitId, final int targetId);
 
     /**
-     * Orders this unit to return its cargo to a nearby resource depot such as a Command Center.
-     * Only workers that are carrying minerals or gas can be ordered to return cargo.
+     * Orders this unit to return its cargo to a nearby resource depot such as a
+     * Command Center. Only workers that are carrying minerals or gas can be
+     * ordered to return cargo.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean returnCargo() {
         return returnCargo(getId());
@@ -1009,16 +1035,17 @@ public class Unit {
     private native boolean returnCargo(final int unitId);
 
     /**
-     * Orders the unit to repair another unit. After issuing, the orders will become
-     * {@code OrderTypes.Repair} while transitioning.
+     * Orders the unit to repair another unit. After issuing, the orders will
+     * become {@code OrderTypes.Repair} while transitioning.
      * 
      * <p>
-     * Only Terran SCVs can be ordered to repair, and the target must be a mechanical Terran unit or
-     * building.
+     * Only Terran SCVs can be ordered to repair, and the target must be a
+     * mechanical Terran unit or building.
      * 
      * @param target
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean repair(final Unit target) {
         return repair(getId(), target.getId());
@@ -1030,7 +1057,8 @@ public class Unit {
      * Orders this unit to burrow. After issuing, the orders will become
      * {@code OrderTypes.Burrowing} while transitioning.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean burrow() {
         return burrow(getId());
@@ -1045,7 +1073,8 @@ public class Unit {
      * <p>
      * This unit should be a burrowed unit.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean unburrow() {
         return unburrow(getId());
@@ -1056,7 +1085,8 @@ public class Unit {
     /**
      * Orders this unit to cloak.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean cloak() {
         return cloak(getId());
@@ -1067,7 +1097,8 @@ public class Unit {
     /**
      * Orders this unit to decloak.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean decloak() {
         return decloak(getId());
@@ -1076,13 +1107,14 @@ public class Unit {
     private native boolean decloak(final int unitId);
 
     /**
-     * Orders this unit to siege. After issuing, the orders will become {@code OrderTypes.Sieging}
-     * while transitioning.
+     * Orders this unit to siege. After issuing, the orders will become
+     * {@code OrderTypes.Sieging} while transitioning.
      * 
      * <p>
      * This unit should be a Terran Siege Tank.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean siege() {
         return siege(getId());
@@ -1097,7 +1129,8 @@ public class Unit {
      * <p>
      * This unit should be a Terran Siege Tank.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean unsiege() {
         return unsiege(getId());
@@ -1111,7 +1144,8 @@ public class Unit {
      * <p>
      * This unit should be a Terran building that can be lifted.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean lift() {
         return lift(getId());
@@ -1128,7 +1162,8 @@ public class Unit {
      * @param location
      *            location to land the building
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean land(final Location.Tile location) {
         return land(getId(), location.x, location.y);
@@ -1142,7 +1177,8 @@ public class Unit {
      * @param target
      *            target to load
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean load(final Unit target) {
         return load(getId(), target.getId());
@@ -1156,7 +1192,8 @@ public class Unit {
      * @param target
      *            target to unload
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean unload(final Unit target) {
         return unload(getId(), target.getId());
@@ -1167,7 +1204,8 @@ public class Unit {
     /**
      * Orders this unit to unload all units.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean unloadAll() {
         return unloadAll(getId());
@@ -1179,13 +1217,15 @@ public class Unit {
      * Orders this unit to unload all units.
      * 
      * <p>
-     * This unit should be a Terran Dropship, Protoss Shuttle, or Zerg Overlord. If this unit is a
-     * Terran Bunker, the units will be unloaded right outside the bunker.
+     * This unit should be a Terran Dropship, Protoss Shuttle, or Zerg Overlord.
+     * If this unit is a Terran Bunker, the units will be unloaded right outside
+     * the bunker.
      * 
      * @param location
      *            location to unload Units
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean unloadAll(final Location location) {
         return unloadAll(getId(), location.x, location.y);
@@ -1194,13 +1234,14 @@ public class Unit {
     private native boolean unloadAll(final int unitId, final int x, final int y);
 
     /**
-     * Works like the right-click in the GUI (e.g. right-click on a location to order the unit to
-     * move).
+     * Works like the right-click in the GUI (e.g. right-click on a location to
+     * order the unit to move).
      * 
      * @param location
      *            location to right-click on
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean rightClick(final Location location) {
         return rightClick(getId(), location.x, location.y);
@@ -1209,13 +1250,14 @@ public class Unit {
     private native boolean rightClick(final int unitId, final int x, final int y);
 
     /**
-     * Works like the right-click in the GUI (e.g. right-click on a mineral patch to order a worker
-     * to mine, right-click on an enemy to attack it).
+     * Works like the right-click in the GUI (e.g. right-click on a mineral
+     * patch to order a worker to mine, right-click on an enemy to attack it).
      * 
      * @param target
      *            target to right-click on
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean rightClick(final Unit target) {
         return rightClick(getId(), target.getId());
@@ -1226,7 +1268,8 @@ public class Unit {
     /**
      * Orders this unit to halt construction
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean haltConstruction() {
         return haltConstruction(getId());
@@ -1237,7 +1280,8 @@ public class Unit {
     /**
      * Orders this unit to cancel the construction in progress.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean cancelConstruction() {
         return cancelConstruction(getId());
@@ -1248,7 +1292,8 @@ public class Unit {
     /**
      * Orders this unit to cancel the addon in progress.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean cancelAddon() {
         return cancelAddon(getId());
@@ -1262,7 +1307,8 @@ public class Unit {
      * @param slot
      *            slot position to cancel
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean cancelTrain(final int slot) {
         return cancelTrain(getId(), slot);
@@ -1273,7 +1319,8 @@ public class Unit {
     /**
      * Orders this unit to cancel the morphing in progress.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean cancelMorph() {
         return cancelMorph(getId());
@@ -1284,7 +1331,8 @@ public class Unit {
     /**
      * Orders this unit to cancel the current research in progress.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean cancelResearch() {
         return cancelResearch(getId());
@@ -1295,7 +1343,8 @@ public class Unit {
     /**
      * Orders this unit to cancel the current upgrade in progress.
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean cancelUpgrade() {
         return cancelUpgrade(getId());
@@ -1304,12 +1353,14 @@ public class Unit {
     private native boolean cancelUpgrade(final int unitId);
 
     /**
-     * Orders this unit to use tech that doesn't require a target (e.g. Stimpack).
+     * Orders this unit to use tech that doesn't require a target (e.g.
+     * Stimpack).
      * 
      * @param tech
      *            tech to use
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean useTech(final TechTypes tech) {
         return useTech(getId(), tech.getId());
@@ -1318,7 +1369,8 @@ public class Unit {
     private native boolean useTech(final int unitId, final int typeId);
 
     /**
-     * Orders this unit to use tech that requires a location (e.g. Spider Mines).
+     * Orders this unit to use tech that requires a location (e.g. Spider
+     * Mines).
      * 
      * @param tech
      *            tech to use
@@ -1326,13 +1378,15 @@ public class Unit {
      * @param location
      *            location to target the tech
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean useTech(final TechTypes tech, final Location location) {
         return useTech(getId(), tech.getId(), location.x, location.y);
     }
 
-    private native boolean useTech(final int unitId, final int techId, final int x, final int y);
+    private native boolean useTech(final int unitId, final int techId,
+            final int x, final int y);
 
     /**
      * Orders this unit to use tech that requires another unit (e.g. Irradiate).
@@ -1343,11 +1397,13 @@ public class Unit {
      * @param target
      *            target to use the tech on
      * 
-     * @return {@code true} if the command can be completed; {@code false} otherwise
+     * @return {@code true} if the command can be completed; {@code false}
+     *         otherwise
      */
     public boolean useTech(final TechTypes tech, final Unit target) {
         return useTech(getId(), tech.getId(), target.getId());
     }
 
-    private native boolean useTech(final int unitId, final int typeId, final int targetId);
+    private native boolean useTech(final int unitId, final int typeId,
+            final int targetId);
 }

@@ -4,43 +4,63 @@
  */
 package jnibwapi;
 
+import jnibwapi.model.Map;
+
 /**
- * An abstract agent that provides functionality for starting an agent.
+ * Serves as the base class for an agent by providing the functionality for
+ * launching the agent on a separate thread.
  */
-public abstract class AbstractAgent extends BWAPIEventListener.Adaptor {
+public abstract class AbstractAgent extends BroodwarListener.Adaptor {
 
     /**
-     * Allows the agent to interact with the game.
+     * Allows the agent to interact with the Broodwar game.
      * 
      * <p>
-     * Using this object before {@link #matchStart()} is called can produce undefined behavior and
+     * Using this object before a match {@link #matchStart() starts} or after a
+     * match {@link #matchEnd(boolean) ends} can produce undefined behavior and
      * crash the agent.
      */
-    protected final JNIBWAPI broodwar;
+    protected final Broodwar broodwar;
 
     /**
-     * Constructs the agent.
+     * Constructs a new agent.
      * 
-     * @param enableBwta
-     *            {@code true} if BWTA should be enabled (may cause the game to freeze for a small
-     *            duration); {@code false} otherwise
+     * <p>
+     * The agent will still need to be {@link #start() started} in order for it
+     * to be notified of game {@link BroodwarListener events}.
+     * 
+     * @param mapDetailsEenabled
+     *            {@code true} if the Broodwar map should be
+     *            {@link Map#isMapDetailsEnabled() analyzed}; {@code false}
+     *            otherwise
      */
-    public AbstractAgent(final boolean enableBwta) {
-        broodwar = new JNIBWAPI(this, enableBwta);
+    public AbstractAgent(final boolean mapDetailsEenabled) {
+        broodwar = new Broodwar(this, mapDetailsEenabled);
     }
 
     /**
-     * Starts the agent by connecting it to BWAPI.
+     * Connects the agent to Broodwar on a separate thread.
+     * 
+     * <p>
+     * This method needs to be invoked prior to starting a Broodwar match.
+     * 
+     * @return the thread that the agent is running on
+     * 
+     * @throws IllegalThreadStateException
+     *             if the thread was already started
      */
-    protected void start() {
-        final Runnable bwapiRunnable = new Runnable() {
+    protected Thread start() {
+        final Runnable agentRunnable = new AgentRunnable();
+        final Thread agentThread = new Thread(agentRunnable);
+        agentThread.start();
+        return agentThread;
+    }
 
-            @Override
-            public void run() {
-                broodwar.start();
-            }
-        };
-        final Thread bwapiThread = new Thread(bwapiRunnable);
-        bwapiThread.start();
+    private class AgentRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            broodwar.start();
+        }
     }
 }

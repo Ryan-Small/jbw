@@ -18,11 +18,11 @@ import jnibwapi.types.UnitType.UnitTypes;
 /**
  * JNI interface for the Brood War API.<br>
  * 
- * This focus of this interface is to provide the callback and game state query functionality in
- * BWAPI.<br>
+ * This focus of this interface is to provide the callback and game state query
+ * functionality in BWAPI.<br>
  * 
- * Note: for thread safety and game state sanity, all native calls should be invoked from the
- * callback methods.<br>
+ * Note: for thread safety and game state sanity, all native calls should be
+ * invoked from the callback methods.<br>
  * 
  * For BWAPI documentation see: {@link http://code.google.com/p/bwapi/}<br>
  * 
@@ -30,11 +30,12 @@ import jnibwapi.types.UnitType.UnitTypes;
  * Game: {@link http://code.google.com/p/bwapi/wiki/Game}<br>
  * Unit: {@link http://code.google.com/p/bwapi/wiki/Unit}<br>
  */
-public class JNIBWAPI {
+public class Broodwar {
 
     /* Load the JNI library. */
     static {
-        // final String clientBridgeDll = "client-bridge-" + System.getProperty("os.arch");
+        // final String clientBridgeDll = "client-bridge-" +
+        // System.getProperty("os.arch");
         final String clientBridgeDll = "client-bridge-x86";
         try {
             System.loadLibrary(clientBridgeDll);
@@ -42,14 +43,16 @@ public class JNIBWAPI {
         } catch (final UnsatisfiedLinkError ex) {
             final File dll = new File(clientBridgeDll + ".dll");
             if (!dll.exists()) {
-                System.err.println("Native code library not found: " + dll.getAbsolutePath());
+                System.err.println("Native code library not found: "
+                        + dll.getAbsolutePath());
             }
-            System.err.println("Native code library failed to load: " + ex.toString());
+            System.err.println("Native code library failed to load: "
+                    + ex.toString());
         }
     }
 
     /** The listener for BWAPI callback events */
-    private final BWAPIEventListener listener;
+    private final BroodwarListener listener;
 
     /** Indicates of BWTA should be enabled */
     private final boolean enableBWTA;
@@ -82,25 +85,29 @@ public class JNIBWAPI {
     private final HashMap<Integer, TechType> techTypes = new HashMap<>();
     private final HashMap<Integer, UpgradeType> upgradeTypes = new HashMap<>();
     private final HashMap<Integer, WeaponType> weaponTypes = new HashMap<>();
-    private final HashMap<Integer, UnitSizeType> unitSizeTypes = new HashMap<>();
+    private final HashMap<Integer, UnitSizeType> unitSizeTypes =
+            new HashMap<>();
     private final HashMap<Integer, BulletType> bulletTypes = new HashMap<>();
     private final HashMap<Integer, DamageType> damageTypes = new HashMap<>();
-    private final HashMap<Integer, ExplosionType> explosionTypes = new HashMap<>();
-    private final HashMap<Integer, UnitCommandType> unitCommandTypes = new HashMap<>();
+    private final HashMap<Integer, ExplosionType> explosionTypes =
+            new HashMap<>();
+    private final HashMap<Integer, UnitCommandType> unitCommandTypes =
+            new HashMap<>();
     private final HashMap<Integer, OrderType> orderTypes = new HashMap<>();
     private final HashMap<Integer, EventType> eventTypes = new HashMap<>();
 
     /**
-     * Instantiates a BWAPI instance, but does not connect to the bridge. To connect, the start
-     * method must be invoked.
+     * Instantiates a BWAPI instance, but does not connect to the bridge. To
+     * connect, the start method must be invoked.
      * 
      * @param listener
      *            listener for BWAPI callback events.
      * 
      * @param enableBWTA
-     *            {@code true} if BWTA should be enabled; {@code false} otherwise
+     *            {@code true} if BWTA should be enabled; {@code false}
+     *            otherwise
      */
-    public JNIBWAPI(final BWAPIEventListener listener, final boolean enableBWTA) {
+    public Broodwar(final BroodwarListener listener, final boolean enableBWTA) {
         this.listener = listener;
         this.enableBWTA = enableBWTA;
 
@@ -123,7 +130,7 @@ public class JNIBWAPI {
     }
 
     // invokes the main native method
-    private native void startClient(JNIBWAPI jniBWAPI);
+    private native void startClient(Broodwar jniBWAPI);
 
     private native int getFrame();
 
@@ -240,15 +247,17 @@ public class JNIBWAPI {
     public native void leaveGame();
 
     // draw commands
-    public native void drawBox(int left, int top, int right, int bottom, int color, boolean fill,
+    public native void drawBox(int left, int top, int right, int bottom,
+            int color, boolean fill, boolean screenCoords);
+
+    public native void drawCircle(int x, int y, int radius, int color,
+            boolean fill, boolean screenCoords);
+
+    public native void drawLine(int x1, int y1, int x2, int y2, int color,
             boolean screenCoords);
 
-    public native void drawCircle(int x, int y, int radius, int color, boolean fill,
-            boolean screenCoords);
-
-    public native void drawLine(int x1, int y1, int x2, int y2, int color, boolean screenCoords);
-
-    public void drawLine(final Point a, final Point b, final int color, final boolean screenCoords) {
+    public void drawLine(final Point a, final Point b, final int color,
+            final boolean screenCoords) {
         drawLine(a.x, a.y, b.x, b.y, color, screenCoords);
     }
 
@@ -256,7 +265,8 @@ public class JNIBWAPI {
 
     public native void drawText(int x, int y, String msg, boolean screenCoords);
 
-    public void drawText(final Point a, final String msg, final boolean screenCoords) {
+    public void drawText(final Point a, final String msg,
+            final boolean screenCoords) {
         drawText(a.x, a.y, msg, screenCoords);
     }
 
@@ -277,10 +287,11 @@ public class JNIBWAPI {
 
     public native boolean hasPower(int tileX, int tileY, int unitTypeID);
 
-    public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight);
+    public native boolean hasPower(int tileX, int tileY, int tileWidth,
+            int tileHeight);
 
-    public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight,
-            int unitTypeID);
+    public native boolean hasPower(int tileX, int tileY, int tileWidth,
+            int tileHeight, int unitTypeID);
 
     public native boolean hasPowerPrecise(int x, int y);
 
@@ -292,10 +303,11 @@ public class JNIBWAPI {
 
     public native boolean hasLoadedUnit(int unitID1, int unitID2);
 
-    public native boolean canBuildHere(int tileX, int tileY, int unitTypeID, boolean checkExplored);
-
-    public native boolean canBuildHere(int unitID, int tileX, int tileY, int unitTypeID,
+    public native boolean canBuildHere(int tileX, int tileY, int unitTypeID,
             boolean checkExplored);
+
+    public native boolean canBuildHere(int unitID, int tileX, int tileY,
+            int unitTypeID, boolean checkExplored);
 
     public boolean canMake(final UnitTypes unitType) {
         return canMake(unitType.ordinal());
@@ -509,7 +521,8 @@ public class JNIBWAPI {
     private void loadTypeData() {
         // race types
         final int[] raceTypeData = getRaceTypes();
-        for (int index = 0; index < raceTypeData.length; index += RaceType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < raceTypeData.length; index +=
+                RaceType.NUM_ATTRIBUTES) {
             final RaceType type = new RaceType(raceTypeData, index);
             type.setName(getRaceTypeName(type.getId()));
             raceTypes.put(type.getId(), type);
@@ -517,16 +530,19 @@ public class JNIBWAPI {
 
         // unit types
         final int[] unitTypeData = getUnitTypes();
-        for (int index = 0; index < unitTypeData.length; index += UnitType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < unitTypeData.length; index +=
+                UnitType.NUM_ATTRIBUTES) {
             final String name = getUnitTypeName(unitTypeData[index]);
             final int[] requiredUnits = getRequiredUnits(unitTypeData[index]);
-            final UnitType type = new UnitType(unitTypeData, index, name, requiredUnits);
+            final UnitType type =
+                    new UnitType(unitTypeData, index, name, requiredUnits);
             unitTypes.put(type.getId(), type);
         }
 
         // tech types
         final int[] techTypeData = getTechTypes();
-        for (int index = 0; index < techTypeData.length; index += TechType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < techTypeData.length; index +=
+                TechType.NUM_ATTRIBUTES) {
             final TechType type = new TechType(techTypeData, index);
             type.setName(getTechTypeName(type.getId()));
             techTypes.put(type.getId(), type);
@@ -534,7 +550,8 @@ public class JNIBWAPI {
 
         // upgrade types
         final int[] upgradeTypeData = getUpgradeTypes();
-        for (int index = 0; index < upgradeTypeData.length; index += UpgradeType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < upgradeTypeData.length; index +=
+                UpgradeType.NUM_ATTRIBUTES) {
             final UpgradeType type = new UpgradeType(upgradeTypeData, index);
             type.setName(getUpgradeTypeName(type.getId()));
             upgradeTypes.put(type.getId(), type);
@@ -542,7 +559,8 @@ public class JNIBWAPI {
 
         // weapon types
         final int[] weaponTypeData = getWeaponTypes();
-        for (int index = 0; index < weaponTypeData.length; index += WeaponType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < weaponTypeData.length; index +=
+                WeaponType.NUM_ATTRIBUTES) {
             final WeaponType type = new WeaponType(weaponTypeData, index);
             type.setName(getWeaponTypeName(type.getId()));
             weaponTypes.put(type.getId(), type);
@@ -550,7 +568,8 @@ public class JNIBWAPI {
 
         // unit size types
         final int[] unitSizeTypeData = getUnitSizeTypes();
-        for (int index = 0; index < unitSizeTypeData.length; index += UnitSizeType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < unitSizeTypeData.length; index +=
+                UnitSizeType.NUM_ATTRIBUTES) {
             final UnitSizeType type = new UnitSizeType(unitSizeTypeData, index);
             type.setName(getUnitSizeTypeName(type.getID()));
             unitSizeTypes.put(type.getID(), type);
@@ -558,7 +577,8 @@ public class JNIBWAPI {
 
         // bullet types
         final int[] bulletTypeData = getBulletTypes();
-        for (int index = 0; index < bulletTypeData.length; index += BulletType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < bulletTypeData.length; index +=
+                BulletType.NUM_ATTRIBUTES) {
             final BulletType type = new BulletType(bulletTypeData, index);
             type.setName(getBulletTypeName(type.getId()));
             bulletTypes.put(type.getId(), type);
@@ -566,7 +586,8 @@ public class JNIBWAPI {
 
         // damage types
         final int[] damageTypeData = getDamageTypes();
-        for (int index = 0; index < damageTypeData.length; index += DamageType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < damageTypeData.length; index +=
+                DamageType.NUM_ATTRIBUTES) {
             final DamageType type = new DamageType(damageTypeData, index);
             type.setName(getDamageTypeName(type.getId()));
             damageTypes.put(type.getId(), type);
@@ -574,8 +595,10 @@ public class JNIBWAPI {
 
         // explosion types
         final int[] explosionTypeData = getExplosionTypes();
-        for (int index = 0; index < explosionTypeData.length; index += ExplosionType.NUM_ATTRIBUTES) {
-            final ExplosionType type = new ExplosionType(explosionTypeData, index);
+        for (int index = 0; index < explosionTypeData.length; index +=
+                ExplosionType.NUM_ATTRIBUTES) {
+            final ExplosionType type =
+                    new ExplosionType(explosionTypeData, index);
             type.setName(getExplosionTypeName(type.getId()));
             explosionTypes.put(type.getId(), type);
         }
@@ -584,14 +607,16 @@ public class JNIBWAPI {
         final int[] unitCommandTypeData = getUnitCommandTypes();
         for (int index = 0; index < unitCommandTypeData.length; index +=
                 UnitCommandType.NUM_ATTRIBUTES) {
-            final UnitCommandType type = new UnitCommandType(unitCommandTypeData, index);
+            final UnitCommandType type =
+                    new UnitCommandType(unitCommandTypeData, index);
             type.setName(getUnitCommandTypeName(type.getId()));
             unitCommandTypes.put(type.getId(), type);
         }
 
         // order types
         final int[] orderTypeData = getOrderTypes();
-        for (int index = 0; index < orderTypeData.length; index += OrderType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < orderTypeData.length; index +=
+                OrderType.NUM_ATTRIBUTES) {
             final OrderType type = new OrderType(orderTypeData, index);
             type.setName(getOrderTypeName(type.getId()));
             orderTypes.put(type.getId(), type);
@@ -609,8 +634,9 @@ public class JNIBWAPI {
     private void loadMapData() {
         final String mapName = new String(getMapName(), charset);
         map =
-                new Map(getMapWidth(), getMapHeight(), mapName, getMapFileName(), getMapHash(),
-                        getHeightData(), getBuildableData(), getWalkableData());
+                new Map(getMapWidth(), getMapHeight(), mapName,
+                        getMapFileName(), getMapHash(), getHeightData(),
+                        getBuildableData(), getWalkableData());
 
         if (!enableBWTA) {
             return;
@@ -632,7 +658,8 @@ public class JNIBWAPI {
             regionData = getRegions();
             chokePointData = getChokePoints();
             baseLocationData = getBaseLocations();
-            for (int index = 0; index < regionData.length; index += Region.numAttributes) {
+            for (int index = 0; index < regionData.length; index +=
+                    Region.numAttributes) {
                 final int id = regionData[index];
                 polygons.put(id, getPolygon(id));
             }
@@ -641,7 +668,8 @@ public class JNIBWAPI {
                 if (!bwtaDir.exists()) {
                     bwtaDir.mkdirs();
                 }
-                final BufferedWriter writer = new BufferedWriter(new FileWriter(bwtaFile));
+                final BufferedWriter writer =
+                        new BufferedWriter(new FileWriter(bwtaFile));
 
                 writeMapData(writer, regionMapData);
                 writeMapData(writer, regionData);
@@ -659,7 +687,8 @@ public class JNIBWAPI {
 
         } else {
             try {
-                final BufferedReader reader = new BufferedReader(new FileReader(bwtaFile));
+                final BufferedReader reader =
+                        new BufferedReader(new FileReader(bwtaFile));
 
                 regionMapData = readMapData(reader);
                 regionData = readMapData(reader);
@@ -670,7 +699,8 @@ public class JNIBWAPI {
                 int[] polygonData;
                 while ((polygonData = readMapData(reader)) != null) {
                     final int[] coordinateData =
-                            Arrays.copyOfRange(polygonData, 1, polygonData.length);
+                            Arrays.copyOfRange(polygonData, 1,
+                                    polygonData.length);
 
                     polygons.put(polygonData[0], coordinateData);
                 }
@@ -681,11 +711,13 @@ public class JNIBWAPI {
             }
         }
 
-        map.initialize(regionMapData, regionData, polygons, chokePointData, baseLocationData);
+        map.initialize(regionMapData, regionData, polygons, chokePointData,
+                baseLocationData);
     }
 
     /**
-     * Convenience method to write integers to a out each part of BWTA map data to a stream.
+     * Convenience method to write integers to a out each part of BWTA map data
+     * to a stream.
      * 
      * @param writer
      *            {@code BufferedWriter} to write to
@@ -696,8 +728,8 @@ public class JNIBWAPI {
      * @throws IOException
      *             if the data cannot be written
      */
-    private static void writeMapData(final BufferedWriter writer, final int[] data)
-            throws IOException {
+    private static void writeMapData(final BufferedWriter writer,
+            final int[] data) throws IOException {
         boolean first = true;
         for (final int val : data) {
             if (first) {
@@ -716,12 +748,14 @@ public class JNIBWAPI {
      * @param reader
      *            {@code BufferedReader} to read from
      * 
-     * @return integers that were read from the line or {@code null} when end-of-stream is reached
+     * @return integers that were read from the line or {@code null} when
+     *         end-of-stream is reached
      * 
      * @throws IOException
      *             if the data cannot be read
      */
-    private static int[] readMapData(final BufferedReader reader) throws IOException {
+    private static int[] readMapData(final BufferedReader reader)
+            throws IOException {
         int[] data = new int[0];
 
         final String line = reader.readLine();
@@ -751,7 +785,8 @@ public class JNIBWAPI {
     }
 
     /**
-     * Notifies the client and event listener that a connection has been formed to the bridge.
+     * Notifies the client and event listener that a connection has been formed
+     * to the bridge.
      * 
      * <p>
      * C++ callback function.
@@ -762,9 +797,9 @@ public class JNIBWAPI {
     }
 
     /**
-     * Notifies the client that a game has started. This method is always called before
-     * {@code BWAPIEventListener.matchStart()}, and is meant as a way of notifying the client to
-     * initialize state.
+     * Notifies the client that a game has started. This method is always called
+     * before {@code BWAPIEventListener.matchStart()}, and is meant as a way of
+     * notifying the client to initialize state.
      * 
      * <p>
      * The listener is not notified of this invocation.
@@ -772,8 +807,8 @@ public class JNIBWAPI {
      * <p>
      * C++ callback function.
      * 
-     * Note: this is always called before the matchStarted event, and is meant as a way of notifying
-     * the AI client to clear up state.
+     * Note: this is always called before the matchStarted event, and is meant
+     * as a way of notifying the AI client to clear up state.
      */
     private void gameStarted() {
         self = null;
@@ -784,8 +819,10 @@ public class JNIBWAPI {
         players.clear();
 
         final int[] playerData = getPlayersData();
-        for (int index = 0; index < playerData.length; index += Player.numAttributes) {
-            final String name = new String(getPlayerName(playerData[index]), charset);
+        for (int index = 0; index < playerData.length; index +=
+                Player.numAttributes) {
+            final String name =
+                    new String(getPlayerName(playerData[index]), charset);
             final Player player = new Player(playerData, index, name);
 
             players.put(player.getId(), player);
@@ -810,7 +847,8 @@ public class JNIBWAPI {
         neutralUnits.clear();
         final int[] unitData = getAllUnitsData();
 
-        for (int index = 0; index < unitData.length; index += Unit.NUMBER_OF_ATTRIBUTES) {
+        for (int index = 0; index < unitData.length; index +=
+                Unit.NUMBER_OF_ATTRIBUTES) {
             final int id = unitData[index];
             final Unit unit = new Unit(id);
             unit.update(unitData, index, this);
@@ -831,9 +869,9 @@ public class JNIBWAPI {
     }
 
     /**
-     * Notifies the client that game data has been updated. This method is always called before
-     * {@code BWAPIEventListener.matchFrame()}, and is meant as a way of notifying the client to
-     * update the game state.
+     * Notifies the client that game data has been updated. This method is
+     * always called before {@code BWAPIEventListener.matchFrame()}, and is
+     * meant as a way of notifying the client to update the game state.
      * 
      * <p>
      * The listener is not notified of this invocation.
@@ -846,13 +884,15 @@ public class JNIBWAPI {
 
         if (!isReplay()) {
             self.update(getPlayerUpdate(self.getId()));
-            self.updateResearch(getResearchStatus(self.getId()), getUpgradeStatus(self.getId()));
+            self.updateResearch(getResearchStatus(self.getId()),
+                    getUpgradeStatus(self.getId()));
 
         } else {
             for (final Integer playerId : players.keySet()) {
                 players.get(playerId).update(getPlayerUpdate(playerId));
-                players.get(playerId).updateResearch(getResearchStatus(playerId),
-                        getUpgradeStatus(playerId));
+                players.get(playerId)
+                        .updateResearch(getResearchStatus(playerId),
+                                getUpgradeStatus(playerId));
             }
         }
 
@@ -864,7 +904,8 @@ public class JNIBWAPI {
         enemyUnits.clear();
         neutralUnits.clear();
 
-        for (int index = 0; index < unitData.length; index += Unit.NUMBER_OF_ATTRIBUTES) {
+        for (int index = 0; index < unitData.length; index +=
+                Unit.NUMBER_OF_ATTRIBUTES) {
             final int id = unitData[index];
 
             deadUnits.remove(id);
@@ -921,8 +962,8 @@ public class JNIBWAPI {
      * Sends BWAPI callback events to the event listener.
      * 
      * <p>
-     * The meaning of the parameters is dependent on the event type itself. In some cases, none of
-     * the parameters are used.
+     * The meaning of the parameters is dependent on the event type itself. In
+     * some cases, none of the parameters are used.
      * 
      * <p>
      * C++ callback function.
@@ -939,7 +980,8 @@ public class JNIBWAPI {
      * @param p3
      *            third parameter for the event
      */
-    private void eventOccurred(final int eventTypeId, final int p1, final int p2, final String p3) {
+    private void eventOccurred(final int eventTypeId, final int p1,
+            final int p2, final String p3) {
 
         final EventType event = eventTypes.get(eventTypeId);
         switch (event) {

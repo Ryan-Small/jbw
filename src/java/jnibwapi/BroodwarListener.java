@@ -5,7 +5,7 @@ package jnibwapi;
  * 
  * Create -> Discover -> Show -> Complete -> Hide -> Evade -> Destroy
  */
-public interface BWAPIEventListener {
+public interface BroodwarListener {
 
     /**
      * Called when the agent has connected to BWAPI.
@@ -47,7 +47,7 @@ public interface BWAPIEventListener {
 
     /**
      * Called when the user hits a key in-game. This method is not invoked if user input has not
-     * been {@link JNIBWAPI#enableUserInput() enabled}.
+     * been {@link Broodwar#enableUserInput() enabled}.
      * 
      * <p>
      * This method enables the user to interact with the agent for various purposes (e.g. debugging,
@@ -60,7 +60,7 @@ public interface BWAPIEventListener {
 
     /**
      * Called when the user attempts to sends a message in-game. This method is not invoked if user
-     * input has not been {@link JNIBWAPI#enableUserInput() enabled}.
+     * input has not been {@link Broodwar#enableUserInput() enabled}.
      * 
      * <p>
      * This method enables the user to interact with the agent for various purposes (e.g. debugging,
@@ -207,7 +207,7 @@ public interface BWAPIEventListener {
     /**
      * An adaptor for the {@code BWAPIEventListener}.
      */
-    public class Adaptor implements BWAPIEventListener {
+    public class Adaptor implements BroodwarListener {
 
         /**
          * {@inheritDoc}
