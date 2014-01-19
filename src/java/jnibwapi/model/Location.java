@@ -24,6 +24,9 @@ public class Location {
     }
 
     public static class Tile extends Location {
+
+        public static final int TILE_SIZE = 32;
+
         public Tile(final int x, final int y) {
             super(x, y);
         }

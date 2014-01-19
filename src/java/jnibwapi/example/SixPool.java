@@ -5,7 +5,6 @@ import java.util.HashSet;
 import jnibwapi.AbstractAgent;
 import jnibwapi.model.Location;
 import jnibwapi.model.Unit;
-import jnibwapi.types.UnitType;
 import jnibwapi.types.UnitType.UnitTypes;
 
 public class SixPool extends AbstractAgent {
@@ -78,15 +77,18 @@ public class SixPool extends AbstractAgent {
         }
 
         // build a spawning pool
-        if (!haveSpawningPool() && broodwar.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
+        if (!haveSpawningPool()
+                && broodwar.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
             for (final Unit potentialDrone : broodwar.getMyUnits()) {
                 if (potentialDrone.getTypeId() == UnitTypes.Zerg_Drone) {
                     for (final Unit unit : broodwar.getMyUnits()) {
                         if (unit.getTypeId() == UnitTypes.Zerg_Overlord) {
                             final int x = unit.getTileLocation().x;
                             final int y = unit.getTileLocation().y;
-                            final Location.Tile position = new Location.Tile(x, y);
-                            potentialDrone.build(UnitTypes.Zerg_Spawning_Pool, position);
+                            final Location.Tile position =
+                                    new Location.Tile(x, y);
+                            potentialDrone.build(UnitTypes.Zerg_Spawning_Pool,
+                                    position);
                             break;
                         }
                     }
@@ -96,7 +98,8 @@ public class SixPool extends AbstractAgent {
         }
 
         // spawn overlords
-        if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf().getSupplyTotal())
+        if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf()
+                .getSupplyTotal())
                 && (broodwar.getSelf().getSupplyTotal() > supplyCap)) {
             if (broodwar.canMake(UnitTypes.Zerg_Overlord.ordinal())) {
                 for (final Unit larva : broodwar.getMyUnits()) {
@@ -110,7 +113,8 @@ public class SixPool extends AbstractAgent {
         // spawn zerglings
         else if (broodwar.canMake(UnitTypes.Zerg_Zergling.ordinal())) {
             for (final Unit unit : broodwar.getMyUnits()) {
-                if ((unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool) && unit.isCompleted()) {
+                if ((unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool)
+                        && unit.isCompleted()) {
                     for (final Unit larva : broodwar.getMyUnits()) {
                         if (larva.getTypeId() == UnitTypes.Zerg_Larva) {
                             larva.morph(UnitTypes.Zerg_Zergling);
@@ -126,7 +130,7 @@ public class SixPool extends AbstractAgent {
                 for (final Unit enemy : broodwar.getEnemyUnits()) {
                     final int x = enemy.getTileLocation().x;
                     final int y = enemy.getTileLocation().y;
-                    final Location position = new Location(x, y);
+                    final Location position = new Location(x * 32, y * 32);
                     unit.attack(position);
                     break;
                 }
@@ -143,15 +147,16 @@ public class SixPool extends AbstractAgent {
         return false;
     }
 
+    @Override
+    public void unitCreate(final Unit unit) {
+        System.out.println("Create: " + unit.getId());
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
-    public void unitDiscover(final int unitId) {
-        final Unit unit = broodwar.getUnit(unitId);
-        final UnitTypes typeId = unit.getTypeId();
-        final UnitType type = broodwar.getUnitType(typeId);
-        System.out.println(unitId + "\t" + type.getName() + "\t" + unit.getReplayId());
+    public void unitDiscover(final Unit unit) {
+        System.out.println("Discover: " + unit.getId());
     }
-
 }

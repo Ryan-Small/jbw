@@ -4,7 +4,7 @@
 #include <jni.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "jnibwapi_JNIBWAPI.h"
+#include "jnibwapi_Broodwar.h"
 #include "jnibwapi_model_Unit.h"
 
 #define JNI_NULL 0
@@ -56,7 +56,7 @@ double fixedScale = 100.0;
 /**
 * Entry point from Java
 */
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_startClient(JNIEnv* env, jobject jObj, jobject classRef)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_startClient(JNIEnv* env, jobject jObj, jobject classRef)
 {
 	// get the java callback functions
 	jEnv = env;
@@ -290,42 +290,42 @@ void loadTypeData(void)
 // Game options
 /*****************************************************************************************************************/
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawHealth(JNIEnv* env, jobject jObj, jboolean enable)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawHealth(JNIEnv* env, jobject jObj, jboolean enable)
 {
 	showHealth = enable != JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawTargets(JNIEnv* env, jobject jObj, jboolean enable)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawTargets(JNIEnv* env, jobject jObj, jboolean enable)
 {
 	showTargets = enable != JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawIDs(JNIEnv* env, jobject jObj, jboolean enable)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawIDs(JNIEnv* env, jobject jObj, jboolean enable)
 {
 	showIDs = enable != JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_enableUserInput(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_enableUserInput(JNIEnv* env, jobject jObj)
 {
 	Broodwar->enableFlag(Flag::UserInput);
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_enablePerfectInformation(JNIEnv* env, jobject jObj) 
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_enablePerfectInformation(JNIEnv* env, jobject jObj)
 {
 	Broodwar->enableFlag(Flag::CompleteMapInformation);
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_setGameSpeed(JNIEnv* env, jobject jObj, jint speed)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_setGameSpeed(JNIEnv* env, jobject jObj, jint speed)
 {
 	Broodwar->setLocalSpeed(speed);
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_setFrameSkip(JNIEnv* env, jobject jObj, jint skip)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_setFrameSkip(JNIEnv* env, jobject jObj, jint skip)
 {
 	Broodwar->setFrameSkip(skip);
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_leaveGame(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_leaveGame(JNIEnv* env, jobject jObj)
 {
 	Broodwar->leaveGame();
 }
@@ -334,17 +334,17 @@ JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_leaveGame(JNIEnv* env, jobject jOb
 // Game state queries
 /*****************************************************************************************************************/
 
-JNIEXPORT jint JNICALL Java_jnibwapi_JNIBWAPI_getFrame(JNIEnv* env, jobject jObj) 
+JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getFrame(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->getFrameCount();
 }
 
-JNIEXPORT jint JNICALL Java_jnibwapi_JNIBWAPI_getReplayFrameTotal(JNIEnv* env, jobject jObj) 
+JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getReplayFrameTotal(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->getReplayFrameCount();
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getPlayersData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getPlayersData(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -375,7 +375,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getPlayersData(JNIEnv* env, j
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getPlayerUpdate(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getPlayerUpdate(JNIEnv* env, jobject jObj, jint playerID)
 {
 	int index = 0;
 	Player* p = Broodwar->getPlayer(playerID);
@@ -395,7 +395,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getPlayerUpdate(JNIEnv* env, 
 	return result;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_jnibwapi_JNIBWAPI_getPlayerName(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jbyteArray JNICALL Java_jnibwapi_Broodwar_getPlayerName(JNIEnv* env, jobject jObj, jint playerID)
 {
 	// NewStringUTF causes issues with unusual characters like Korean symbols
 	std::string str = Broodwar->getPlayer(playerID)->getName();
@@ -404,7 +404,7 @@ JNIEXPORT jbyteArray JNICALL Java_jnibwapi_JNIBWAPI_getPlayerName(JNIEnv* env, j
 	return jbArray;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getResearchStatus(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getResearchStatus(JNIEnv* env, jobject jObj, jint playerID)
 {
 	int index = 0;
 	Player* p = Broodwar->getPlayer(playerID);
@@ -420,7 +420,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getResearchStatus(JNIEnv* env
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUpgradeStatus(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getUpgradeStatus(JNIEnv* env, jobject jObj, jint playerID)
 {
 	int index = 0;
 	Player* p = Broodwar->getPlayer(playerID);
@@ -436,7 +436,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUpgradeStatus(JNIEnv* env,
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUnitTypes(JNIEnv* env, jobject jObj) 
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getUnitTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -518,12 +518,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUnitTypes(JNIEnv* env, job
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getUnitTypeName(JNIEnv* env, jobject jObj, jint unitTypeID) 
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getUnitTypeName(JNIEnv* env, jobject jObj, jint unitTypeID)
 {
 	return env->NewStringUTF(unitTypeMap[unitTypeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRequiredUnits(JNIEnv* env, jobject jObj, jint unitTypeID) 
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getRequiredUnits(JNIEnv* env, jobject jObj, jint unitTypeID)
 {
 	int index = 0;
 	std::map<UnitType, int> requiredUnits = unitTypeMap[unitTypeID].requiredUnits();
@@ -537,7 +537,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRequiredUnits(JNIEnv* env,
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRaceTypes(JNIEnv* env, jobject jObj) 
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getRaceTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -557,12 +557,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRaceTypes(JNIEnv* env, job
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getRaceTypeName(JNIEnv* env, jobject jObj, jint typeID) 
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getRaceTypeName(JNIEnv* env, jobject jObj, jint typeID)
 {
 	return env->NewStringUTF(raceTypeMap[typeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getTechTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getTechTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -587,12 +587,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getTechTypes(JNIEnv* env, job
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getTechTypeName(JNIEnv* env, jobject jObj, jint techID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getTechTypeName(JNIEnv* env, jobject jObj, jint techID)
 {
 	return env->NewStringUTF(techTypeMap[techID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUpgradeTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getUpgradeTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -615,12 +615,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUpgradeTypes(JNIEnv* env, 
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getUpgradeTypeName(JNIEnv* env, jobject jObj, jint upgradeID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getUpgradeTypeName(JNIEnv* env, jobject jObj, jint upgradeID)
 {
 	return env->NewStringUTF(upgradeTypeMap[upgradeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getWeaponTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getWeaponTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -657,12 +657,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getWeaponTypes(JNIEnv* env, j
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getWeaponTypeName(JNIEnv* env, jobject jObj, jint weaponID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getWeaponTypeName(JNIEnv* env, jobject jObj, jint weaponID)
 {
 	return env->NewStringUTF(weaponTypeMap[weaponID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUnitSizeTypes(JNIEnv* env, jobject jObj) 
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getUnitSizeTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -676,12 +676,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUnitSizeTypes(JNIEnv* env,
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getUnitSizeTypeName(JNIEnv* env, jobject jObj, jint sizeID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getUnitSizeTypeName(JNIEnv* env, jobject jObj, jint sizeID)
 {
 	return env->NewStringUTF(unitSizeTypeMap[sizeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getBulletTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getBulletTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -695,12 +695,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getBulletTypes(JNIEnv* env, j
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getBulletTypeName(JNIEnv* env, jobject jObj, jint bulletID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getBulletTypeName(JNIEnv* env, jobject jObj, jint bulletID)
 {
 	return env->NewStringUTF(bulletTypeMap[bulletID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getDamageTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getDamageTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -714,12 +714,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getDamageTypes(JNIEnv* env, j
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getDamageTypeName(JNIEnv* env, jobject jObj, jint damageID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getDamageTypeName(JNIEnv* env, jobject jObj, jint damageID)
 {
 	return env->NewStringUTF(damageTypeMap[damageID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getExplosionTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getExplosionTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -733,17 +733,17 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getExplosionTypes(JNIEnv* env
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getExplosionTypeName(JNIEnv* env, jobject jObj, jint explosionID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getExplosionTypeName(JNIEnv* env, jobject jObj, jint explosionID)
 {
 	return env->NewStringUTF(explosionTypeMap[explosionID].getName().c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getUnitCommandTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getUnitCommandTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
 {
 	return env->NewStringUTF(unitCommandTypeMap[unitCommandID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUnitCommandTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getUnitCommandTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -757,12 +757,12 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUnitCommandTypes(JNIEnv* e
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getOrderTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getOrderTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
 {
 	return env->NewStringUTF(orderTypeMap[unitCommandID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getOrderTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getOrderTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -781,7 +781,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getOrderTypes(JNIEnv* env, jo
 *
 * Each unit takes up a fixed number of integer values. Currently: 118
 */
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getAllUnitsData(JNIEnv* env, jobject jObj) 
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getAllUnitsData(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -918,7 +918,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getAllUnitsData(JNIEnv* env, 
 	return result;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_isVisibleToPlayer(JNIEnv* env, jobject jObj, jint unitID, jint playerID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_isVisibleToPlayer(JNIEnv* env, jobject jObj, jint unitID, jint playerID)
 {
 	Unit* u = Broodwar->getUnit(unitID);
 	Player* p = Broodwar->getPlayer(playerID);
@@ -933,22 +933,22 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_isVisibleToPlayer(JNIEnv* env,
 // Map queries
 /*****************************************************************************************************************/
 
-JNIEXPORT jint JNICALL Java_jnibwapi_JNIBWAPI_getMapWidth(JNIEnv* env, jobject jObj)
+JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getMapWidth(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->mapWidth();
 }
 
-JNIEXPORT jint JNICALL Java_jnibwapi_JNIBWAPI_getMapHeight(JNIEnv* env, jobject jObj)
+JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getMapHeight(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->mapHeight();
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getMapFileName(JNIEnv* env, jobject jObj)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getMapFileName(JNIEnv* env, jobject jObj)
 {
 	return env->NewStringUTF(Broodwar->mapFileName().c_str());
 }
 
-JNIEXPORT jbyteArray JNICALL Java_jnibwapi_JNIBWAPI_getMapName(JNIEnv* env, jobject jObj)
+JNIEXPORT jbyteArray JNICALL Java_jnibwapi_Broodwar_getMapName(JNIEnv* env, jobject jObj)
 {
 	// NewStringUTF causes issues with unusual characters like Korean symbols
 	std::string str = Broodwar->mapName();
@@ -957,12 +957,12 @@ JNIEXPORT jbyteArray JNICALL Java_jnibwapi_JNIBWAPI_getMapName(JNIEnv* env, jobj
 	return jbArray;
 }
 
-JNIEXPORT jstring JNICALL Java_jnibwapi_JNIBWAPI_getMapHash(JNIEnv* env, jobject jObj)
+JNIEXPORT jstring JNICALL Java_jnibwapi_Broodwar_getMapHash(JNIEnv* env, jobject jObj)
 {
 	return env->NewStringUTF(Broodwar->mapHash().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getHeightData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getHeightData(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -980,7 +980,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getHeightData(JNIEnv* env, jo
 }
 
 // Returns the regionId for each map tile
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRegionMap(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getRegionMap(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -998,7 +998,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRegionMap(JNIEnv* env, job
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getWalkableData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getWalkableData(JNIEnv* env, jobject jObj)
 {
 	// Note: walk tiles are 8x8 pixels, build tiles are 32x32 pixels
 	int index = 0;	
@@ -1016,7 +1016,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getWalkableData(JNIEnv* env, 
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getBuildableData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getBuildableData(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -1033,7 +1033,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getBuildableData(JNIEnv* env,
 	return result;
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_analyzeTerrain(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_analyzeTerrain(JNIEnv* env, jobject jObj)
 {
 	regionMap.clear();
 	BWTA::readMap();
@@ -1047,7 +1047,7 @@ JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_analyzeTerrain(JNIEnv* env, jobjec
 	}
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getChokePoints(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getChokePoints(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -1069,7 +1069,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getChokePoints(JNIEnv* env, j
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRegions(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getRegions(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -1085,7 +1085,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getRegions(JNIEnv* env, jobje
 	return result;
 } 
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getPolygon(JNIEnv* env, jobject jObj, jint regionID)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getPolygon(JNIEnv* env, jobject jObj, jint regionID)
 {
 	int index = 0;
 	std::set<BWTA::Region*> regions = BWTA::getRegions();
@@ -1103,7 +1103,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getPolygon(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getBaseLocations(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getBaseLocations(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -1126,7 +1126,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getBaseLocations(JNIEnv* env,
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getUnitIdsOnTile(JNIEnv * env, jobject jObj, jint tx, jint ty)
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getUnitIdsOnTile(JNIEnv * env, jobject jObj, jint tx, jint ty)
 {
 	std::set<Unit*> unitsOnTile = Broodwar->getUnitsOnTile(tx, ty);
 	int index = 0;
@@ -1553,7 +1553,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_model_Unit_useTech__III(JNIEnv* env, jo
 // Utility functions
 /*****************************************************************************************************************/
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawBox(JNIEnv* env, jobject jObj, jint left, jint top, jint right, jint bottom, jint color, jboolean fill, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawBox(JNIEnv* env, jobject jObj, jint left, jint top, jint right, jint bottom, jint color, jboolean fill, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawBoxScreen(left, top, right, bottom, BWAPI::Color(color), fill ? true : false);
@@ -1562,7 +1562,7 @@ JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawBox(JNIEnv* env, jobject jObj,
 	}
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawCircle(JNIEnv* env, jobject jObj, jint x, jint y, jint radius, jint color, jboolean fill, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawCircle(JNIEnv* env, jobject jObj, jint x, jint y, jint radius, jint color, jboolean fill, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawCircleScreen(x, y, radius, BWAPI::Color(color), fill ? true : false);
@@ -1571,7 +1571,7 @@ JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawCircle(JNIEnv* env, jobject jO
 	}
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawLine(JNIEnv* env, jobject jObj, jint x1, jint y1, jint x2, jint y2, jint color, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawLine(JNIEnv* env, jobject jObj, jint x1, jint y1, jint x2, jint y2, jint color, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawLineScreen(x1, y1, x2, y2, BWAPI::Color(color));
@@ -1580,7 +1580,7 @@ JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawLine(JNIEnv* env, jobject jObj
 	}
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawDot(JNIEnv* env, jobject jObj, jint x, jint y, jint color, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawDot(JNIEnv* env, jobject jObj, jint x, jint y, jint color, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawDotScreen(x, y, BWAPI::Color(color));	  
@@ -1589,7 +1589,7 @@ JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawDot(JNIEnv* env, jobject jObj,
 	}
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_drawText(JNIEnv* env, jobject jObj, jint x, jint y, jstring msg, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_drawText(JNIEnv* env, jobject jObj, jint x, jint y, jstring msg, jboolean screenCoords)
 {
 	const char* text = env->GetStringUTFChars(msg, 0);
 
@@ -1722,17 +1722,17 @@ void drawIDs(void) {
 // Extended functions
 /*****************************************************************************************************************/
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_isVisible(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_isVisible(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
 {
 	return Broodwar->isVisible(tileX, tileY);
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_isExplored(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_isExplored(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
 {
 	return Broodwar->isExplored(tileX, tileY);
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_isBuildable(JNIEnv *, jobject, jint tx, jint ty, jboolean includeBuildings ){
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_isBuildable(JNIEnv *, jobject, jint tx, jint ty, jboolean includeBuildings){
 	bool checkBuildings = false;
 	if(includeBuildings)
 	{
@@ -1741,17 +1741,17 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_isBuildable(JNIEnv *, jobject,
 	return Broodwar->isBuildable(tx, ty , checkBuildings);
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasCreep(JNIEnv* env, jobject jObj, jint tx, jint ty)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasCreep(JNIEnv* env, jobject jObj, jint tx, jint ty)
 {
 	return Broodwar->hasCreep(tx, ty);
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPower__II(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPower__II(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
 {
 	return Broodwar->hasPower(tileX, tileY);
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPower__III(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPower__III(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 
@@ -1762,12 +1762,12 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPower__III(JNIEnv* env, job
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPower__IIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPower__IIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight)
 {
 	return Broodwar->hasPower(tileX, tileY, tileWidth, tileHeight);
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPower__IIIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight, jint unitID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPower__IIIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight, jint unitID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 
@@ -1778,17 +1778,17 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPower__IIIII(JNIEnv* env, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPowerPrecise(JNIEnv* env, jobject jObj, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPowerPrecise(JNIEnv* env, jobject jObj, jint x, jint y)
 {
 	return Broodwar->hasPowerPrecise(x, y);
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPath__IIII(JNIEnv* env, jobject jObj, jint fromX, jint fromY, jint toX, jint toY)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPath__IIII(JNIEnv* env, jobject jObj, jint fromX, jint fromY, jint toX, jint toY)
 {
 	return Broodwar->hasPath(BWAPI::Position(fromX, fromY), BWAPI::Position(toX, toY));
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPath__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPath__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1800,7 +1800,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPath__II(JNIEnv* env, jobje
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPath__III(JNIEnv* env, jobject jObj, jint unitID, jint toX, jint toY)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPath__III(JNIEnv* env, jobject jObj, jint unitID, jint toX, jint toY)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 
@@ -1811,7 +1811,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasPath__III(JNIEnv* env, jobj
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasLoadedUnit
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasLoadedUnit
 	(JNIEnv *, jobject, jint unitID1, jint unitID2){
 		Unit* unit = Broodwar->getUnit(unitID1);
 		if (unit != NULL) {
@@ -1825,7 +1825,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_hasLoadedUnit
 		return false;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canBuildHere__IIIZ(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canBuildHere__IIIZ(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::UnitType unitType = unitTypeMap[unitTypeID];
@@ -1835,7 +1835,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canBuildHere__IIIZ(JNIEnv* env
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canBuildHere__IIIIZ(JNIEnv* env, jobject jObj, jint unitID, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canBuildHere__IIIIZ(JNIEnv* env, jobject jObj, jint unitID, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1846,7 +1846,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canBuildHere__IIIIZ(JNIEnv* en
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canMake__I(JNIEnv* env, jobject jObj, jint unitTypeID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canMake__I(JNIEnv* env, jobject jObj, jint unitTypeID)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::UnitType unitType = unitTypeMap[unitTypeID];
@@ -1856,7 +1856,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canMake__I(JNIEnv* env, jobjec
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canMake__II(JNIEnv* env, jobject jObj, jint unitID, jint unitTypeID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canMake__II(JNIEnv* env, jobject jObj, jint unitID, jint unitTypeID)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1867,7 +1867,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canMake__II(JNIEnv* env, jobje
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canResearch__I(JNIEnv* env, jobject jObj, jint techTypeID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canResearch__I(JNIEnv* env, jobject jObj, jint techTypeID)
 {
 	if (techTypeMap.count(techTypeID) > 0) {
 		BWAPI::TechType techType = techTypeMap[techTypeID];
@@ -1877,7 +1877,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canResearch__I(JNIEnv* env, jo
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canResearch__II(JNIEnv* env, jobject jObj, jint unitID, jint techTypeID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canResearch__II(JNIEnv* env, jobject jObj, jint unitID, jint techTypeID)
 {
 	if (techTypeMap.count(techTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1888,7 +1888,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canResearch__II(JNIEnv* env, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canUpgrade__I(JNIEnv* env, jobject jObj, jint upgradeTypeID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canUpgrade__I(JNIEnv* env, jobject jObj, jint upgradeTypeID)
 {
 	if (upgradeTypeMap.count(upgradeTypeID) > 0) {
 		BWAPI::UpgradeType upgradeType = upgradeTypeMap[upgradeTypeID];
@@ -1898,7 +1898,7 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canUpgrade__I(JNIEnv* env, job
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canUpgrade__II(JNIEnv* env, jobject jObj, jint unitID, jint upgradeTypeID)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canUpgrade__II(JNIEnv* env, jobject jObj, jint unitID, jint upgradeTypeID)
 {
 	if (upgradeTypeMap.count(upgradeTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1909,35 +1909,35 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_canUpgrade__II(JNIEnv* env, jo
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_isReplay(JNIEnv *env, jobject jObj)
+JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_isReplay(JNIEnv *env, jobject jObj)
 {
 	return Broodwar->isReplay();
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_printText(JNIEnv* env, jobject jObj, jstring message)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_printText(JNIEnv* env, jobject jObj, jstring message)
 {
 	const char* messagechars = env->GetStringUTFChars(message, 0);
 	Broodwar->printf("%s", messagechars);
 	env->ReleaseStringUTFChars(message, messagechars);
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_sendText(JNIEnv* env, jobject jObj, jstring message)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_sendText(JNIEnv* env, jobject jObj, jstring message)
 {
 	const char* messagechars = env->GetStringUTFChars(message, 0);
 	Broodwar->sendText("%s", messagechars);
 	env->ReleaseStringUTFChars(message, messagechars);
 }
 
-JNIEXPORT void JNICALL Java_jnibwapi_JNIBWAPI_setCommandOptimizationLevel(JNIEnv* env, jobject jObj, jint level)
+JNIEXPORT void JNICALL Java_jnibwapi_Broodwar_setCommandOptimizationLevel(JNIEnv* env, jobject jObj, jint level)
 {
 	Broodwar->setCommandOptimizationLevel(level);
 }
 
-JNIEXPORT jint JNICALL Java_jnibwapi_JNIBWAPI_getLastError(JNIEnv *, jobject){
+JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getLastError(JNIEnv *, jobject){
 	return Broodwar->getLastError().getID();
 }
 
-JNIEXPORT jint JNICALL Java_jnibwapi_JNIBWAPI_getRemainingLatencyFrames(JNIEnv *, jobject){
+JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getRemainingLatencyFrames(JNIEnv *, jobject){
 
 		return Broodwar->getRemainingLatencyFrames();
 }

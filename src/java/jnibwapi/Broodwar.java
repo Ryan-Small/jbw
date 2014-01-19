@@ -7,10 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 
+import jnibwapi.model.*;
 import jnibwapi.model.Map;
-import jnibwapi.model.Player;
-import jnibwapi.model.Region;
-import jnibwapi.model.Unit;
 import jnibwapi.types.*;
 import jnibwapi.types.TechType.TechTypes;
 import jnibwapi.types.UnitType.UnitTypes;
@@ -1011,47 +1009,48 @@ public class Broodwar {
                 break;
 
             case PlayerLeft :
-                listener.playerLeft(p1);
+                listener.playerLeft(players.get(p1));
                 break;
 
             case NukeDetect :
                 if (p1 == -1) {
                     listener.nukeDetect();
                 } else {
-                    listener.nukeDetect(p1, p2);
+                    final Location location = new Location(p1, p2);
+                    listener.nukeDetect(location);
                 }
                 break;
 
             case UnitDiscover :
-                listener.unitDiscover(p1);
+                listener.unitDiscover(units.get(p1));
                 break;
 
             case UnitEvade :
-                listener.unitEvade(p1);
+                listener.unitEvade(units.get(p1));
                 break;
 
             case UnitShow :
-                listener.unitShow(p1);
+                listener.unitShow(units.get(p1));
                 break;
 
             case UnitHide :
-                listener.unitHide(p1);
+                listener.unitHide(units.get(p1));
                 break;
 
             case UnitCreate :
-                listener.unitCreate(p1);
+                listener.unitCreate(units.get(p1));
                 break;
 
             case UnitDestroy :
-                listener.unitDestroy(p1);
+                listener.unitDestroy(units.get(p1));
                 break;
 
             case UnitMorph :
-                listener.unitMorph(p1);
+                listener.unitMorph(units.get(p1));
                 break;
 
             case UnitRenegade :
-                listener.unitRenegade(p1);
+                listener.unitRenegade(units.get(p1));
                 break;
 
             case SaveGame :
@@ -1059,11 +1058,11 @@ public class Broodwar {
                 break;
 
             case UnitComplete :
-                listener.unitComplete(p1);
+                listener.unitComplete(units.get(p1));
                 break;
 
             case PlayerDropped :
-                listener.playerDropped(p1);
+                listener.playerDropped(players.get(p1));
                 break;
 
             case None :
