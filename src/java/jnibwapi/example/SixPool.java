@@ -2,12 +2,12 @@ package jnibwapi.example;
 
 import java.util.HashSet;
 
-import jnibwapi.AbstractAgent;
+import jnibwapi.BroodwarAgent;
 import jnibwapi.model.Location;
 import jnibwapi.model.Unit;
 import jnibwapi.types.UnitType.UnitTypes;
 
-public class SixPool extends AbstractAgent {
+public class SixPool extends BroodwarAgent {
 
     /** Used for mineral splits. */
     private final HashSet<Integer> claimed = new HashSet<Integer>();
@@ -29,6 +29,11 @@ public class SixPool extends AbstractAgent {
         super(enableBwta);
     }
 
+    /**
+     * Configure the game and do any agent initialization.
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public void matchStart() {
         // broodwar.setGameSpeed(0);
@@ -36,6 +41,11 @@ public class SixPool extends AbstractAgent {
         broodwar.enablePerfectInformation();
     }
 
+    /**
+     * The agent's primary logic will be executed here.
+     * 
+     * {@inheritDoc}
+     */
     @Override
     public void matchFrame() {
         // spawn a drone
@@ -149,7 +159,7 @@ public class SixPool extends AbstractAgent {
 
     @Override
     public void unitCreate(final Unit unit) {
-        System.out.println("Create: " + unit.getId());
+        System.out.println("Create: " + unit.getId() + unit.getTypeId());
     }
 
     /**
@@ -157,6 +167,40 @@ public class SixPool extends AbstractAgent {
      */
     @Override
     public void unitDiscover(final Unit unit) {
-        System.out.println("Discover: " + unit.getId());
+        System.out.println("Discover: " + unit.getId() + unit.getTypeId());
+    }
+
+    /**
+     * This method enables the user to interact with the agent for various
+     * purposes (e.g. debugging, controlling).
+     */
+    @Override
+    public void keyPressed(final int keyCode) {
+
+    }
+
+    /**
+     * This method can enable the user to interact with the agent for various
+     * purposes (e.g. debugging, controlling).
+     * 
+     * {@inheritDoc}
+     */
+    @Override
+    public void sendText(final String message) {
+
+    }
+
+    /**
+     * This method enables other players or agents to interact with the agent
+     * for various purposes (e.g. debugging, controlling).
+     */
+    @Override
+    public void receiveText(final String message) {
+
+    }
+
+    @Override
+    public void unitShow(final Unit unit) {
+        System.out.println("Show: " + unit.getId() + "\t" + unit.getTypeId());
     }
 }

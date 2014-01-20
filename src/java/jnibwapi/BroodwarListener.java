@@ -16,10 +16,7 @@ public interface BroodwarListener {
     public void connected();
 
     /**
-     * Invoked only once at the beginning of a match (i.e. frame 0).
-     * 
-     * <p>
-     * The agent can do any initializations here.
+     * Invoked only once at the beginning of a match (i.e. frame 0)
      */
     public void matchStart();
 
@@ -41,7 +38,7 @@ public interface BroodwarListener {
      * Invoked when the state of a match is saved to a file.
      * 
      * @param fileName
-     *            name of the file the match was saved to
+     *            the name of the file the match was saved to
      */
     public void saveGame(final String fileName);
 
@@ -49,12 +46,8 @@ public interface BroodwarListener {
      * Invoked when the user hits a key in-game. This method is not invoked if
      * user input has not been {@link Broodwar#enableUserInput() enabled}.
      * 
-     * <p>
-     * This method enables the user to interact with the agent for various
-     * purposes (e.g. debugging, controlling).
-     * 
      * @param keyCode
-     *            key pressed by the user
+     *            the key code of the key that was pressed by the user
      */
     public void keyPressed(final int keyCode);
 
@@ -63,12 +56,8 @@ public interface BroodwarListener {
      * not invoked if user input has not been {@link Broodwar#enableUserInput()
      * enabled}.
      * 
-     * <p>
-     * This method can enable the user to interact with the agent for various
-     * purposes (e.g. debugging, controlling).
-     * 
      * @param message
-     *            message sent by the user
+     *            the message sent by the user
      */
     public void sendText(final String message);
 
@@ -76,12 +65,8 @@ public interface BroodwarListener {
      * Invoked when the agent receives a message from another {@code Player}.
      * Messages sent by the user or the agent will never invoke this method.
      * 
-     * <p>
-     * This method enables other players or agents to interact with the agent
-     * for various purposes (e.g. debugging, controlling).
-     * 
      * @param message
-     *            message sent by another player or agent
+     *            the message sent by another player or agent
      */
     public void receiveText(final String message);
 
@@ -91,7 +76,7 @@ public interface BroodwarListener {
      * parameters preserved.
      * 
      * @param player
-     *            player that has left the game
+     *            the player that has left the game
      */
     public void playerLeft(final Player player);
 
@@ -101,7 +86,7 @@ public interface BroodwarListener {
      * color and alliance parameters preserved.
      * 
      * @param player
-     *            player that has been dropped from the game
+     *            the player that has been dropped from the game
      */
     public void playerDropped(final Player player);
 
@@ -109,7 +94,7 @@ public interface BroodwarListener {
      * Invoked when a nuke has been launched and the location is visible.
      * 
      * @param location
-     *            location the nuke is targeted for
+     *            the location the nuke is targeted for
      */
     public void nukeDetect(final Location location);
 
@@ -124,9 +109,8 @@ public interface BroodwarListener {
      * morphing, and the construction of structures over a Geyser.
      * 
      * @param unit
-     *            unit that has been created
+     *            the unit that has been created
      */
-    // TODO: What if the enemy unit is visible?
     public void unitCreate(final Unit unit);
 
     /**
@@ -143,7 +127,7 @@ public interface BroodwarListener {
      * </ul>
      * 
      * @param unit
-     *            unit that has had its {@code UnitType} changed
+     *            the unit that has had its {@code UnitType} changed
      */
     public void unitMorph(final Unit unit);
 
@@ -152,41 +136,41 @@ public interface BroodwarListener {
      * accessible.
      * 
      * @param unitId
-     *            unit that is now accessible
+     *            the unit that is now accessible
      */
     public void unitDiscover(final Unit unit);
 
     /**
-     * Invoked when a previously invisible {@code Unit} becomes visible.
+     * Invoked when a previously invisible {@code Unit} becomes visible. This
+     * method is not invoked for units owned by this player.
      * 
      * @param unit
-     *            unit that is becoming visible
+     *            the unit that is becoming visible
      */
-    // TODO: What about units that are owned by the agent?
     public void unitShow(final Unit unit);
 
     /**
      * Invoked when the state of a unit changes from incomplete to complete.
      * 
      * @param unit
-     *            unit that just finished training or being constructed
+     *            the unit that just finished training or being constructed
      */
     public void unitComplete(final Unit unit);
 
     /**
-     * Invoked when a previously visible {@code Unit} becomes invisible.
+     * Invoked when a previously visible {@code Unit} becomes invisible. This
+     * method is not invoked for units owned by this player.
      * 
      * @param unit
-     *            unit that is becoming invisible
+     *            the unit that is becoming invisible
      */
-    // TODO: What about units that are owned by the agent?
     public void unitHide(final Unit unit);
 
     /**
      * Invoked when a previously accessible {@code Unit} becomes inaccessible.
      * 
      * @param unit
-     *            unit that is now inaccessible
+     *            the unit that is now inaccessible
      */
     public void unitEvade(final Unit unit);
 
@@ -196,16 +180,16 @@ public interface BroodwarListener {
      * Extractor).
      * 
      * @param unit
-     *            unit that has been destroyed
+     *            the unit that has been destroyed
      */
     public void unitDestroy(final Unit unit);
 
     /**
      * Invoked when a unit changes ownership (e.g. through Dark Archon's Mind
-     * Control, Geyser when an assimilator is built on it).
+     * Control, when an assimilator is built on a Geyser).
      * 
      * @param unit
-     *            unit that has changed ownership
+     *            the unit that has changed ownership
      */
     public void unitRenegade(final Unit unit);
 

@@ -10,10 +10,11 @@ import jnibwapi.model.Map;
  * Serves as the base class for an agent by providing the functionality for
  * launching the agent on a separate thread.
  */
-public abstract class AbstractAgent extends BroodwarListener.Adaptor {
+public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
 
     /**
-     * Allows the agent to interact with the Broodwar game.
+     * Provides functionality for interacting with the currently connected
+     * Broodwar game.
      * 
      * <p>
      * Using this object before a match {@link #matchStart() starts} or after a
@@ -34,7 +35,7 @@ public abstract class AbstractAgent extends BroodwarListener.Adaptor {
      *            {@link Map#isMapDetailsEnabled() analyzed}; {@code false}
      *            otherwise
      */
-    public AbstractAgent(final boolean mapDetailsEenabled) {
+    public BroodwarAgent(final boolean mapDetailsEenabled) {
         broodwar = new Broodwar(this, mapDetailsEenabled);
     }
 
