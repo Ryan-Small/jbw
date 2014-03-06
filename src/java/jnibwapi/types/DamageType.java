@@ -1,9 +1,7 @@
 package jnibwapi.types;
 
 /**
- * Represents a StarCraft damage type.
- * 
- * For a description of fields see: http://code.google.com/p/bwapi/wiki/DamageType
+ * http://code.google.com/p/bwapi/wiki/DamageType
  */
 public class DamageType {
 
@@ -30,15 +28,15 @@ public class DamageType {
         id = data[index++];
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(final String name) {
         this.name = name;
-    }
-
-    public int getId() {
-        return id;
     }
 }

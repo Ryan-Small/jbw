@@ -1,9 +1,7 @@
 package jnibwapi.types;
 
 /**
- * Represents a StarCraft event type.
- * 
- * For a description of fields see: http://code.google.com/p/bwapi/wiki/Event
+ * http://code.google.com/p/bwapi/wiki/Event
  */
 public enum EventType {
     MatchStart,

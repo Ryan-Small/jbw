@@ -33,9 +33,8 @@ public class Map {
     private List<BaseLocation> baseLocations = null;
     private HashMap<Integer, Region> idToRegion = null;
 
-    public Map(final String name, final String fileName, final String hash,
-            final int width, final int height, final int[] heightMap,
-            final int[] buildable, final int[] walkable) {
+    public Map(final String name, final String fileName, final String hash, final int width,
+            final int height, final int[] heightMap, final int[] buildable, final int[] walkable) {
         this.width = width;
         this.height = height;
         walkWidth = 4 * width;
@@ -60,27 +59,24 @@ public class Map {
         Arrays.fill(lowResWalkable, true);
         for (int wx = 0; wx < walkWidth; wx++) {
             for (int wy = 0; wy < walkHeight; wy++) {
-                lowResWalkable[(wx / 4) + (width * (wy / 4))] &=
-                        isWalkable(wx, wy);
+                lowResWalkable[(wx / 4) + (width * (wy / 4))] &= isWalkable(wx, wy);
             }
         }
     }
 
     /** Initialize the map with regions and base locations */
     public void initialize(final int[] regionMapData, final int[] regionData,
-            final HashMap<Integer, int[]> regionPolygons,
-            final int[] chokePointData, final int[] baseLocationData) {
+            final HashMap<Integer, int[]> regionPolygons, final int[] chokePointData,
+            final int[] baseLocationData) {
         // regionMap
         regionMap = regionMapData;
 
         // regions
         regions = new ArrayList<>();
         if (regionData != null) {
-            for (int index = 0; index < regionData.length; index +=
-                    Region.NUM_ATTRIBUTES) {
+            for (int index = 0; index < regionData.length; index += Region.NUM_ATTRIBUTES) {
                 final int[] coordinates = regionPolygons.get(regionData[index]);
-                final Region region =
-                        new Region(regionData, index, coordinates);
+                final Region region = new Region(regionData, index, coordinates);
                 regions.add(region);
             }
         }
@@ -92,10 +88,8 @@ public class Map {
         // choke points
         chokePoints = new ArrayList<>();
         if (chokePointData != null) {
-            for (int index = 0; index < chokePointData.length; index +=
-                    ChokePoint.NUM_ATTRIBUTES) {
-                final ChokePoint chokePoint =
-                        new ChokePoint(chokePointData, index, idToRegion);
+            for (int index = 0; index < chokePointData.length; index += ChokePoint.NUM_ATTRIBUTES) {
+                final ChokePoint chokePoint = new ChokePoint(chokePointData, index, idToRegion);
                 chokePoints.add(chokePoint);
             }
         }
@@ -105,8 +99,7 @@ public class Map {
         if (baseLocationData != null) {
             for (int index = 0; index < baseLocationData.length; index +=
                     BaseLocation.NUM_ATTRIBUTES) {
-                final BaseLocation baseLocation =
-                        new BaseLocation(baseLocationData, index);
+                final BaseLocation baseLocation = new BaseLocation(baseLocationData, index);
                 baseLocations.add(baseLocation);
             }
         }
@@ -114,23 +107,20 @@ public class Map {
         // connect the region graph
         for (final ChokePoint chokePoint : chokePoints) {
             chokePoint.getFirstRegion().addChokePoint(chokePoint);
-            chokePoint.getFirstRegion().addConnectedRegion(
-                    chokePoint.getSecondRegion());
+            chokePoint.getFirstRegion().addConnectedRegion(chokePoint.getSecondRegion());
             chokePoint.getSecondRegion().addChokePoint(chokePoint);
-            chokePoint.getSecondRegion().addConnectedRegion(
-                    chokePoint.getFirstRegion());
+            chokePoint.getSecondRegion().addConnectedRegion(chokePoint.getFirstRegion());
         }
 
         mapDetailsEnabled = true;
     }
 
     /**
-     * If {@code mapDetailsEenabled} is {@code true}, the map will be analyzed
-     * in detail allowing the {@link Broodwar#getMap() map} to provide region,
-     * choke point, and base location information. Broodwar may hang for a short
-     * duration the first time a map is analyzed. Once the map analysis has
-     * completed, the information is cached, reducing the analysis time for that
-     * map.
+     * If {@code mapDetailsEenabled} is {@code true}, the map will be analyzed in detail allowing
+     * the {@link Broodwar#getMap() map} to provide region, choke point, and base location
+     * information. Broodwar may hang for a short duration the first time a map is analyzed. Once
+     * the map analysis has completed, the information is cached, reducing the analysis time for
+     * that map.
      * 
      * @return
      */
@@ -179,8 +169,7 @@ public class Map {
     }
 
     /**
-     * Works only after initialize(). Returns null if the specified position is
-     * out of bounds.
+     * Works only after initialize(). Returns null if the specified position is out of bounds.
      */
     public Region getRegion(final int tx, final int ty) {
         if ((tx < width) && (ty < height) && (tx >= 0) && (ty >= 0)) {
@@ -247,12 +236,11 @@ public class Map {
     }
 
     /**
-     * Find the shortest walkable distance, in pixels, between two tile
-     * positions or -1 if not reachable. Works only after initialize(). Ported
-     * from BWTA.
+     * Find the shortest walkable distance, in pixels, between two tile positions or -1 if not
+     * reachable. Works only after initialize(). Ported from BWTA.
      */
-    public double getGroundDistance(final int startTx, final int startTy,
-            final int endTx, final int endTy) {
+    public double getGroundDistance(final int startTx, final int startTy, final int endTx,
+            final int endTy) {
         if (!isConnected(startTx, startTy, endTx, endTy)) {
             return -1;
         }
@@ -260,11 +248,11 @@ public class Map {
     }
 
     /**
-     * Based on map connectedness only. Ignores buildings. Works only after
-     * initialize(). Ported from BWTA.
+     * Based on map connectedness only. Ignores buildings. Works only after initialize(). Ported
+     * from BWTA.
      */
-    public boolean isConnected(final int startTx, final int startTy,
-            final int endTx, final int endTy) {
+    public boolean isConnected(final int startTx, final int startTy, final int endTx,
+            final int endTy) {
         if (getRegion(startTx, startTy) == null) {
             return false;
         }
@@ -279,13 +267,12 @@ public class Map {
      * Performs an A* search. Intended to be called from
      * {@link #getGroundDistance(int, int, int, int)}. Ported from BWTA.
      */
-    private double aStarSearchDistance(final int startTx, final int startTy,
-            final int endTx, final int endTy) {
+    private double aStarSearchDistance(final int startTx, final int startTy, final int endTx,
+            final int endTy) {
         // Distance of 10 per build tile, or sqrt(10^2 + 10^2) ~= 14 diagonally
         final int mvmtCost = 10;
         final int mvmtCostDiag = 14;
-        final PriorityQueue<AStarTile> openTiles =
-                new PriorityQueue<AStarTile>(); // min heap
+        final PriorityQueue<AStarTile> openTiles = new PriorityQueue<AStarTile>(); // min heap
         // Map from tile to distance
         final HashMap<Point, Integer> gmap = new HashMap<Point, Integer>();
         final HashSet<Point> closedTiles = new HashSet<Point>();
@@ -331,13 +318,11 @@ public class Map {
                     // abs(dx - dy) is the rest of the distance, so costs
                     // mvmtCost
                     final int h =
-                            (Math.abs(dx - dy) * mvmtCost)
-                                    + (Math.min(dx, dy) * mvmtCostDiag);
+                            (Math.abs(dx - dy) * mvmtCost) + (Math.min(dx, dy) * mvmtCostDiag);
                     final int f = g + h;
                     if (!gmap.containsKey(t) || (gmap.get(t) > g)) {
                         gmap.put(t, g);
-                        for (final Iterator<AStarTile> it =
-                                openTiles.iterator(); it.hasNext();) {
+                        for (final Iterator<AStarTile> it = openTiles.iterator(); it.hasNext();) {
                             if (it.next().tilePos.equals(t)) {
                                 it.remove();
                             }

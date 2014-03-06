@@ -1,9 +1,7 @@
 package jnibwapi.types;
 
 /**
- * Represents a StarCraft bullet type.
- * 
- * For a description of fields see: http://code.google.com/p/bwapi/wiki/BulletType
+ * http://code.google.com/p/bwapi/wiki/BulletType
  */
 public class BulletType {
 
@@ -66,15 +64,15 @@ public class BulletType {
         id = data[index++];
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
 
     public void setName(final String name) {
         this.name = name;
-    }
-
-    public int getId() {
-        return id;
     }
 }

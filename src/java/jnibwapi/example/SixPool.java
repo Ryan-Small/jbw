@@ -87,18 +87,15 @@ public class SixPool extends BroodwarAgent {
         }
 
         // build a spawning pool
-        if (!haveSpawningPool()
-                && broodwar.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
+        if (!haveSpawningPool() && broodwar.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
             for (final Unit potentialDrone : broodwar.getMyUnits()) {
                 if (potentialDrone.getTypeId() == UnitTypes.Zerg_Drone) {
                     for (final Unit unit : broodwar.getMyUnits()) {
                         if (unit.getTypeId() == UnitTypes.Zerg_Overlord) {
                             final int x = unit.getTileLocation().x;
                             final int y = unit.getTileLocation().y;
-                            final Location.Tile position =
-                                    new Location.Tile(x, y);
-                            potentialDrone.build(UnitTypes.Zerg_Spawning_Pool,
-                                    position);
+                            final Location.Tile position = new Location.Tile(x, y);
+                            potentialDrone.build(UnitTypes.Zerg_Spawning_Pool, position);
                             break;
                         }
                     }
@@ -108,8 +105,7 @@ public class SixPool extends BroodwarAgent {
         }
 
         // spawn overlords
-        if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf()
-                .getSupplyTotal())
+        if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf().getSupplyTotal())
                 && (broodwar.getSelf().getSupplyTotal() > supplyCap)) {
             if (broodwar.canMake(UnitTypes.Zerg_Overlord.ordinal())) {
                 for (final Unit larva : broodwar.getMyUnits()) {
@@ -123,8 +119,7 @@ public class SixPool extends BroodwarAgent {
         // spawn zerglings
         else if (broodwar.canMake(UnitTypes.Zerg_Zergling.ordinal())) {
             for (final Unit unit : broodwar.getMyUnits()) {
-                if ((unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool)
-                        && unit.isCompleted()) {
+                if ((unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool) && unit.isCompleted()) {
                     for (final Unit larva : broodwar.getMyUnits()) {
                         if (larva.getTypeId() == UnitTypes.Zerg_Larva) {
                             larva.morph(UnitTypes.Zerg_Zergling);
@@ -171,8 +166,8 @@ public class SixPool extends BroodwarAgent {
     }
 
     /**
-     * This method enables the user to interact with the agent for various
-     * purposes (e.g. debugging, controlling).
+     * This method enables the user to interact with the agent for various purposes (e.g. debugging,
+     * controlling).
      */
     @Override
     public void keyPressed(final int keyCode) {
@@ -180,8 +175,8 @@ public class SixPool extends BroodwarAgent {
     }
 
     /**
-     * This method can enable the user to interact with the agent for various
-     * purposes (e.g. debugging, controlling).
+     * This method can enable the user to interact with the agent for various purposes (e.g.
+     * debugging, controlling).
      * 
      * {@inheritDoc}
      */
@@ -191,8 +186,8 @@ public class SixPool extends BroodwarAgent {
     }
 
     /**
-     * This method enables other players or agents to interact with the agent
-     * for various purposes (e.g. debugging, controlling).
+     * This method enables other players or agents to interact with the agent for various purposes
+     * (e.g. debugging, controlling).
      */
     @Override
     public void receiveText(final String message) {

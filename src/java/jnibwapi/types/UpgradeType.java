@@ -148,7 +148,7 @@ public class UpgradeType {
         return maxRepeats;
     }
 
-    public int getWhatUpgradesTypeID() {
+    public int getWhatUpgradesTypeId() {
         return whatUpgradesTypeId;
     }
 }
