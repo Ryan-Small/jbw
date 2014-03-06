@@ -33,8 +33,8 @@ public class Map {
     private List<BaseLocation> baseLocations = null;
     private HashMap<Integer, Region> idToRegion = null;
 
-    public Map(final int width, final int height, final String name,
-            final String fileName, final String hash, final int[] heightMap,
+    public Map(final String name, final String fileName, final String hash,
+            final int width, final int height, final int[] heightMap,
             final int[] buildable, final int[] walkable) {
         this.width = width;
         this.height = height;
@@ -66,7 +66,7 @@ public class Map {
         }
     }
 
-    /** Initialise the map with regions and base locations */
+    /** Initialize the map with regions and base locations */
     public void initialize(final int[] regionMapData, final int[] regionData,
             final HashMap<Integer, int[]> regionPolygons,
             final int[] chokePointData, final int[] baseLocationData) {
@@ -77,7 +77,7 @@ public class Map {
         regions = new ArrayList<>();
         if (regionData != null) {
             for (int index = 0; index < regionData.length; index +=
-                    Region.numAttributes) {
+                    Region.NUM_ATTRIBUTES) {
                 final int[] coordinates = regionPolygons.get(regionData[index]);
                 final Region region =
                         new Region(regionData, index, coordinates);

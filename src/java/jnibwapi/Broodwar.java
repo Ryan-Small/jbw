@@ -16,11 +16,11 @@ import jnibwapi.types.UnitType.UnitTypes;
 /**
  * JNI interface for the Brood War API.<br>
  * 
- * This focus of this interface is to provide the callback and game state query
- * functionality in BWAPI.<br>
+ * This focus of this interface is to provide the callback and game state query functionality in
+ * BWAPI.<br>
  * 
- * Note: for thread safety and game state sanity, all native calls should be
- * invoked from the callback methods.<br>
+ * Note: for thread safety and game state sanity, all native calls should be invoked from the
+ * callback methods.<br>
  * 
  * For BWAPI documentation see: {@link http://code.google.com/p/bwapi/}<br>
  * 
@@ -32,8 +32,7 @@ public class Broodwar {
 
     /* Load the JNI library. */
     static {
-        // final String clientBridgeDll = "client-bridge-" +
-        // System.getProperty("os.arch");
+        // final String clientBridgeDll = "client-bridge-" + System.getProperty("os.arch");
         final String clientBridgeDll = "client-bridge-x86";
         try {
             System.loadLibrary(clientBridgeDll);
@@ -41,11 +40,9 @@ public class Broodwar {
         } catch (final UnsatisfiedLinkError ex) {
             final File dll = new File(clientBridgeDll + ".dll");
             if (!dll.exists()) {
-                System.err.println("Native code library not found: "
-                        + dll.getAbsolutePath());
+                System.err.println("Native code library not found: " + dll.getAbsolutePath());
             }
-            System.err.println("Native code library failed to load: "
-                    + ex.toString());
+            System.err.println("Native code library failed to load: " + ex.toString());
         }
     }
 
@@ -56,65 +53,64 @@ public class Broodwar {
     private final boolean enableBWTA;
 
     /** The character set to use when decoding Strings. */
-    private Charset charset;
+    private static final Charset CHARACTER_SET = getCharset();
 
-    private int gameFrame = 0;
+    private static Charset getCharset() {
 
-    private Map map;
+        try {
+            return Charset.forName("Cp949");
+        } catch (final UnsupportedCharsetException e) {
+            System.err.println("Korean character set not available.");
+            return StandardCharsets.ISO_8859_1;
+        }
+    }
 
     private final HashMap<Integer, Unit> units = new HashMap<>();
-    private final List<Unit> playerUnits = new ArrayList<>();
-    private final List<Unit> alliedUnits = new ArrayList<>();
-    private final List<Unit> enemyUnits = new ArrayList<>();
-    private final List<Unit> neutralUnits = new ArrayList<>();
+    private final ArrayList<Unit> playerUnits = new ArrayList<>();
+    private final ArrayList<Unit> alliedUnits = new ArrayList<>();
+    private final ArrayList<Unit> enemyUnits = new ArrayList<>();
+    private final ArrayList<Unit> neutralUnits = new ArrayList<>();
 
-    private Player self;
-    private Player neutralPlayer;
-
-    private final Set<Integer> allyIds = new HashSet<>();
-    private final Set<Integer> enemyIds = new HashSet<>();
+    private final HashSet<Integer> allyIds = new HashSet<>();
+    private final HashSet<Integer> enemyIds = new HashSet<>();
 
     private final HashMap<Integer, Player> players = new HashMap<>();
-    private final List<Player> allies = new ArrayList<>();
-    private final List<Player> enemies = new ArrayList<>();
+    private final ArrayList<Player> allies = new ArrayList<>();
+    private final ArrayList<Player> enemies = new ArrayList<>();
 
     private final HashMap<Integer, UnitType> unitTypes = new HashMap<>();
     private final HashMap<Integer, RaceType> raceTypes = new HashMap<>();
     private final HashMap<Integer, TechType> techTypes = new HashMap<>();
     private final HashMap<Integer, UpgradeType> upgradeTypes = new HashMap<>();
     private final HashMap<Integer, WeaponType> weaponTypes = new HashMap<>();
-    private final HashMap<Integer, UnitSizeType> unitSizeTypes =
-            new HashMap<>();
+    private final HashMap<Integer, UnitSizeType> unitSizeTypes = new HashMap<>();
     private final HashMap<Integer, BulletType> bulletTypes = new HashMap<>();
     private final HashMap<Integer, DamageType> damageTypes = new HashMap<>();
-    private final HashMap<Integer, ExplosionType> explosionTypes =
-            new HashMap<>();
-    private final HashMap<Integer, UnitCommandType> unitCommandTypes =
-            new HashMap<>();
+    private final HashMap<Integer, ExplosionType> explosionTypes = new HashMap<>();
+    private final HashMap<Integer, UnitCommandType> unitCommandTypes = new HashMap<>();
     private final HashMap<Integer, OrderType> orderTypes = new HashMap<>();
     private final HashMap<Integer, EventType> eventTypes = new HashMap<>();
 
+    private int gameFrame = 0;
+
+    private Map map;
+
+    private Player self;
+    private Player neutralPlayer;
+
     /**
-     * Instantiates a BWAPI instance, but does not connect to the bridge. To
-     * connect, the start method must be invoked.
+     * Instantiates a BWAPI instance, but does not connect to the bridge. To connect, the start
+     * method must be invoked.
      * 
      * @param listener
      *            listener for BWAPI callback events.
      * 
      * @param enableBWTA
-     *            {@code true} if BWTA should be enabled; {@code false}
-     *            otherwise
+     *            {@code true} if BWTA should be enabled; {@code false} otherwise
      */
     public Broodwar(final BroodwarListener listener, final boolean enableBWTA) {
         this.listener = listener;
         this.enableBWTA = enableBWTA;
-
-        try {
-            charset = Charset.forName("Cp949");
-        } catch (final UnsupportedCharsetException e) {
-            charset = StandardCharsets.ISO_8859_1;
-            System.err.println("Korean character set not available.");
-        }
     }
 
     /**
@@ -208,6 +204,7 @@ public class Broodwar {
 
     private native String getMapHash();
 
+    // TODO: Change to getMapHeightData();
     private native int[] getHeightData();
 
     /** Returns the regionId for each map tile */
@@ -245,17 +242,15 @@ public class Broodwar {
     public native void leaveGame();
 
     // draw commands
-    public native void drawBox(int left, int top, int right, int bottom,
-            int color, boolean fill, boolean screenCoords);
-
-    public native void drawCircle(int x, int y, int radius, int color,
-            boolean fill, boolean screenCoords);
-
-    public native void drawLine(int x1, int y1, int x2, int y2, int color,
+    public native void drawBox(int left, int top, int right, int bottom, int color, boolean fill,
             boolean screenCoords);
 
-    public void drawLine(final Point a, final Point b, final int color,
-            final boolean screenCoords) {
+    public native void drawCircle(int x, int y, int radius, int color, boolean fill,
+            boolean screenCoords);
+
+    public native void drawLine(int x1, int y1, int x2, int y2, int color, boolean screenCoords);
+
+    public void drawLine(final Point a, final Point b, final int color, final boolean screenCoords) {
         drawLine(a.x, a.y, b.x, b.y, color, screenCoords);
     }
 
@@ -263,8 +258,7 @@ public class Broodwar {
 
     public native void drawText(int x, int y, String msg, boolean screenCoords);
 
-    public void drawText(final Point a, final String msg,
-            final boolean screenCoords) {
+    public void drawText(final Point a, final String msg, final boolean screenCoords) {
         drawText(a.x, a.y, msg, screenCoords);
     }
 
@@ -285,11 +279,10 @@ public class Broodwar {
 
     public native boolean hasPower(int tileX, int tileY, int unitTypeID);
 
-    public native boolean hasPower(int tileX, int tileY, int tileWidth,
-            int tileHeight);
+    public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight);
 
-    public native boolean hasPower(int tileX, int tileY, int tileWidth,
-            int tileHeight, int unitTypeID);
+    public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight,
+            int unitTypeID);
 
     public native boolean hasPowerPrecise(int x, int y);
 
@@ -301,11 +294,10 @@ public class Broodwar {
 
     public native boolean hasLoadedUnit(int unitID1, int unitID2);
 
-    public native boolean canBuildHere(int tileX, int tileY, int unitTypeID,
-            boolean checkExplored);
+    public native boolean canBuildHere(int tileX, int tileY, int unitTypeID, boolean checkExplored);
 
-    public native boolean canBuildHere(int unitID, int tileX, int tileY,
-            int unitTypeID, boolean checkExplored);
+    public native boolean canBuildHere(int unitID, int tileX, int tileY, int unitTypeID,
+            boolean checkExplored);
 
     public boolean canMake(final UnitTypes unitType) {
         return canMake(unitType.ordinal());
@@ -496,7 +488,7 @@ public class Broodwar {
     }
 
     public List<Unit> getUnitsOnTile(final int x, final int y) {
-        // Often will have 0 or few units on tile
+        // Most tiles will have 0 units on tile.
         final List<Unit> units = new ArrayList<Unit>(0);
         for (final int id : getUnitIdsOnTile(x, y)) {
             units.add(getUnit(id));
@@ -519,203 +511,189 @@ public class Broodwar {
     private void loadTypeData() {
         // race types
         final int[] raceTypeData = getRaceTypes();
-        for (int index = 0; index < raceTypeData.length; index +=
-                RaceType.NUM_ATTRIBUTES) {
-            final RaceType type = new RaceType(raceTypeData, index);
+        for (int i = 0; i < raceTypeData.length; i += RaceType.NUM_ATTRIBUTES) {
+            final RaceType type = new RaceType(raceTypeData, i);
             type.setName(getRaceTypeName(type.getId()));
             raceTypes.put(type.getId(), type);
         }
 
         // unit types
         final int[] unitTypeData = getUnitTypes();
-        for (int index = 0; index < unitTypeData.length; index +=
-                UnitType.NUM_ATTRIBUTES) {
-            final String name = getUnitTypeName(unitTypeData[index]);
-            final int[] requiredUnits = getRequiredUnits(unitTypeData[index]);
-            final UnitType type =
-                    new UnitType(unitTypeData, index, name, requiredUnits);
+        for (int i = 0; i < unitTypeData.length; i += UnitType.NUM_ATTRIBUTES) {
+            final String name = getUnitTypeName(unitTypeData[i]);
+            final int[] requiredUnits = getRequiredUnits(unitTypeData[i]);
+            final UnitType type = new UnitType(unitTypeData, i, name, requiredUnits);
             unitTypes.put(type.getId(), type);
         }
 
         // tech types
         final int[] techTypeData = getTechTypes();
-        for (int index = 0; index < techTypeData.length; index +=
-                TechType.NUM_ATTRIBUTES) {
-            final TechType type = new TechType(techTypeData, index);
+        for (int i = 0; i < techTypeData.length; i += TechType.NUM_ATTRIBUTES) {
+            final TechType type = new TechType(techTypeData, i);
             type.setName(getTechTypeName(type.getId()));
             techTypes.put(type.getId(), type);
         }
 
         // upgrade types
         final int[] upgradeTypeData = getUpgradeTypes();
-        for (int index = 0; index < upgradeTypeData.length; index +=
-                UpgradeType.NUM_ATTRIBUTES) {
-            final UpgradeType type = new UpgradeType(upgradeTypeData, index);
+        for (int i = 0; i < upgradeTypeData.length; i += UpgradeType.NUM_ATTRIBUTES) {
+            final UpgradeType type = new UpgradeType(upgradeTypeData, i);
             type.setName(getUpgradeTypeName(type.getId()));
             upgradeTypes.put(type.getId(), type);
         }
 
         // weapon types
         final int[] weaponTypeData = getWeaponTypes();
-        for (int index = 0; index < weaponTypeData.length; index +=
-                WeaponType.NUM_ATTRIBUTES) {
-            final WeaponType type = new WeaponType(weaponTypeData, index);
+        for (int i = 0; i < weaponTypeData.length; i += WeaponType.NUM_ATTRIBUTES) {
+            final WeaponType type = new WeaponType(weaponTypeData, i);
             type.setName(getWeaponTypeName(type.getId()));
             weaponTypes.put(type.getId(), type);
         }
 
         // unit size types
         final int[] unitSizeTypeData = getUnitSizeTypes();
-        for (int index = 0; index < unitSizeTypeData.length; index +=
-                UnitSizeType.NUM_ATTRIBUTES) {
-            final UnitSizeType type = new UnitSizeType(unitSizeTypeData, index);
-            type.setName(getUnitSizeTypeName(type.getID()));
-            unitSizeTypes.put(type.getID(), type);
+        for (int i = 0; i < unitSizeTypeData.length; i += UnitSizeType.NUM_ATTRIBUTES) {
+            final UnitSizeType type = new UnitSizeType(unitSizeTypeData, i);
+            type.setName(getUnitSizeTypeName(type.getId()));
+            unitSizeTypes.put(type.getId(), type);
         }
 
         // bullet types
         final int[] bulletTypeData = getBulletTypes();
-        for (int index = 0; index < bulletTypeData.length; index +=
-                BulletType.NUM_ATTRIBUTES) {
-            final BulletType type = new BulletType(bulletTypeData, index);
+        for (int i = 0; i < bulletTypeData.length; i += BulletType.NUM_ATTRIBUTES) {
+            final BulletType type = new BulletType(bulletTypeData, i);
             type.setName(getBulletTypeName(type.getId()));
             bulletTypes.put(type.getId(), type);
         }
 
         // damage types
         final int[] damageTypeData = getDamageTypes();
-        for (int index = 0; index < damageTypeData.length; index +=
-                DamageType.NUM_ATTRIBUTES) {
-            final DamageType type = new DamageType(damageTypeData, index);
+        for (int i = 0; i < damageTypeData.length; i += DamageType.NUM_ATTRIBUTES) {
+            final DamageType type = new DamageType(damageTypeData, i);
             type.setName(getDamageTypeName(type.getId()));
             damageTypes.put(type.getId(), type);
         }
 
         // explosion types
         final int[] explosionTypeData = getExplosionTypes();
-        for (int index = 0; index < explosionTypeData.length; index +=
-                ExplosionType.NUM_ATTRIBUTES) {
-            final ExplosionType type =
-                    new ExplosionType(explosionTypeData, index);
+        for (int i = 0; i < explosionTypeData.length; i += ExplosionType.NUM_ATTRIBUTES) {
+            final ExplosionType type = new ExplosionType(explosionTypeData, i);
             type.setName(getExplosionTypeName(type.getId()));
             explosionTypes.put(type.getId(), type);
         }
 
         // unitCommand types
         final int[] unitCommandTypeData = getUnitCommandTypes();
-        for (int index = 0; index < unitCommandTypeData.length; index +=
-                UnitCommandType.NUM_ATTRIBUTES) {
-            final UnitCommandType type =
-                    new UnitCommandType(unitCommandTypeData, index);
+        for (int i = 0; i < unitCommandTypeData.length; i += UnitCommandType.NUM_ATTRIBUTES) {
+            final UnitCommandType type = new UnitCommandType(unitCommandTypeData, i);
             type.setName(getUnitCommandTypeName(type.getId()));
             unitCommandTypes.put(type.getId(), type);
         }
 
         // order types
         final int[] orderTypeData = getOrderTypes();
-        for (int index = 0; index < orderTypeData.length; index +=
-                OrderType.NUM_ATTRIBUTES) {
-            final OrderType type = new OrderType(orderTypeData, index);
+        for (int i = 0; i < orderTypeData.length; i += OrderType.NUM_ATTRIBUTES) {
+            final OrderType type = new OrderType(orderTypeData, i);
             type.setName(getOrderTypeName(type.getId()));
             orderTypes.put(type.getId(), type);
         }
 
-        // event types - no extra data to load
+        // event types
         for (final EventType type : EventType.values()) {
             eventTypes.put(type.getId(), type);
         }
     }
 
-    /**
-     * Loads map data and (if enableBWTA is true) BWTA data.
-     */
     private void loadMapData() {
-        final String mapName = new String(getMapName(), charset);
-        map =
-                new Map(getMapWidth(), getMapHeight(), mapName,
-                        getMapFileName(), getMapHash(), getHeightData(),
-                        getBuildableData(), getWalkableData());
 
-        if (!enableBWTA) {
-            return;
+        final String mapName = new String(getMapName(), CHARACTER_SET);
+        final String fileName = getMapFileName();
+        final String hash = getMapHash();
+        final int x = getMapWidth();
+        final int y = getMapHeight();
+        final int[] z = getHeightData();
+        final int[] buildable = getBuildableData();
+        final int[] walkable = getWalkableData();
+
+        map = new Map(mapName, fileName, hash, x, y, z, buildable, walkable);
+
+        if (enableBWTA) {
+            loadMapDetails();
         }
+    }
 
-        final File bwtaDir = new File("bwta/");
-        final File bwtaFile = new File(bwtaDir, map.getName() + ".jbwta");
-        final boolean analyzed = bwtaFile.exists();
+    private void loadMapDetails() {
+        final String mapDataCacheFileName = map.getName() + ".jbwta";
+        final File mapDataCacheFile = new File("bwta/", mapDataCacheFileName);
 
-        int[] regionMapData = null;
-        int[] regionData = null;
-        int[] chokePointData = null;
-        int[] baseLocationData = null;
-        final HashMap<Integer, int[]> polygons = new HashMap<Integer, int[]>();
-
-        if (!analyzed) {
-            analyzeTerrain();
-            regionMapData = getRegionMap();
-            regionData = getRegions();
-            chokePointData = getChokePoints();
-            baseLocationData = getBaseLocations();
-            for (int index = 0; index < regionData.length; index +=
-                    Region.numAttributes) {
-                final int id = regionData[index];
-                polygons.put(id, getPolygon(id));
-            }
-
+        if (mapDataCacheFile.exists()) {
             try {
-                if (!bwtaDir.exists()) {
-                    bwtaDir.mkdirs();
-                }
-                final BufferedWriter writer =
-                        new BufferedWriter(new FileWriter(bwtaFile));
+                final FileReader fr = new FileReader(mapDataCacheFile);
+                final BufferedReader br = new BufferedReader(fr);
 
-                writeMapData(writer, regionMapData);
-                writeMapData(writer, regionData);
-                writeMapData(writer, chokePointData);
-                writeMapData(writer, baseLocationData);
-                for (final int id : polygons.keySet()) {
-                    writer.write("" + id + ",");
-                    writeMapData(writer, polygons.get(id));
-                }
+                final int[] regionMap = readMapData(br);
+                final int[] regions = readMapData(br);
+                final int[] chokePoints = readMapData(br);
+                final int[] bases = readMapData(br);
 
-                writer.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
-            }
-
-        } else {
-            try {
-                final BufferedReader reader =
-                        new BufferedReader(new FileReader(bwtaFile));
-
-                regionMapData = readMapData(reader);
-                regionData = readMapData(reader);
-                chokePointData = readMapData(reader);
-                baseLocationData = readMapData(reader);
-
-                // polygons (first integer is ID)
-                int[] polygonData;
-                while ((polygonData = readMapData(reader)) != null) {
-                    final int[] coordinateData =
-                            Arrays.copyOfRange(polygonData, 1,
-                                    polygonData.length);
-
-                    polygons.put(polygonData[0], coordinateData);
+                int[] data = null;
+                final HashMap<Integer, int[]> polygons = new HashMap<>();
+                while ((data = readMapData(br)) != null) {
+                    final int id = data[0];
+                    final int size = data.length;
+                    polygons.put(id, Arrays.copyOfRange(data, 1, size));
                 }
 
-                reader.close();
-            } catch (final Exception ex) {
-                ex.printStackTrace();
+                br.close();
+
+                map.initialize(regionMap, regions, polygons, chokePoints, bases);
+                return;
+
+            } catch (final IOException ex) {
+                System.err.println("Map data could not be loaded.");
+                System.err.println(ex.getMessage());
             }
         }
 
-        map.initialize(regionMapData, regionData, polygons, chokePointData,
-                baseLocationData);
+        analyzeTerrain();
+        final int[] regionMap = getRegionMap();
+        final int[] regions = getRegions();
+        final int[] chokePoints = getChokePoints();
+        final int[] bases = getBaseLocations();
+        final HashMap<Integer, int[]> polygons = new HashMap<>();
+        for (int i = 0; i < regions.length; i += Region.NUM_ATTRIBUTES) {
+            final int id = regions[i];
+            polygons.put(id, getPolygon(id));
+        }
+
+        try {
+            if (!mapDataCacheFile.getParentFile().exists()) {
+                mapDataCacheFile.getParentFile().mkdirs();
+            }
+            final FileWriter fw = new FileWriter(mapDataCacheFile);
+            final BufferedWriter bw = new BufferedWriter(fw);
+
+            writeMapData(bw, regionMap);
+            writeMapData(bw, regions);
+            writeMapData(bw, chokePoints);
+            writeMapData(bw, bases);
+            for (final int id : polygons.keySet()) {
+                bw.write("" + id + ",");
+                writeMapData(bw, polygons.get(id));
+            }
+
+            bw.close();
+
+            map.initialize(regionMap, regions, polygons, chokePoints, bases);
+
+        } catch (final Exception ex) {
+            System.err.println("Map data could not be cached.");
+            System.err.println(ex.getMessage());
+        }
     }
 
     /**
-     * Convenience method to write integers to a out each part of BWTA map data
-     * to a stream.
+     * Convenience method to write integers to a out each part of BWTA map data to a stream.
      * 
      * @param writer
      *            {@code BufferedWriter} to write to
@@ -726,8 +704,7 @@ public class Broodwar {
      * @throws IOException
      *             if the data cannot be written
      */
-    private static void writeMapData(final BufferedWriter writer,
-            final int[] data) throws IOException {
+    private static void writeMapData(final Writer writer, final int[] data) throws IOException {
         boolean first = true;
         for (final int val : data) {
             if (first) {
@@ -741,20 +718,17 @@ public class Broodwar {
     }
 
     /**
-     * Convenience method to read a line of integers.
+     * Convenience method to read a line of integers separated by commas.
      * 
      * @param reader
      *            {@code BufferedReader} to read from
      * 
-     * @return integers that were read from the line or {@code null} when
-     *         end-of-stream is reached
+     * @return integers that were read from the line or {@code null} when end-of-stream is reached
      * 
      * @throws IOException
      *             if the data cannot be read
      */
-    private static int[] readMapData(final BufferedReader reader)
-            throws IOException {
-        int[] data = new int[0];
+    private static int[] readMapData(final BufferedReader reader) throws IOException {
 
         final String line = reader.readLine();
         if (line == null) {
@@ -762,8 +736,8 @@ public class Broodwar {
         }
 
         final String[] stringData = line.split(",");
+        final int[] data = new int[stringData.length];
         if ((stringData.length > 0) && !stringData[0].equals("")) {
-            data = new int[stringData.length];
             for (int i = 0; i < stringData.length; i++) {
                 data[i] = Integer.parseInt(stringData[i]);
             }
@@ -783,8 +757,7 @@ public class Broodwar {
     }
 
     /**
-     * Notifies the client and event listener that a connection has been formed
-     * to the bridge.
+     * Notifies the client and event listener that a connection has been formed to the bridge.
      * 
      * <p>
      * C++ callback function.
@@ -795,18 +768,15 @@ public class Broodwar {
     }
 
     /**
-     * Notifies the client that a game has started. This method is always called
-     * before {@code BWAPIEventListener.matchStart()}, and is meant as a way of
-     * notifying the client to initialize state.
+     * Notifies the client that a game has started. This method is always called before
+     * {@code BWAPIEventListener.matchStart()}, and is meant as a way of notifying the client to
+     * initialize state.
      * 
      * <p>
      * The listener is not notified of this invocation.
      * 
      * <p>
      * C++ callback function.
-     * 
-     * Note: this is always called before the matchStarted event, and is meant
-     * as a way of notifying the AI client to clear up state.
      */
     private void gameStarted() {
         self = null;
@@ -817,22 +787,24 @@ public class Broodwar {
         players.clear();
 
         final int[] playerData = getPlayersData();
-        for (int index = 0; index < playerData.length; index +=
-                Player.numAttributes) {
-            final String name =
-                    new String(getPlayerName(playerData[index]), charset);
-            final Player player = new Player(playerData, index, name);
+        for (int i = 0; i < playerData.length; i += Player.NUMBER_OF_ATTRIBUTES) {
+
+            final String name = new String(getPlayerName(playerData[i]), CHARACTER_SET);
+            final Player player = new Player(playerData, i, name);
 
             players.put(player.getId(), player);
 
             if (player.isSelf()) {
                 self = player;
+
             } else if (player.isAlly()) {
                 allies.add(player);
                 allyIds.add(player.getId());
+
             } else if (player.isEnemy()) {
                 enemies.add(player);
                 enemyIds.add(player.getId());
+
             } else if (player.isNeutral()) {
                 neutralPlayer = player;
             }
@@ -845,19 +817,21 @@ public class Broodwar {
         neutralUnits.clear();
         final int[] unitData = getAllUnitsData();
 
-        for (int index = 0; index < unitData.length; index +=
-                Unit.NUMBER_OF_ATTRIBUTES) {
-            final int id = unitData[index];
+        for (int i = 0; i < unitData.length; i += Unit.NUMBER_OF_ATTRIBUTES) {
+            final int id = unitData[i];
             final Unit unit = new Unit(id);
-            unit.update(unitData, index, this);
+            unit.update(unitData, i, this);
 
             units.put(id, unit);
             if ((self != null) && (unit.getOwner().getId() == self.getId())) {
                 playerUnits.add(unit);
+
             } else if (allyIds.contains(unit.getOwner().getId())) {
                 alliedUnits.add(unit);
+
             } else if (enemyIds.contains(unit.getOwner().getId())) {
                 enemyUnits.add(unit);
+
             } else {
                 neutralUnits.add(unit);
             }
@@ -867,9 +841,9 @@ public class Broodwar {
     }
 
     /**
-     * Notifies the client that game data has been updated. This method is
-     * always called before {@code BWAPIEventListener.matchFrame()}, and is
-     * meant as a way of notifying the client to update the game state.
+     * Notifies the client that game data has been updated. This method is always called before
+     * {@code BWAPIEventListener.matchFrame()}, and is meant as a way of notifying the client to
+     * update the game state.
      * 
      * <p>
      * The listener is not notified of this invocation.
@@ -882,15 +856,13 @@ public class Broodwar {
 
         if (!isReplay()) {
             self.update(getPlayerUpdate(self.getId()));
-            self.updateResearch(getResearchStatus(self.getId()),
-                    getUpgradeStatus(self.getId()));
+            self.updateResearch(getResearchStatus(self.getId()), getUpgradeStatus(self.getId()));
 
         } else {
             for (final Integer playerId : players.keySet()) {
                 players.get(playerId).update(getPlayerUpdate(playerId));
-                players.get(playerId)
-                        .updateResearch(getResearchStatus(playerId),
-                                getUpgradeStatus(playerId));
+                players.get(playerId).updateResearch(getResearchStatus(playerId),
+                        getUpgradeStatus(playerId));
             }
         }
 
@@ -902,9 +874,8 @@ public class Broodwar {
         enemyUnits.clear();
         neutralUnits.clear();
 
-        for (int index = 0; index < unitData.length; index +=
-                Unit.NUMBER_OF_ATTRIBUTES) {
-            final int id = unitData[index];
+        for (int i = 0; i < unitData.length; i += Unit.NUMBER_OF_ATTRIBUTES) {
+            final int id = unitData[i];
 
             deadUnits.remove(id);
 
@@ -914,7 +885,7 @@ public class Broodwar {
                 units.put(id, unit);
             }
 
-            unit.update(unitData, index, this);
+            unit.update(unitData, i, this);
 
             if (self != null) {
                 if (unit.getOwner().getId() == self.getId()) {
@@ -940,9 +911,9 @@ public class Broodwar {
             }
         }
 
-        for (final Integer unitID : deadUnits) {
-            units.get(unitID).setDestroyed();
-            units.remove(unitID);
+        for (final Integer unitId : deadUnits) {
+            units.get(unitId).setDestroyed();
+            units.remove(unitId);
         }
     }
 
@@ -960,8 +931,8 @@ public class Broodwar {
      * Sends BWAPI callback events to the event listener.
      * 
      * <p>
-     * The meaning of the parameters is dependent on the event type itself. In
-     * some cases, none of the parameters are used.
+     * The meaning of the parameters is dependent on the event type itself. In some cases, none of
+     * the parameters are used.
      * 
      * <p>
      * C++ callback function.
@@ -978,8 +949,7 @@ public class Broodwar {
      * @param p3
      *            third parameter for the event
      */
-    private void eventOccurred(final int eventTypeId, final int p1,
-            final int p2, final String p3) {
+    private void eventOccurred(final int eventTypeId, final int p1, final int p2, final String p3) {
 
         final EventType event = eventTypes.get(eventTypeId);
         switch (event) {
@@ -996,12 +966,11 @@ public class Broodwar {
                 break;
 
             case MenuFrame :
-                // Unused?
+                // Not currently used.
                 break;
 
             case SendText :
                 listener.sendText(p3);
-                System.out.println("send text in switch");
                 break;
 
             case ReceiveText :
@@ -1013,11 +982,10 @@ public class Broodwar {
                 break;
 
             case NukeDetect :
-                if (p1 == -1) {
-                    listener.nukeDetect();
+                if ((p1 == -1) || (p2 == -1)) {
+                    listener.nukeDetect(Location.UNKNOWN);
                 } else {
-                    final Location location = new Location(p1, p2);
-                    listener.nukeDetect(location);
+                    listener.nukeDetect(new Location(p1, p2));
                 }
                 break;
 
@@ -1066,7 +1034,7 @@ public class Broodwar {
                 break;
 
             case None :
-                // Unused?
+                // Not currently used.
                 break;
         }
     }

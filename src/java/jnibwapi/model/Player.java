@@ -9,7 +9,7 @@ import java.awt.Point;
  */
 public class Player {
 	
-	public static final int numAttributes = 11;
+	public static final int NUMBER_OF_ATTRIBUTES = 11;
 	
 	private final int ID;
 	private final int raceID;

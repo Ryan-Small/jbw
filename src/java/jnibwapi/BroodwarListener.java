@@ -5,8 +5,8 @@ import jnibwapi.model.Player;
 import jnibwapi.model.Unit;
 
 /**
- * Serves as a callback interface for {@link Broodwar}, which will notify the
- * implementing class of game events.
+ * Serves as a callback interface for {@link Broodwar}, which will notify the implementing class of
+ * game events.
  */
 public interface BroodwarListener {
 
@@ -29,8 +29,8 @@ public interface BroodwarListener {
      * Invoked only once at the end of a match.
      * 
      * @param isWinner
-     *            {@code true} if this agent won; {@code false} if this agent
-     *            lost or if the game was a replay
+     *            {@code true} if this agent won; {@code false} if this agent lost or if the game
+     *            was a replay
      */
     public void matchEnd(final boolean isWinner);
 
@@ -43,8 +43,8 @@ public interface BroodwarListener {
     public void saveGame(final String fileName);
 
     /**
-     * Invoked when the user hits a key in-game. This method is not invoked if
-     * user input has not been {@link Broodwar#enableUserInput() enabled}.
+     * Invoked when the user hits a key in-game. This method is not invoked if user input has not
+     * been {@link Broodwar#enableUserInput() enabled}.
      * 
      * @param keyCode
      *            the key code of the key that was pressed by the user
@@ -52,9 +52,8 @@ public interface BroodwarListener {
     public void keyPressed(final int keyCode);
 
     /**
-     * Invoked when the user attempts to sends a message in-game. This method is
-     * not invoked if user input has not been {@link Broodwar#enableUserInput()
-     * enabled}.
+     * Invoked when the user attempts to sends a message in-game. This method is not invoked if user
+     * input has not been {@link Broodwar#enableUserInput() enabled}.
      * 
      * @param message
      *            the message sent by the user
@@ -62,8 +61,8 @@ public interface BroodwarListener {
     public void sendText(final String message);
 
     /**
-     * Invoked when the agent receives a message from another {@code Player}.
-     * Messages sent by the user or the agent will never invoke this method.
+     * Invoked when the agent receives a message from another {@code Player}. Messages sent by the
+     * user or the agent will never invoke this method.
      * 
      * @param message
      *            the message sent by another player or agent
@@ -71,9 +70,8 @@ public interface BroodwarListener {
     public void receiveText(final String message);
 
     /**
-     * Invoked when a {@code Player} leaves the game. All of their units are
-     * automatically given to the neutral player with their color and alliance
-     * parameters preserved.
+     * Invoked when a {@code Player} leaves the game. All of their units are automatically given to
+     * the neutral player with their color and alliance parameters preserved.
      * 
      * @param player
      *            the player that has left the game
@@ -81,9 +79,8 @@ public interface BroodwarListener {
     public void playerLeft(final Player player);
 
     /**
-     * Invoked when a {@code Player} has been dropped from the game. All of
-     * their units are automatically given to the neutral player with their
-     * color and alliance parameters preserved.
+     * Invoked when a {@code Player} has been dropped from the game. All of their units are
+     * automatically given to the neutral player with their color and alliance parameters preserved.
      * 
      * @param player
      *            the player that has been dropped from the game
@@ -91,22 +88,24 @@ public interface BroodwarListener {
     public void playerDropped(final Player player);
 
     /**
-     * Invoked when a nuke has been launched and the location is visible.
+     * Invoked when a nuke has been launched. If the location is not visible, the provided location
+     * will be {@link Location#UNKNOWN unknown}.
      * 
      * @param location
      *            the location the nuke is targeted for
      */
     public void nukeDetect(final Location location);
 
-    /**
-     * Invoked when a nuke has been launched and the location is not visible.
-     */
-    public void nukeDetect();
+    // TODO: Decided if we still want this?
+    // /**
+    // * Invoked when a nuke has been launched and the location is not visible.
+    // */
+    // public void nukeDetect();
 
     /**
-     * Invoked only when an accessible unit is created. This method will not be
-     * Invoked for enemy units if perfect information is disabled, Zerg units
-     * morphing, and the construction of structures over a Geyser.
+     * Invoked only when an accessible unit is created. This method will not be Invoked for enemy
+     * units if perfect information is disabled, Zerg units morphing, and the construction of
+     * structures over a Geyser.
      * 
      * @param unit
      *            the unit that has been created
@@ -132,8 +131,7 @@ public interface BroodwarListener {
     public void unitMorph(final Unit unit);
 
     /**
-     * Invoked every time a previously inaccessible {@code Unit} becomes
-     * accessible.
+     * Invoked every time a previously inaccessible {@code Unit} becomes accessible.
      * 
      * @param unitId
      *            the unit that is now accessible
@@ -141,8 +139,8 @@ public interface BroodwarListener {
     public void unitDiscover(final Unit unit);
 
     /**
-     * Invoked when a previously invisible {@code Unit} becomes visible. This
-     * method is not invoked for units owned by this player.
+     * Invoked when a previously invisible {@code Unit} becomes visible. This method is not invoked
+     * for units owned by this player.
      * 
      * @param unit
      *            the unit that is becoming visible
@@ -158,8 +156,8 @@ public interface BroodwarListener {
     public void unitComplete(final Unit unit);
 
     /**
-     * Invoked when a previously visible {@code Unit} becomes invisible. This
-     * method is not invoked for units owned by this player.
+     * Invoked when a previously visible {@code Unit} becomes invisible. This method is not invoked
+     * for units owned by this player.
      * 
      * @param unit
      *            the unit that is becoming invisible
@@ -175,9 +173,8 @@ public interface BroodwarListener {
     public void unitEvade(final Unit unit);
 
     /**
-     * Invoked when an accessible unit is removed from the game either through
-     * death or other means (e.g. mined out mineral patch, Drone becomes
-     * Extractor).
+     * Invoked when an accessible unit is removed from the game either through death or other means
+     * (e.g. mined out mineral patch, Drone becomes Extractor).
      * 
      * @param unit
      *            the unit that has been destroyed
@@ -185,8 +182,8 @@ public interface BroodwarListener {
     public void unitDestroy(final Unit unit);
 
     /**
-     * Invoked when a unit changes ownership (e.g. through Dark Archon's Mind
-     * Control, when an assimilator is built on a Geyser).
+     * Invoked when a unit changes ownership (e.g. through Dark Archon's Mind Control, when an
+     * assimilator is built on a Geyser).
      * 
      * @param unit
      *            the unit that has changed ownership
@@ -261,12 +258,13 @@ public interface BroodwarListener {
         public void nukeDetect(final Location location) {
         }
 
+        // TODO: Decide if we still want this.
         /**
          * {@inheritDoc}
          */
-        @Override
-        public void nukeDetect() {
-        }
+        // @Override
+        // public void nukeDetect() {
+        // }
 
         /**
          * {@inheritDoc}

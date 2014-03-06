@@ -9,6 +9,8 @@ package jnibwapi.model;
  */
 public class Location {
 
+    public static final Location UNKNOWN = new Location(-1, -1);
+
     public final int x;
     public final int y;
 

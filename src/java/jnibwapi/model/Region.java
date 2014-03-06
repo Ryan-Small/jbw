@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Region {
 	
-	public static final int numAttributes = 3;
+	public static final int NUM_ATTRIBUTES = 3;
 	
 	private final int ID;
 	private final int centerX;
