@@ -4,6 +4,9 @@ import java.awt.Point;
 import java.util.*;
 
 import jnibwapi.Broodwar;
+import jnibwapi.model.Position.Type;
+import jnibwapi.types.UnitType;
+import jnibwapi.util.BWColor;
 
 /**
  * Stores information about a StarCraft map.
@@ -11,10 +14,7 @@ import jnibwapi.Broodwar;
 public class Map {
     public static final int TILE_SIZE = 32;
 
-    private final int width;
-    private final int height;
-    private final int walkWidth;
-    private final int walkHeight;
+    private final Position size;
     private final String name;
     private final String fileName;
     private final String hash;
@@ -25,7 +25,6 @@ public class Map {
     private final boolean[] lowResWalkable;
 
     // The following are set in initialize() method
-    private boolean mapDetailsEnabled = false;
     /** Region ID for each build tile */
     private int[] regionMap = null;
     private List<Region> regions = null;
@@ -35,10 +34,7 @@ public class Map {
 
     public Map(final String name, final String fileName, final String hash, final int width,
             final int height, final int[] heightMap, final int[] buildable, final int[] walkable) {
-        this.width = width;
-        this.height = height;
-        walkWidth = 4 * width;
-        walkHeight = 4 * height;
+        size = new Position(width, height, Type.BUILD);
         this.name = name;
         this.fileName = fileName;
         this.hash = hash;
@@ -57,14 +53,15 @@ public class Map {
         // Fill lowResWalkable for A* search
         lowResWalkable = new boolean[width * height];
         Arrays.fill(lowResWalkable, true);
-        for (int wx = 0; wx < walkWidth; wx++) {
-            for (int wy = 0; wy < walkHeight; wy++) {
-                lowResWalkable[(wx / 4) + (width * (wy / 4))] &= isWalkable(wx, wy);
+        for (int wx = 0; wx < size.getWX(); wx++) {
+            for (int wy = 0; wy < size.getWY(); wy++) {
+                lowResWalkable[(wx / 4) + (width * (wy / 4))] &=
+                        isWalkable(new Position(wx, wy, Type.WALK));
             }
         }
     }
 
-    /** Initialize the map with regions and base locations */
+    /** Initialise the map with regions and base locations */
     public void initialize(final int[] regionMapData, final int[] regionData,
             final HashMap<Integer, int[]> regionPolygons, final int[] chokePointData,
             final int[] baseLocationData) {
@@ -82,7 +79,7 @@ public class Map {
         }
         idToRegion = new HashMap<>();
         for (final Region region : regions) {
-            idToRegion.put(region.getID(), region);
+            idToRegion.put(region.getId(), region);
         }
 
         // choke points
@@ -99,7 +96,8 @@ public class Map {
         if (baseLocationData != null) {
             for (int index = 0; index < baseLocationData.length; index +=
                     BaseLocation.NUM_ATTRIBUTES) {
-                final BaseLocation baseLocation = new BaseLocation(baseLocationData, index);
+                final BaseLocation baseLocation =
+                        new BaseLocation(baseLocationData, index, idToRegion);
                 baseLocations.add(baseLocation);
             }
         }
@@ -111,39 +109,35 @@ public class Map {
             chokePoint.getSecondRegion().addChokePoint(chokePoint);
             chokePoint.getSecondRegion().addConnectedRegion(chokePoint.getFirstRegion());
         }
-
-        mapDetailsEnabled = true;
     }
 
-    /**
-     * If {@code mapDetailsEenabled} is {@code true}, the map will be analyzed in detail allowing
-     * the {@link Broodwar#getMap() map} to provide region, choke point, and base location
-     * information. Broodwar may hang for a short duration the first time a map is analyzed. Once
-     * the map analysis has completed, the information is cached, reducing the analysis time for
-     * that map.
-     * 
-     * @return
-     */
-    public boolean isMapDetailsEnabled() {
-        return mapDetailsEnabled;
+    /** Get the map size as a Position object */
+    public Position getSize() {
+        return size;
     }
 
-    /** In build tiles (32px) */
+    /** @deprecated Width in build tiles (32px). Use {@link #getSize()} instead. */
+    @Deprecated
     public int getWidth() {
-        return width;
+        return size.getBX();
     }
 
-    /** In build tiles (32px) */
+    /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
+    @Deprecated
     public int getHeight() {
-        return height;
+        return size.getBY();
     }
 
+    /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
+    @Deprecated
     public int getWalkWidth() {
-        return walkWidth;
+        return size.getWX();
     }
 
+    /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
+    @Deprecated
     public int getWalkHeight() {
-        return walkHeight;
+        return size.getWY();
     }
 
     /** The name of the current map */
@@ -160,45 +154,48 @@ public class Map {
         return hash;
     }
 
-    public int getHeight(final int tx, final int ty) {
-        if ((tx < width) && (ty < height) && (tx >= 0) && (ty >= 0)) {
-            return heightMap[tx + (width * ty)];
+    /** Converts a position to a 1-dimensional build tile array index for this map */
+    private int getBuildTileArrayIndex(final Position p) {
+        return p.getBX() + (size.getBX() * p.getBY());
+    }
+
+    public int getGroundHeight(final Position p) {
+        if (p.isValid(this)) {
+            return heightMap[getBuildTileArrayIndex(p)];
         } else {
             return 0;
         }
     }
 
-    /**
-     * Works only after initialize(). Returns null if the specified position is out of bounds.
-     */
-    public Region getRegion(final int tx, final int ty) {
-        if ((tx < width) && (ty < height) && (tx >= 0) && (ty >= 0)) {
-            return idToRegion.get(regionMap[tx + (width * ty)]);
+    /** Works only after initialize(). Returns null if the specified position is invalid. */
+    public Region getRegion(final Position p) {
+        if (p.isValid(this)) {
+            return idToRegion.get(regionMap[getBuildTileArrayIndex(p)]);
         } else {
             return null;
         }
     }
 
-    public boolean isBuildable(final int tx, final int ty) {
-        if ((tx < width) && (ty < height) && (tx >= 0) && (ty >= 0)) {
-            return buildable[tx + (width * ty)];
+    public boolean isBuildable(final Position p) {
+        if (p.isValid(this)) {
+            return buildable[getBuildTileArrayIndex(p)];
         } else {
             return false;
         }
     }
 
-    public boolean isWalkable(final int wx, final int wy) {
-        if ((wx < walkWidth) && (wy < walkHeight) && (wx >= 0) && (wy >= 0)) {
-            return walkable[wx + (walkWidth * wy)];
+    public boolean isWalkable(final Position p) {
+        if (p.isValid(this)) {
+            return walkable[p.getWX() + (size.getWX() * p.getWY())];
         } else {
             return false;
         }
     }
 
     /** Checks whether all 16 walk tiles in a build tile are walkable */
-    public boolean isLowResWalkable(final int tx, final int ty) {
-        if ((tx < width) && (ty < height) && (tx >= 0) && (ty >= 0)) {
-            return lowResWalkable[tx + (width * ty)];
+    public boolean isLowResWalkable(final Position p) {
+        if (p.isValid(this)) {
+            return lowResWalkable[getBuildTileArrayIndex(p)];
         } else {
             return false;
         }
@@ -239,28 +236,25 @@ public class Map {
      * Find the shortest walkable distance, in pixels, between two tile positions or -1 if not
      * reachable. Works only after initialize(). Ported from BWTA.
      */
-    public double getGroundDistance(final int startTx, final int startTy, final int endTx,
-            final int endTy) {
-        if (!isConnected(startTx, startTy, endTx, endTy)) {
+    public double getGroundDistance(final Position start, final Position end) {
+        if (!isConnected(start, end)) {
             return -1;
         }
-        return aStarSearchDistance(startTx, startTy, endTx, endTy);
+        return aStarSearchDistance(start.getBX(), start.getBY(), end.getBX(), end.getBY());
     }
 
     /**
      * Based on map connectedness only. Ignores buildings. Works only after initialize(). Ported
      * from BWTA.
      */
-    public boolean isConnected(final int startTx, final int startTy, final int endTx,
-            final int endTy) {
-        if (getRegion(startTx, startTy) == null) {
+    public boolean isConnected(final Position start, final Position end) {
+        if (getRegion(start) == null) {
             return false;
         }
-        if (getRegion(endTx, endTy) == null) {
+        if (getRegion(end) == null) {
             return false;
         }
-        return getRegion(startTx, startTy).getAllConnectedRegions().contains(
-                getRegion(endTx, endTy));
+        return getRegion(start).getAllConnectedRegions().contains(getRegion(end));
     }
 
     /**
@@ -289,16 +283,17 @@ public class Map {
             closedTiles.add(p);
             // Explore the neighbours of p
             final int minx = Math.max(p.x - 1, 0);
-            final int maxx = Math.min(p.x + 1, width - 1);
+            final int maxx = Math.min(p.x + 1, size.getBX() - 1);
             final int miny = Math.max(p.y - 1, 0);
-            final int maxy = Math.min(p.y + 1, height - 1);
+            final int maxy = Math.min(p.y + 1, size.getBY() - 1);
             for (int x = minx; x <= maxx; x++) {
                 for (int y = miny; y <= maxy; y++) {
-                    if (!isLowResWalkable(x, y)) {
+                    if (!isLowResWalkable(new Position(x, y, Type.BUILD))) {
                         continue;
                     }
-                    if ((p.x != x) && (p.y != y) && !isLowResWalkable(p.x, y)
-                            && !isLowResWalkable(x, p.y)) {
+                    if ((p.x != x) && (p.y != y)
+                            && !isLowResWalkable(new Position(p.x, y, Type.BUILD))
+                            && !isLowResWalkable(new Position(x, p.y, Type.BUILD))) {
                         continue; // Not diagonally accessible
                     }
                     final Point t = new Point(x, y);
@@ -313,10 +308,8 @@ public class Map {
                     final int dx = Math.abs(x - end.x);
                     final int dy = Math.abs(y - end.y);
                     // Heuristic for remaining distance:
-                    // min(dx, dy) is the minimum diagonal distance, so costs
-                    // mvmtCostDiag
-                    // abs(dx - dy) is the rest of the distance, so costs
-                    // mvmtCost
+                    // min(dx, dy) is the minimum diagonal distance, so costs mvmtCostDiag
+                    // abs(dx - dy) is the rest of the distance, so costs mvmtCost
                     final int h =
                             (Math.abs(dx - dy) * mvmtCost) + (Math.min(dx, dy) * mvmtCostDiag);
                     final int f = g + h;
@@ -351,4 +344,56 @@ public class Map {
         }
     }
 
+    /**
+     * Debugging method to check terrain has been analysed properly. Taken from BWAPI's
+     * ExampleAIClient
+     */
+    public void drawTerrainData(final Broodwar bwapi) {
+        // iterate through all the base locations and draw their outlines
+        for (final BaseLocation bl : bwapi.getMap().getBaseLocations()) {
+            final Position p = bl.getPosition();
+
+            // draw outline of base location
+            final Position otherCorner = p.translated(new Position(4, 3, Type.BUILD));
+            bwapi.drawBox(p, otherCorner, BWColor.Blue, false, false);
+
+            // if this is an island expansion, draw a yellow circle around the base location
+            if (bl.isIsland()) {
+                bwapi.drawCircle(p.translated(new Position(2, 1, Type.BUILD)), 80, BWColor.Yellow,
+                        false, false);
+            }
+
+            // draw a circle at each mineral patch and a box at each vespene geyser
+            for (final Unit u : bwapi.getNeutralUnits()) {
+                final UnitType ut = u.getType();
+                if (ut.isResourceContainer()) {
+                    if (ut.isMineralField()) {
+                        // Minerals
+                        bwapi.drawCircle(u.getTargetPosition(), 30, BWColor.Cyan, false, false);
+                    } else {
+                        // Geysers
+                        bwapi.drawBox(u.getTopLeft(), u.getBottomRight(), BWColor.Orange, false,
+                                false);
+                    }
+                }
+            }
+        }
+
+        // Iterate through all the regions and draw the polygon outline of it in green.
+        for (final Region r : getRegions()) {
+            final Position[] polygon = r.getPolygon();
+            for (int i = 0; i < polygon.length; i++) {
+                final Position point1 = polygon[i];
+                final Position point2 = polygon[(i + 1) % polygon.length];
+                bwapi.drawLine(point1, point2, BWColor.Green, false);
+            }
+        }
+
+        // Visualise the chokepoints with red lines
+        for (final ChokePoint cp : getChokePoints()) {
+            final Position point1 = cp.getFirstSide();
+            final Position point2 = cp.getSecondSide();
+            bwapi.drawLine(point1, point2, BWColor.Red, false);
+        }
+    }
 }

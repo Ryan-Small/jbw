@@ -1,6 +1,5 @@
 package jnibwapi;
 
-import java.awt.Point;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -10,8 +9,18 @@ import java.util.*;
 import jnibwapi.model.*;
 import jnibwapi.model.Map;
 import jnibwapi.types.*;
+import jnibwapi.types.BulletType.BulletTypes;
+import jnibwapi.types.DamageType.DamageTypes;
+import jnibwapi.types.ExplosionType.ExplosionTypes;
+import jnibwapi.types.OrderType.OrderTypes;
+import jnibwapi.types.RaceType.RaceTypes;
 import jnibwapi.types.TechType.TechTypes;
+import jnibwapi.types.UnitCommandType.UnitCommandTypes;
+import jnibwapi.types.UnitSizeType.UnitSizeTypes;
 import jnibwapi.types.UnitType.UnitTypes;
+import jnibwapi.types.UpgradeType.UpgradeTypes;
+import jnibwapi.types.WeaponType.WeaponTypes;
+import jnibwapi.util.BWColor;
 
 /**
  * JNI interface for the Brood War API.<br>
@@ -28,7 +37,7 @@ import jnibwapi.types.UnitType.UnitTypes;
  * Game: {@link http://code.google.com/p/bwapi/wiki/Game}<br>
  * Unit: {@link http://code.google.com/p/bwapi/wiki/Unit}<br>
  */
-public class Broodwar {
+public class Broodwar implements IdLookup {
 
     /* Load the JNI library. */
     static {
@@ -66,10 +75,10 @@ public class Broodwar {
     }
 
     private final HashMap<Integer, Unit> units = new HashMap<>();
-    private final ArrayList<Unit> playerUnits = new ArrayList<>();
-    private final ArrayList<Unit> alliedUnits = new ArrayList<>();
-    private final ArrayList<Unit> enemyUnits = new ArrayList<>();
-    private final ArrayList<Unit> neutralUnits = new ArrayList<>();
+    private ArrayList<Unit> playerUnits = new ArrayList<>();
+    private ArrayList<Unit> alliedUnits = new ArrayList<>();
+    private ArrayList<Unit> enemyUnits = new ArrayList<>();
+    private ArrayList<Unit> neutralUnits = new ArrayList<>();
 
     private final HashSet<Integer> allyIds = new HashSet<>();
     private final HashSet<Integer> enemyIds = new HashSet<>();
@@ -132,62 +141,62 @@ public class Broodwar {
 
     private native int[] getPlayersData();
 
-    private native int[] getPlayerUpdate(int playerID);
+    private native int[] getPlayerUpdate(int playerId);
 
     /** Returns string as a byte[] to properly handle ASCII-extended characters */
-    private native byte[] getPlayerName(int playerID);
+    private native byte[] getPlayerName(int playerId);
 
-    private native int[] getResearchStatus(int playerID);
+    private native int[] getResearchStatus(int playerId);
 
-    private native int[] getUpgradeStatus(int playerID);
+    private native int[] getUpgradeStatus(int playerId);
 
     private native int[] getAllUnitsData();
 
     private native int[] getRaceTypes();
 
-    private native String getRaceTypeName(int unitTypeID);
+    private native String getRaceTypeName(int unitTypeId);
 
     private native int[] getUnitTypes();
 
-    private native String getUnitTypeName(int unitTypeID);
+    private native String getUnitTypeName(int unitTypeId);
 
-    private native int[] getRequiredUnits(int unitTypeID);
+    private native int[] getRequiredUnits(int unitTypeId);
 
     private native int[] getTechTypes();
 
-    private native String getTechTypeName(int techID);
+    private native String getTechTypeName(int techId);
 
     private native int[] getUpgradeTypes();
 
-    private native String getUpgradeTypeName(int upgradeID);
+    private native String getUpgradeTypeName(int upgradeId);
 
     private native int[] getWeaponTypes();
 
-    private native String getWeaponTypeName(int weaponID);
+    private native String getWeaponTypeName(int weaponId);
 
     private native int[] getUnitSizeTypes();
 
-    private native String getUnitSizeTypeName(int sizeID);
+    private native String getUnitSizeTypeName(int sizeId);
 
     private native int[] getBulletTypes();
 
-    private native String getBulletTypeName(int bulletID);
+    private native String getBulletTypeName(int bulletId);
 
     private native int[] getDamageTypes();
 
-    private native String getDamageTypeName(int damageID);
+    private native String getDamageTypeName(int damageId);
 
     private native int[] getExplosionTypes();
 
-    private native String getExplosionTypeName(int explosionID);
+    private native String getExplosionTypeName(int explosionId);
 
     private native int[] getUnitCommandTypes();
 
-    private native String getUnitCommandTypeName(int unitCommandID);
+    private native String getUnitCommandTypeName(int unitCommandId);
 
     private native int[] getOrderTypes();
 
-    private native String getOrderTypeName(int unitCommandID);
+    private native String getOrderTypeName(int unitCommandId);
 
     private native int[] getUnitIdsOnTile(int tx, int ty);
 
@@ -218,11 +227,9 @@ public class Broodwar {
 
     private native int[] getRegions();
 
-    private native int[] getPolygon(int regionID);
+    private native int[] getPolygon(int regionId);
 
     private native int[] getBaseLocations();
-
-    // unit commands: http://code.google.com/p/bwapi/wiki/Unit
 
     // utility commands
     public native void drawHealth(boolean enable);
@@ -242,82 +249,111 @@ public class Broodwar {
     public native void leaveGame();
 
     // draw commands
-    public native void drawBox(int left, int top, int right, int bottom, int color, boolean fill,
+    private native void drawBox(int left, int top, int right, int bottom, int color, boolean fill,
             boolean screenCoords);
 
-    public native void drawCircle(int x, int y, int radius, int color, boolean fill,
-            boolean screenCoords);
-
-    public native void drawLine(int x1, int y1, int x2, int y2, int color, boolean screenCoords);
-
-    public void drawLine(final Point a, final Point b, final int color, final boolean screenCoords) {
-        drawLine(a.x, a.y, b.x, b.y, color, screenCoords);
+    public void drawBox(final Position topLeft, final Position bottomRight, final BWColor bWColor,
+            final boolean fill, final boolean screenCoords) {
+        drawBox(topLeft.getPX(), topLeft.getPY(), bottomRight.getPX(), bottomRight.getPY(),
+                bWColor.getID(), fill, screenCoords);
     }
 
-    public native void drawDot(int x, int y, int color, boolean screenCoords);
+    private native void drawCircle(int x, int y, int radius, int color, boolean fill,
+            boolean screenCoords);
 
-    public native void drawText(int x, int y, String msg, boolean screenCoords);
+    public void drawCircle(final Position p, final int radius, final BWColor bWColor,
+            final boolean fill, final boolean screenCoords) {
+        drawCircle(p.getPX(), p.getPY(), radius, bWColor.getID(), fill, screenCoords);
+    }
 
-    public void drawText(final Point a, final String msg, final boolean screenCoords) {
-        drawText(a.x, a.y, msg, screenCoords);
+    private native void drawLine(int x1, int y1, int x2, int y2, int color, boolean screenCoords);
+
+    public void drawLine(final Position start, final Position end, final BWColor bWColor,
+            final boolean screenCoords) {
+        drawLine(start.getPX(), start.getPY(), end.getPX(), end.getPY(), bWColor.getID(),
+                screenCoords);
+    }
+
+    private native void drawDot(int x, int y, int color, boolean screenCoords);
+
+    public void drawDot(final Position p, final BWColor bWColor, final boolean screenCoords) {
+        drawDot(p.getPX(), p.getPY(), bWColor.getID(), screenCoords);
+    }
+
+    private native void drawText(int x, int y, String msg, boolean screenCoords);
+
+    public void drawText(final Position a, final String msg, final boolean screenCoords) {
+        drawText(a.getPX(), a.getPY(), msg, screenCoords);
     }
 
     // Extended Commands
-    public native boolean isVisible(int tileX, int tileY);
+    private native boolean isVisible(int tileX, int tileY);
 
-    public native boolean isExplored(int tileX, int tileY);
+    public boolean isVisible(final Position p) {
+        return isVisible(p.getBX(), p.getBY());
+    }
 
-    public native boolean isBuildable(int tx, int ty, boolean includeBuildings);
+    private native boolean isExplored(int tileX, int tileY);
 
-    public boolean isBuildable(final int tx, final int ty) {
-        return isBuildable(tx, ty, false);
+    public boolean isExplored(final Position p) {
+        return isExplored(p.getBX(), p.getBY());
+    }
+
+    private native boolean isBuildable(int tx, int ty, boolean includeBuildings);
+
+    public boolean isBuildable(final Position p, final boolean includeBuildings) {
+        return isBuildable(p.getBX(), p.getBY(), includeBuildings);
     }
 
     public native boolean hasCreep(int tileX, int tileY);
 
     public native boolean hasPower(int tileX, int tileY);
 
-    public native boolean hasPower(int tileX, int tileY, int unitTypeID);
+    public native boolean hasPower(int tileX, int tileY, int unitTypeId);
 
     public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight);
 
     public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight,
-            int unitTypeID);
+            int unitTypeId);
 
     public native boolean hasPowerPrecise(int x, int y);
 
     public native boolean hasPath(int fromX, int fromY, int toX, int toY);
 
-    public native boolean hasPath(int unitID, int targetID);
+    public native boolean hasPath(int unitId, int targetId);
 
-    public native boolean hasPath(int unitID, int toX, int toY);
+    public native boolean hasPath(int unitId, int toX, int toY);
 
-    public native boolean hasLoadedUnit(int unitID1, int unitID2);
+    public native int[] getLoadedUnits(int unitId);
 
-    public native boolean canBuildHere(int tileX, int tileY, int unitTypeID, boolean checkExplored);
+    public native int[] getInterceptors(int unitId);
 
-    public native boolean canBuildHere(int unitID, int tileX, int tileY, int unitTypeID,
+    public native int[] getLarva(int unitId);
+
+    public native boolean canBuildHere(int tileX, int tileY, int unitTypeId, boolean checkExplored);
+
+    public native boolean canBuildHere(int unitId, int tileX, int tileY, int unitTypeId,
             boolean checkExplored);
 
-    public boolean canMake(final UnitTypes unitType) {
-        return canMake(unitType.ordinal());
+    public boolean canMake(final UnitType unitType) {
+        return canMake(unitType.getId());
     }
 
-    public native boolean canMake(int unitTypeID);
+    public native boolean canMake(int unitTypeId);
 
-    public native boolean canMake(int unitID, int unitTypeID);
+    public native boolean canMake(int unitId, int unitTypeId);
 
-    public boolean canResearch(final TechTypes techType) {
-        return canResearch(techType.ordinal());
+    public boolean canResearch(final TechType techType) {
+        return canResearch(techType.getId());
     }
 
-    public native boolean canResearch(int techTypeID);
+    public native boolean canResearch(int techTypeId);
 
-    public native boolean canResearch(int unitID, int techTypeID);
+    public native boolean canResearch(int unitId, int techTypeId);
 
-    public native boolean canUpgrade(int upgradeTypeID);
+    public native boolean canUpgrade(int upgradeTypeId);
 
-    public native boolean canUpgrade(int unitID, int upgradeTypeID);
+    public native boolean canUpgrade(int unitId, int upgradeTypeId);
 
     public native void printText(String message);
 
@@ -327,7 +363,7 @@ public class Broodwar {
 
     public native boolean isReplay();
 
-    private native boolean isVisibleToPlayer(int unitID, int playerID);
+    private native boolean isVisibleToPlayer(int unitId, int playerId);
 
     public boolean isVisibleToPlayer(final Unit u, final Player p) {
         return isVisibleToPlayer(u.getId(), p.getId());
@@ -337,93 +373,94 @@ public class Broodwar {
 
     public native int getRemainingLatencyFrames();
 
-    public UnitType getUnitType(final UnitTypes typeId) {
-        return unitTypes.get(typeId);
-    }
-
-    public RaceType getRaceType(final int typeId) {
-        return raceTypes.get(typeId);
-    }
-
-    public TechType getTechType(final int typeId) {
-        return techTypes.get(typeId);
-    }
-
-    public UpgradeType getUpgradeType(final int upgradeId) {
-        return upgradeTypes.get(upgradeId);
-    }
-
-    public WeaponType getWeaponType(final int weaponId) {
-        return weaponTypes.get(weaponId);
-    }
-
-    public UnitSizeType getUnitSizeType(final int sizeId) {
-        return unitSizeTypes.get(sizeId);
-    }
-
-    public BulletType getBulletType(final int bulletId) {
-        return bulletTypes.get(bulletId);
-    }
-
-    public DamageType getDamageType(final int damageId) {
-        return damageTypes.get(damageId);
-    }
-
-    public ExplosionType getExplosionType(final int explosionId) {
-        return explosionTypes.get(explosionId);
-    }
-
-    public UnitCommandType getUnitCommandType(final int unitCommandId) {
-        return unitCommandTypes.get(unitCommandId);
-    }
-
-    public OrderType getOrderType(final int orderId) {
-        return orderTypes.get(orderId);
-    }
-
-    public Collection<UnitType> unitTypes() {
-        return Collections.unmodifiableCollection(unitTypes.values());
-    }
-
-    public Collection<RaceType> raceTypes() {
-        return Collections.unmodifiableCollection(raceTypes.values());
-    }
-
-    public Collection<TechType> techTypes() {
-        return Collections.unmodifiableCollection(techTypes.values());
-    }
-
-    public Collection<UpgradeType> upgradeTypes() {
-        return Collections.unmodifiableCollection(upgradeTypes.values());
-    }
-
-    public Collection<WeaponType> weaponTypes() {
-        return Collections.unmodifiableCollection(weaponTypes.values());
-    }
-
-    public Collection<UnitSizeType> unitSizeTypes() {
-        return Collections.unmodifiableCollection(unitSizeTypes.values());
-    }
-
-    public Collection<BulletType> bulletTypes() {
-        return Collections.unmodifiableCollection(bulletTypes.values());
-    }
-
-    public Collection<DamageType> damageTypes() {
-        return Collections.unmodifiableCollection(damageTypes.values());
-    }
-
-    public Collection<ExplosionType> explosionTypes() {
-        return Collections.unmodifiableCollection(explosionTypes.values());
-    }
-
-    public Collection<UnitCommandType> unitCommandTypes() {
-        return Collections.unmodifiableCollection(unitCommandTypes.values());
-    }
-
-    public Collection<OrderType> orderTypes() {
-        return Collections.unmodifiableCollection(orderTypes.values());
-    }
+    // //////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // public UnitType getUnitType(final UnitTypes typeId) {
+    // return unitTypes.get(typeId);
+    // }
+    //
+    // public RaceType getRaceType(final int typeId) {
+    // return raceTypes.get(typeId);
+    // }
+    //
+    // public TechType getTechType(final int typeId) {
+    // return techTypes.get(typeId);
+    // }
+    //
+    // public UpgradeType getUpgradeType(final int upgradeId) {
+    // return upgradeTypes.get(upgradeId);
+    // }
+    //
+    // public WeaponType getWeaponType(final int weaponId) {
+    // return weaponTypes.get(weaponId);
+    // }
+    //
+    // public UnitSizeType getUnitSizeType(final int sizeId) {
+    // return unitSizeTypes.get(sizeId);
+    // }
+    //
+    // public BulletType getBulletType(final int bulletId) {
+    // return bulletTypes.get(bulletId);
+    // }
+    //
+    // public DamageType getDamageType(final int damageId) {
+    // return damageTypes.get(damageId);
+    // }
+    //
+    // public ExplosionType getExplosionType(final int explosionId) {
+    // return explosionTypes.get(explosionId);
+    // }
+    //
+    // public UnitCommandType getUnitCommandType(final int unitCommandId) {
+    // return unitCommandTypes.get(unitCommandId);
+    // }
+    //
+    // public OrderType getOrderType(final int orderId) {
+    // return orderTypes.get(orderId);
+    // }
+    //
+    // public Collection<UnitType> unitTypes() {
+    // return Collections.unmodifiableCollection(unitTypes.values());
+    // }
+    //
+    // public Collection<RaceType> raceTypes() {
+    // return Collections.unmodifiableCollection(raceTypes.values());
+    // }
+    //
+    // public Collection<TechType> techTypes() {
+    // return Collections.unmodifiableCollection(techTypes.values());
+    // }
+    //
+    // public Collection<UpgradeType> upgradeTypes() {
+    // return Collections.unmodifiableCollection(upgradeTypes.values());
+    // }
+    //
+    // public Collection<WeaponType> weaponTypes() {
+    // return Collections.unmodifiableCollection(weaponTypes.values());
+    // }
+    //
+    // public Collection<UnitSizeType> unitSizeTypes() {
+    // return Collections.unmodifiableCollection(unitSizeTypes.values());
+    // }
+    //
+    // public Collection<BulletType> bulletTypes() {
+    // return Collections.unmodifiableCollection(bulletTypes.values());
+    // }
+    //
+    // public Collection<DamageType> damageTypes() {
+    // return Collections.unmodifiableCollection(damageTypes.values());
+    // }
+    //
+    // public Collection<ExplosionType> explosionTypes() {
+    // return Collections.unmodifiableCollection(explosionTypes.values());
+    // }
+    //
+    // public Collection<UnitCommandType> unitCommandTypes() {
+    // return Collections.unmodifiableCollection(unitCommandTypes.values());
+    // }
+    //
+    // public Collection<OrderType> orderTypes() {
+    // return Collections.unmodifiableCollection(orderTypes.values());
+    // }
 
     public int getFrameCount() {
         return gameFrame;
@@ -437,9 +474,9 @@ public class Broodwar {
         return neutralPlayer;
     }
 
-    public Player getPlayer(final int playerId) {
-        return players.get(playerId);
-    }
+    // public Player getPlayer(final int playerId) {
+    // return players.get(playerId);
+    // }
 
     public Collection<Player> getPlayers() {
         return Collections.unmodifiableCollection(players.values());
@@ -453,8 +490,14 @@ public class Broodwar {
         return Collections.unmodifiableList(enemies);
     }
 
-    public Unit getUnit(final int unitID) {
-        return units.get(unitID);
+    @Override
+    public Player getPlayer(final int playerID) {
+        return players.get(playerID);
+    }
+
+    @Override
+    public Unit getUnit(final int unitId) {
+        return units.get(unitId);
     }
 
     public Collection<Unit> getAllUnits() {
@@ -480,11 +523,11 @@ public class Broodwar {
     public List<Unit> getUnits(final Player p) {
         final List<Unit> pUnits = new ArrayList<Unit>();
         for (final Unit u : units.values()) {
-            if (u.getOwner().getId() == p.getId()) {
+            if (u.getPlayer() == p) {
                 pUnits.add(u);
             }
         }
-        return Collections.unmodifiableList(pUnits);
+        return pUnits;
     }
 
     public List<Unit> getUnitsOnTile(final int x, final int y) {
@@ -511,96 +554,85 @@ public class Broodwar {
     private void loadTypeData() {
         // race types
         final int[] raceTypeData = getRaceTypes();
-        for (int i = 0; i < raceTypeData.length; i += RaceType.NUM_ATTRIBUTES) {
-            final RaceType type = new RaceType(raceTypeData, i);
-            type.setName(getRaceTypeName(type.getId()));
-            raceTypes.put(type.getId(), type);
+        for (int index = 0; index < raceTypeData.length; index += RaceType.NUM_ATTRIBUTES) {
+            final int id = raceTypeData[index];
+            RaceTypes.getRaceType(id).initialize(raceTypeData, index, getRaceTypeName(id));
         }
 
         // unit types
         final int[] unitTypeData = getUnitTypes();
-        for (int i = 0; i < unitTypeData.length; i += UnitType.NUM_ATTRIBUTES) {
-            final String name = getUnitTypeName(unitTypeData[i]);
-            final int[] requiredUnits = getRequiredUnits(unitTypeData[i]);
-            final UnitType type = new UnitType(unitTypeData, i, name, requiredUnits);
-            unitTypes.put(type.getId(), type);
+        for (int index = 0; index < unitTypeData.length; index += UnitType.NUM_ATTRIBUTES) {
+            final int id = unitTypeData[index];
+            UnitTypes.getUnitType(id).initialize(unitTypeData, index, getUnitTypeName(id),
+                    getRequiredUnits(id));
         }
 
         // tech types
         final int[] techTypeData = getTechTypes();
-        for (int i = 0; i < techTypeData.length; i += TechType.NUM_ATTRIBUTES) {
-            final TechType type = new TechType(techTypeData, i);
-            type.setName(getTechTypeName(type.getId()));
-            techTypes.put(type.getId(), type);
+        for (int index = 0; index < techTypeData.length; index += TechType.NUM_ATTRIBUTES) {
+            final int id = techTypeData[index];
+            TechTypes.getTechType(id).initialize(techTypeData, index, getTechTypeName(id));
         }
 
         // upgrade types
         final int[] upgradeTypeData = getUpgradeTypes();
-        for (int i = 0; i < upgradeTypeData.length; i += UpgradeType.NUM_ATTRIBUTES) {
-            final UpgradeType type = new UpgradeType(upgradeTypeData, i);
-            type.setName(getUpgradeTypeName(type.getId()));
-            upgradeTypes.put(type.getId(), type);
+        for (int index = 0; index < upgradeTypeData.length; index += UpgradeType.NUM_ATTRIBUTES) {
+            final int id = upgradeTypeData[index];
+            UpgradeTypes.getUpgradeType(id).initialize(upgradeTypeData, index,
+                    getUpgradeTypeName(id));
         }
 
         // weapon types
         final int[] weaponTypeData = getWeaponTypes();
-        for (int i = 0; i < weaponTypeData.length; i += WeaponType.NUM_ATTRIBUTES) {
-            final WeaponType type = new WeaponType(weaponTypeData, i);
-            type.setName(getWeaponTypeName(type.getId()));
-            weaponTypes.put(type.getId(), type);
+        for (int index = 0; index < weaponTypeData.length; index += WeaponType.NUM_ATTRIBUTES) {
+            final int id = weaponTypeData[index];
+            WeaponTypes.getWeaponType(id).initialize(weaponTypeData, index, getWeaponTypeName(id));
         }
 
         // unit size types
         final int[] unitSizeTypeData = getUnitSizeTypes();
-        for (int i = 0; i < unitSizeTypeData.length; i += UnitSizeType.NUM_ATTRIBUTES) {
-            final UnitSizeType type = new UnitSizeType(unitSizeTypeData, i);
-            type.setName(getUnitSizeTypeName(type.getId()));
-            unitSizeTypes.put(type.getId(), type);
+        for (int index = 0; index < unitSizeTypeData.length; index += UnitSizeType.NUM_ATTRIBUTES) {
+            final int id = unitSizeTypeData[index];
+            UnitSizeTypes.getUnitSizeType(id).initialize(unitSizeTypeData, index,
+                    getUnitSizeTypeName(id));
         }
 
         // bullet types
         final int[] bulletTypeData = getBulletTypes();
-        for (int i = 0; i < bulletTypeData.length; i += BulletType.NUM_ATTRIBUTES) {
-            final BulletType type = new BulletType(bulletTypeData, i);
-            type.setName(getBulletTypeName(type.getId()));
-            bulletTypes.put(type.getId(), type);
+        for (int index = 0; index < bulletTypeData.length; index += BulletType.NUM_ATTRIBUTES) {
+            final int id = bulletTypeData[index];
+            BulletTypes.getBulletType(id).initialize(bulletTypeData, index, getBulletTypeName(id));
         }
 
         // damage types
         final int[] damageTypeData = getDamageTypes();
-        for (int i = 0; i < damageTypeData.length; i += DamageType.NUM_ATTRIBUTES) {
-            final DamageType type = new DamageType(damageTypeData, i);
-            type.setName(getDamageTypeName(type.getId()));
-            damageTypes.put(type.getId(), type);
+        for (int index = 0; index < damageTypeData.length; index += DamageType.NUM_ATTRIBUTES) {
+            final int id = damageTypeData[index];
+            DamageTypes.getDamageType(id).initialize(damageTypeData, index, getDamageTypeName(id));
         }
 
         // explosion types
         final int[] explosionTypeData = getExplosionTypes();
-        for (int i = 0; i < explosionTypeData.length; i += ExplosionType.NUM_ATTRIBUTES) {
-            final ExplosionType type = new ExplosionType(explosionTypeData, i);
-            type.setName(getExplosionTypeName(type.getId()));
-            explosionTypes.put(type.getId(), type);
+        for (int index = 0; index < explosionTypeData.length; index += ExplosionType.NUM_ATTRIBUTES) {
+            final int id = explosionTypeData[index];
+            ExplosionTypes.getExplosionType(id).initialize(explosionTypeData, index,
+                    getExplosionTypeName(id));
         }
 
         // unitCommand types
         final int[] unitCommandTypeData = getUnitCommandTypes();
-        for (int i = 0; i < unitCommandTypeData.length; i += UnitCommandType.NUM_ATTRIBUTES) {
-            final UnitCommandType type = new UnitCommandType(unitCommandTypeData, i);
-            type.setName(getUnitCommandTypeName(type.getId()));
-            unitCommandTypes.put(type.getId(), type);
+        for (int index = 0; index < unitCommandTypeData.length; index +=
+                UnitCommandType.NUM_ATTRIBUTES) {
+            final int id = unitCommandTypeData[index];
+            UnitCommandTypes.getUnitCommandType(id).initialize(unitCommandTypeData, index,
+                    getUnitCommandTypeName(id));
         }
 
         // order types
         final int[] orderTypeData = getOrderTypes();
-        for (int i = 0; i < orderTypeData.length; i += OrderType.NUM_ATTRIBUTES) {
-            final OrderType type = new OrderType(orderTypeData, i);
-            type.setName(getOrderTypeName(type.getId()));
-            orderTypes.put(type.getId(), type);
-        }
-
-        // event types
-        for (final EventType type : EventType.values()) {
-            eventTypes.put(type.getId(), type);
+        for (int index = 0; index < orderTypeData.length; index += OrderType.NUM_ATTRIBUTES) {
+            final int id = orderTypeData[index];
+            OrderTypes.getOrderType(id).initialize(orderTypeData, index, getOrderTypeName(id));
         }
     }
 
@@ -779,37 +811,31 @@ public class Broodwar {
      * C++ callback function.
      */
     private void gameStarted() {
+        // get the players
         self = null;
         allies.clear();
-        allyIds.clear();
         enemies.clear();
-        enemyIds.clear();
         players.clear();
 
         final int[] playerData = getPlayersData();
-        for (int i = 0; i < playerData.length; i += Player.NUMBER_OF_ATTRIBUTES) {
-
-            final String name = new String(getPlayerName(playerData[i]), CHARACTER_SET);
-            final Player player = new Player(playerData, i, name);
+        for (int index = 0; index < playerData.length; index += Player.NUM_ATTRIBUTES) {
+            final String name = new String(getPlayerName(playerData[index]), CHARACTER_SET);
+            final Player player = new Player(playerData, index, name);
 
             players.put(player.getId(), player);
 
             if (player.isSelf()) {
                 self = player;
-
             } else if (player.isAlly()) {
                 allies.add(player);
-                allyIds.add(player.getId());
-
             } else if (player.isEnemy()) {
                 enemies.add(player);
-                enemyIds.add(player.getId());
-
             } else if (player.isNeutral()) {
                 neutralPlayer = player;
             }
         }
 
+        // get unit data
         units.clear();
         playerUnits.clear();
         alliedUnits.clear();
@@ -817,21 +843,18 @@ public class Broodwar {
         neutralUnits.clear();
         final int[] unitData = getAllUnitsData();
 
-        for (int i = 0; i < unitData.length; i += Unit.NUMBER_OF_ATTRIBUTES) {
-            final int id = unitData[i];
-            final Unit unit = new Unit(id);
-            unit.update(unitData, i, this);
+        for (int index = 0; index < unitData.length; index += Unit.NUM_ATTRIBUTES) {
+            final int id = unitData[index];
+            final Unit unit = new Unit(id, this);
+            unit.update(unitData, index);
 
             units.put(id, unit);
-            if ((self != null) && (unit.getOwner().getId() == self.getId())) {
+            if ((self != null) && (unit.getPlayer() == self)) {
                 playerUnits.add(unit);
-
-            } else if (allyIds.contains(unit.getOwner().getId())) {
+            } else if (allies.contains(unit.getPlayer())) {
                 alliedUnits.add(unit);
-
-            } else if (enemyIds.contains(unit.getOwner().getId())) {
+            } else if (enemies.contains(unit.getPlayer())) {
                 enemyUnits.add(unit);
-
             } else {
                 neutralUnits.add(unit);
             }
@@ -852,68 +875,66 @@ public class Broodwar {
      * C++ callback function.
      */
     private void gameUpdate() {
+        // update game state
         gameFrame = getFrame();
-
         if (!isReplay()) {
             self.update(getPlayerUpdate(self.getId()));
             self.updateResearch(getResearchStatus(self.getId()), getUpgradeStatus(self.getId()));
-
         } else {
-            for (final Integer playerId : players.keySet()) {
-                players.get(playerId).update(getPlayerUpdate(playerId));
-                players.get(playerId).updateResearch(getResearchStatus(playerId),
-                        getUpgradeStatus(playerId));
+            for (final Integer playerID : players.keySet()) {
+                players.get(playerID).update(getPlayerUpdate(playerID));
+                players.get(playerID).updateResearch(getResearchStatus(playerID),
+                        getUpgradeStatus(playerID));
             }
         }
-
+        // update units
         final int[] unitData = getAllUnitsData();
         final HashSet<Integer> deadUnits = new HashSet<Integer>(units.keySet());
+        final ArrayList<Unit> playerList = new ArrayList<Unit>();
+        final ArrayList<Unit> alliedList = new ArrayList<Unit>();
+        final ArrayList<Unit> enemyList = new ArrayList<Unit>();
+        final ArrayList<Unit> neutralList = new ArrayList<Unit>();
 
-        playerUnits.clear();
-        alliedUnits.clear();
-        enemyUnits.clear();
-        neutralUnits.clear();
-
-        for (int i = 0; i < unitData.length; i += Unit.NUMBER_OF_ATTRIBUTES) {
-            final int id = unitData[i];
+        for (int index = 0; index < unitData.length; index += Unit.NUM_ATTRIBUTES) {
+            final int id = unitData[index];
 
             deadUnits.remove(id);
 
             Unit unit = units.get(id);
             if (unit == null) {
-                unit = new Unit(id);
+                unit = new Unit(id, this);
                 units.put(id, unit);
             }
 
-            unit.update(unitData, i, this);
+            unit.update(unitData, index);
 
             if (self != null) {
-                if (unit.getOwner().getId() == self.getId()) {
-                    playerUnits.add(unit);
-
-                } else if (allyIds.contains(unit.getOwner().getId())) {
-                    alliedUnits.add(unit);
-
-                } else if (enemyIds.contains(unit.getOwner().getId())) {
-                    enemyUnits.add(unit);
-
+                if (unit.getPlayer() == self) {
+                    playerList.add(unit);
+                } else if (allies.contains(unit.getPlayer())) {
+                    alliedList.add(unit);
+                } else if (enemies.contains(unit.getPlayer())) {
+                    enemyList.add(unit);
                 } else {
-                    neutralUnits.add(unit);
+                    neutralList.add(unit);
                 }
-            } else if (allyIds.contains(unit.getOwner().getId())) {
-                alliedUnits.add(unit);
-
-            } else if (enemyIds.contains(unit.getOwner().getId())) {
-                enemyUnits.add(unit);
-
+            } else if (allies.contains(unit.getPlayer())) {
+                alliedList.add(unit);
+            } else if (enemies.contains(unit.getPlayer())) {
+                enemyList.add(unit);
             } else {
-                neutralUnits.add(unit);
+                neutralList.add(unit);
             }
         }
 
-        for (final Integer unitId : deadUnits) {
-            units.get(unitId).setDestroyed();
-            units.remove(unitId);
+        // update the unit lists
+        playerUnits = playerList;
+        alliedUnits = alliedList;
+        enemyUnits = enemyList;
+        neutralUnits = neutralList;
+        for (final Integer unitID : deadUnits) {
+            units.get(unitID).setDestroyed();
+            units.remove(unitID);
         }
     }
 
