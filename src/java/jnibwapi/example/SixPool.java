@@ -3,7 +3,7 @@ package jnibwapi.example;
 import java.util.HashSet;
 
 import jnibwapi.BroodwarAgent;
-import jnibwapi.model.Location;
+import jnibwapi.model.Position;
 import jnibwapi.model.Unit;
 import jnibwapi.types.UnitType.UnitTypes;
 
@@ -51,7 +51,7 @@ public class SixPool extends BroodwarAgent {
         // spawn a drone
         if ((droneCount < 6) && (broodwar.canMake(UnitTypes.Zerg_Drone))) {
             for (final Unit unit : broodwar.getMyUnits()) {
-                if (unit.getTypeId().getId() == UnitTypes.Zerg_Larva.getId()) {
+                if (unit.getType() == UnitTypes.Zerg_Larva) {
                     if (unit.morph(UnitTypes.Zerg_Drone)) {
                         droneCount++;
                     }
@@ -62,15 +62,15 @@ public class SixPool extends BroodwarAgent {
         // collect minerals
 
         for (final Unit unit : broodwar.getMyUnits()) {
-            if (unit.getTypeId() == UnitTypes.Zerg_Drone) {
+            if (unit.getType() == UnitTypes.Zerg_Drone) {
                 if (unit.isIdle() && (unit.getId() != poolDrone)) {
                     for (final Unit minerals : broodwar.getNeutralUnits()) {
-                        if ((minerals.getTypeId() == UnitTypes.Resource_Mineral_Field)
+                        if ((minerals.getType() == UnitTypes.Resource_Mineral_Field)
                                 && !claimed.contains(minerals.getId())) {
-                            final int mineralsX = minerals.getLocation().x;
-                            final int mineralsY = minerals.getLocation().y;
-                            final int unitX = unit.getLocation().x;
-                            final int unitY = unit.getLocation().y;
+                            final int mineralsX = minerals.getTargetPosition().getPX();
+                            final int mineralsY = minerals.getTargetPosition().getPY();
+                            final int unitX = unit.getTargetPosition().getPX();
+                            final int unitY = unit.getTargetPosition().getPY();
                             final double distance =
                                     Math.sqrt(Math.pow(mineralsX - unitX, 2)
                                             + Math.pow(mineralsY - unitY, 2));
@@ -87,14 +87,12 @@ public class SixPool extends BroodwarAgent {
         }
 
         // build a spawning pool
-        if (!haveSpawningPool() && broodwar.canMake(UnitTypes.Zerg_Spawning_Pool.ordinal())) {
+        if (!haveSpawningPool() && broodwar.canMake(UnitTypes.Zerg_Spawning_Pool)) {
             for (final Unit potentialDrone : broodwar.getMyUnits()) {
-                if (potentialDrone.getTypeId() == UnitTypes.Zerg_Drone) {
+                if (potentialDrone.getType() == UnitTypes.Zerg_Drone) {
                     for (final Unit unit : broodwar.getMyUnits()) {
-                        if (unit.getTypeId() == UnitTypes.Zerg_Overlord) {
-                            final int x = unit.getTileLocation().x;
-                            final int y = unit.getTileLocation().y;
-                            final Location.Tile position = new Location.Tile(x, y);
+                        if (unit.getType() == UnitTypes.Zerg_Overlord) {
+                            final Position position = unit.getTargetPosition();
                             potentialDrone.build(UnitTypes.Zerg_Spawning_Pool, position);
                             break;
                         }
@@ -107,9 +105,9 @@ public class SixPool extends BroodwarAgent {
         // spawn overlords
         if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf().getSupplyTotal())
                 && (broodwar.getSelf().getSupplyTotal() > supplyCap)) {
-            if (broodwar.canMake(UnitTypes.Zerg_Overlord.ordinal())) {
+            if (broodwar.canMake(UnitTypes.Zerg_Overlord)) {
                 for (final Unit larva : broodwar.getMyUnits()) {
-                    if (larva.getTypeId() == UnitTypes.Zerg_Larva) {
+                    if (larva.getType() == UnitTypes.Zerg_Larva) {
                         larva.morph(UnitTypes.Zerg_Overlord);
                         supplyCap = broodwar.getSelf().getSupplyTotal();
                     }
@@ -117,11 +115,11 @@ public class SixPool extends BroodwarAgent {
             }
         }
         // spawn zerglings
-        else if (broodwar.canMake(UnitTypes.Zerg_Zergling.ordinal())) {
+        else if (broodwar.canMake(UnitTypes.Zerg_Zergling)) {
             for (final Unit unit : broodwar.getMyUnits()) {
-                if ((unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool) && unit.isCompleted()) {
+                if ((unit.getType() == UnitTypes.Zerg_Spawning_Pool) && unit.isCompleted()) {
                     for (final Unit larva : broodwar.getMyUnits()) {
-                        if (larva.getTypeId() == UnitTypes.Zerg_Larva) {
+                        if (larva.getType() == UnitTypes.Zerg_Larva) {
                             larva.morph(UnitTypes.Zerg_Zergling);
                         }
                     }
@@ -131,12 +129,9 @@ public class SixPool extends BroodwarAgent {
 
         // attack
         for (final Unit unit : broodwar.getMyUnits()) {
-            if ((unit.getTypeId() == UnitTypes.Zerg_Zergling) && unit.isIdle()) {
+            if ((unit.getType() == UnitTypes.Zerg_Zergling) && unit.isIdle()) {
                 for (final Unit enemy : broodwar.getEnemyUnits()) {
-                    final int x = enemy.getTileLocation().x;
-                    final int y = enemy.getTileLocation().y;
-                    final Location position = new Location(x * 32, y * 32);
-                    unit.attack(position);
+                    unit.attack(enemy.getTargetPosition());
                     break;
                 }
             }
@@ -145,7 +140,7 @@ public class SixPool extends BroodwarAgent {
 
     private boolean haveSpawningPool() {
         for (final Unit unit : broodwar.getMyUnits()) {
-            if (unit.getTypeId() == UnitTypes.Zerg_Spawning_Pool) {
+            if (unit.getType() == UnitTypes.Zerg_Spawning_Pool) {
                 return true;
             }
         }
@@ -154,7 +149,7 @@ public class SixPool extends BroodwarAgent {
 
     @Override
     public void unitCreate(final Unit unit) {
-        System.out.println("Create: " + unit.getId() + unit.getTypeId());
+        System.out.println("Create: " + unit.getId() + unit.getType());
     }
 
     /**
@@ -162,7 +157,7 @@ public class SixPool extends BroodwarAgent {
      */
     @Override
     public void unitDiscover(final Unit unit) {
-        System.out.println("Discover: " + unit.getId() + unit.getTypeId());
+        System.out.println("Discover: " + unit.getId() + unit.getType());
     }
 
     /**
@@ -196,6 +191,6 @@ public class SixPool extends BroodwarAgent {
 
     @Override
     public void unitShow(final Unit unit) {
-        System.out.println("Show: " + unit.getId() + "\t" + unit.getTypeId());
+        System.out.println("Show: " + unit.getId() + "\t" + unit.getType());
     }
 }

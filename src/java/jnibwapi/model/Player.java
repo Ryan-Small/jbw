@@ -1,6 +1,10 @@
 package jnibwapi.model;
 
-import java.awt.Point;
+import jnibwapi.model.Position.Type;
+import jnibwapi.types.*;
+import jnibwapi.types.RaceType.RaceTypes;
+import jnibwapi.types.TechType.TechTypes;
+import jnibwapi.types.UpgradeType.UpgradeTypes;
 
 /**
  * Represents a StarCraft player.
@@ -9,11 +13,11 @@ import java.awt.Point;
  */
 public class Player {
 
-    public static final int NUMBER_OF_ATTRIBUTES = 11;
+    public static final int NUM_ATTRIBUTES = 11;
 
-    private final int ID;
-    private final int raceID;
-    private final int typeID;
+    private final int id;
+    private final int raceId;
+    private final int typeId;
     private final int startLocationX;
     private final int startLocationY;
     private final boolean self;
@@ -35,15 +39,15 @@ public class Player {
     private int buildingScore;
     private int razingScore;
 
-    private boolean[] researching = null;
-    private boolean[] researched = null;
-    private boolean[] upgrading = null;
-    private int[] upgradeLevel = null;
+    private final boolean[] researching;
+    private final boolean[] researched;
+    private final boolean[] upgrading;
+    private final int[] upgradeLevel;
 
     public Player(final int[] data, int index, final String name) {
-        ID = data[index++];
-        raceID = data[index++];
-        typeID = data[index++];
+        id = data[index++];
+        raceId = data[index++];
+        typeId = data[index++];
         startLocationX = data[index++];
         startLocationY = data[index++];
         self = (data[index++] == 1);
@@ -53,6 +57,19 @@ public class Player {
         observer = (data[index++] == 1);
         color = data[index++];
         this.name = name;
+        // Initialise technology records
+        int highestIDTechType = 0;
+        for (final TechType t : TechTypes.getAllTechTypes()) {
+            highestIDTechType = Math.max(highestIDTechType, t.getId());
+        }
+        researching = new boolean[highestIDTechType + 1];
+        researched = new boolean[highestIDTechType + 1];
+        int highestIDUpgradeType = 0;
+        for (final UpgradeType ut : UpgradeTypes.getAllUpgradeTypes()) {
+            highestIDUpgradeType = Math.max(highestIDUpgradeType, ut.getId());
+        }
+        upgrading = new boolean[highestIDUpgradeType + 1];
+        upgradeLevel = new int[highestIDUpgradeType + 1];
     }
 
     public void update(final int[] data) {
@@ -69,45 +86,39 @@ public class Player {
         razingScore = data[index++];
     }
 
-    public void updateResearch(final int[] researchData, final int[] upgradeData) {
-        researched = new boolean[researchData.length / 2];
-        researching = new boolean[researchData.length / 2];
-
-        for (int i = 0; i < researchData.length; i += 2) {
-            researched[i / 2] = (researchData[i] == 1);
-            researching[i / 2] = (researchData[i + 1] == 1);
+    public void updateResearch(final int[] techData, final int[] upgradeData) {
+        for (int i = 0; i < techData.length; i += 3) {
+            final int techTypeID = techData[i];
+            researched[techTypeID] = (techData[i + 1] == 1);
+            researching[techTypeID] = (techData[i + 2] == 1);
         }
 
-        upgradeLevel = new int[upgradeData.length / 2];
-        upgrading = new boolean[upgradeData.length / 2];
-
-        for (int i = 0; i < upgradeData.length; i += 2) {
-            upgradeLevel[i / 2] = upgradeData[i];
-            upgrading[i / 2] = (upgradeData[i + 1] == 1);
+        for (int i = 0; i < upgradeData.length; i += 3) {
+            final int upgradeTypeID = upgradeData[i];
+            upgradeLevel[upgradeTypeID] = upgradeData[i + 1];
+            upgrading[upgradeTypeID] = (upgradeData[i + 2] == 1);
         }
     }
 
     public int getId() {
-        return ID;
+        return id;
     }
 
-    public int getRaceID() {
-        return raceID;
+    public RaceType getRace() {
+        return RaceTypes.getRaceType(raceId);
     }
 
-    public int getTypeID() {
-        return typeID;
+    // TODO Should return a PlayerType
+    public int getTypeId() {
+        return typeId;
     }
 
     /**
-     * Returns the starting tile position of the Player, or null if unknown (eg. for enemy players
-     * without complete map information).
+     * Returns the starting tile position of the Player. Note: the position may be equal to
+     * Positions.Invalid / Positions.None / Positions.Unknown.
      */
-    public Point getStartLocation() {
-        if (startLocationX == 1000) {
-            return null; // In the case of Invalid/None/Unknown TilePosition
-        }
-        return new Point(startLocationX, startLocationY);
+    public Position getStartLocation() {
+        return new Position(startLocationX, startLocationY, Type.BUILD);
     }
 
     public boolean isSelf() {
@@ -178,22 +189,42 @@ public class Player {
         return razingScore;
     }
 
-    public boolean isResearched(final int techID) {
-        return ((researched != null) && (techID < researched.length)) ? researched[techID] : false;
+    public boolean isResearched(final TechType tech) {
+        return researched[tech.getId()];
     }
 
-    public boolean isResearching(final int techID) {
-        return ((researching != null) && (techID < researching.length)) ? researching[techID]
-                : false;
+    public boolean isResearching(final TechType tech) {
+        return researching[tech.getId()];
     }
 
-    public int getUpgradeLevel(final int upgradeID) {
-        return ((upgradeLevel != null) && (upgradeID < upgradeLevel.length)) ? upgradeLevel[upgradeID]
-                : 0;
+    public int getUpgradeLevel(final UpgradeType upgrade) {
+        return upgradeLevel[upgrade.getId()];
     }
 
-    public boolean isUpgrading(final int upgradeID) {
-        return ((upgrading != null) && (upgradeID < upgrading.length)) ? upgrading[upgradeID]
-                : false;
+    public boolean isUpgrading(final UpgradeType upgrade) {
+        return upgrading[upgrade.getId()];
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Player other = (Player) obj;
+        if (id != other.id) {
+            return false;
+        }
+        return true;
     }
 }

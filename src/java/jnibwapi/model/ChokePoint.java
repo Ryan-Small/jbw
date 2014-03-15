@@ -3,39 +3,37 @@ package jnibwapi.model;
 import java.util.Map;
 
 /**
- * Represents a choke point in a StarCraft map.
- * 
- * For a description of fields see: http://code.google.com/p/bwta/wiki/Chokepoint
+ * http://code.google.com/p/bwta/wiki/Chokepoint
  */
 public class ChokePoint {
 
     public static final int NUM_ATTRIBUTES = 9;
-    private static final double fixedScale = 100.0;
+    public static final double fixedScale = 100.0;
 
-    private final int centerX;
-    private final int centerY;
+    private final Position center;
     private final double radius;
-    private final int firstRegionID;
-    private final int secondRegionID;
-    private final int firstSideX;
-    private final int firstSideY;
-    private final int secondSideX;
-    private final int secondSideY;
+    private final int firstRegionId;
+    private final int secondRegionId;
+    private final Position firstSide;
+    private final Position secondSide;
     private final Region firstRegion;
     private final Region secondRegion;
 
     public ChokePoint(final int[] data, int index, final Map<Integer, Region> idToRegion) {
-        centerX = data[index++];
-        centerY = data[index++];
+        final int centerX = data[index++];
+        final int centerY = data[index++];
+        center = new Position(centerX, centerY);
         radius = data[index++] / fixedScale;
-        firstRegionID = data[index++];
-        secondRegionID = data[index++];
-        firstSideX = data[index++];
-        firstSideY = data[index++];
-        secondSideX = data[index++];
-        secondSideY = data[index++];
-        firstRegion = idToRegion.get(firstRegionID);
-        secondRegion = idToRegion.get(secondRegionID);
+        firstRegionId = data[index++];
+        secondRegionId = data[index++];
+        final int firstSideX = data[index++];
+        final int firstSideY = data[index++];
+        firstSide = new Position(firstSideX, firstSideY);
+        final int secondSideX = data[index++];
+        final int secondSideY = data[index++];
+        secondSide = new Position(secondSideX, secondSideY);
+        firstRegion = idToRegion.get(firstRegionId);
+        secondRegion = idToRegion.get(secondRegionId);
     }
 
     public Region getOtherRegion(final Region region) {
@@ -50,39 +48,19 @@ public class ChokePoint {
         return secondRegion;
     }
 
-    public int getCenterX() {
-        return centerX;
-    }
-
-    public int getCenterY() {
-        return centerY;
+    public Position getCenter() {
+        return center;
     }
 
     public double getRadius() {
         return radius;
     }
 
-    public int getFirstRegionID() {
-        return firstRegionID;
+    public Position getFirstSide() {
+        return firstSide;
     }
 
-    public int getSecondRegionID() {
-        return secondRegionID;
-    }
-
-    public int getFirstSideX() {
-        return firstSideX;
-    }
-
-    public int getFirstSideY() {
-        return firstSideY;
-    }
-
-    public int getSecondSideX() {
-        return secondSideX;
-    }
-
-    public int getSecondSideY() {
-        return secondSideY;
+    public Position getSecondSide() {
+        return secondSide;
     }
 }

@@ -585,11 +585,27 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPath__III
 
 /*
  * Class:     jnibwapi_Broodwar
- * Method:    hasLoadedUnit
- * Signature: (II)Z
+ * Method:    getLoadedUnits
+ * Signature: (I)[I
  */
-JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasLoadedUnit
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getLoadedUnits
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_Broodwar
+ * Method:    getInterceptors
+ * Signature: (I)[I
+ */
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getInterceptors
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     jnibwapi_Broodwar
+ * Method:    getLarva
+ * Signature: (I)[I
+ */
+JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getLarva
+  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     jnibwapi_Broodwar

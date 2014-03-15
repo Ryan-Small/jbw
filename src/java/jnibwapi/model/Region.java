@@ -11,35 +11,34 @@ public class Region {
 
     public static final int NUM_ATTRIBUTES = 3;
 
-    private final int ID;
-    private final int centerX;
-    private final int centerY;
-    private final int[] coordinates;
+    private final int id;
+    private final Position center;
+    private final Position[] polygon;
     private final Set<Region> connectedRegions = new HashSet<>();
     private final Set<ChokePoint> chokePoints = new HashSet<>();
     private Set<Region> allConnectedRegions = null;
 
     public Region(final int[] data, int index, final int[] coordinates) {
-        ID = data[index++];
-        centerX = data[index++];
-        centerY = data[index++];
-        this.coordinates = coordinates;
+        id = data[index++];
+        final int centerX = data[index++];
+        final int centerY = data[index++];
+        center = new Position(centerX, centerY);
+        polygon = new Position[coordinates.length / 2];
+        for (int i = 0; i < coordinates.length; i += 2) {
+            polygon[i / 2] = new Position(coordinates[i], coordinates[i + 1]);
+        }
     }
 
-    public int getID() {
-        return ID;
+    public int getId() {
+        return id;
     }
 
-    public int getCenterX() {
-        return centerX;
+    public Position getCenter() {
+        return center;
     }
 
-    public int getCenterY() {
-        return centerY;
-    }
-
-    public int[] getCoordinates() {
-        return Arrays.copyOf(coordinates, coordinates.length);
+    public Position[] getPolygon() {
+        return Arrays.copyOf(polygon, polygon.length);
     }
 
     protected void addChokePoint(final ChokePoint chokePoint) {
@@ -74,5 +73,4 @@ public class Region {
         }
         return Collections.unmodifiableSet(allConnectedRegions);
     }
-
 }

@@ -1,7 +1,10 @@
 package jnibwapi.model;
 
-import jnibwapi.Broodwar;
+import jnibwapi.IdLookup;
+import jnibwapi.types.*;
+import jnibwapi.types.OrderType.OrderTypes;
 import jnibwapi.types.TechType.TechTypes;
+import jnibwapi.types.UnitCommandType.UnitCommandTypes;
 import jnibwapi.types.UnitType.UnitTypes;
 import jnibwapi.types.UpgradeType.UpgradeTypes;
 
@@ -38,17 +41,21 @@ import jnibwapi.types.UpgradeType.UpgradeTypes;
  */
 public class Unit {
 
-    public static final int NUMBER_OF_ATTRIBUTES = 118;
+    public static final int NUM_ATTRIBUTES = 123;
 
     private static final double FIXED_SCALE = 100.0;
     private static final double TO_DEGREES = 180.0 / Math.PI;
 
+    private final IdLookup lookup;
+
     private final int id;
     private int replayId;
-    private Player owner;
-    private UnitTypes typeId;
-    private Location location;
-    private Location.Tile tileLocation;
+    private int playerId;
+    private int typeId;
+    private int x;
+    private int y;
+    private int tileX;
+    private int tileY;
     private double angle;
     private double velocityX;
     private double velocityY;
@@ -58,8 +65,9 @@ public class Unit {
     private int resources;
     private int resourceGroup;
     private int lastCommandFrame;
-    private int lastCommandID;
-    private int initialTypeID;
+    private int lastCommandId;
+    private int lastAttackingPlayerId;
+    private int initialTypeId;
     private int initialX;
     private int initialY;
     private int initialTileX;
@@ -85,28 +93,32 @@ public class Unit {
     private int removeTimer;
     private int stasisTimer;
     private int stimTimer;
-    private int buildTypeID;
+    private int buildTypeId;
     private int trainingQueueSize;
-    private int researchingTechID;
-    private int upgradingUpgradeID;
+    private int researchingTechId;
+    private int upgradingUpgradeId;
     private int remainingBuildTimer;
     private int remainingTrainTime;
     private int remainingResearchTime;
     private int remainingUpgradeTime;
-    private int buildUnitID;
-    private int targetUnitID;
+    private int buildUnitId;
+    private int targetUnitId;
     private int targetX;
     private int targetY;
-    private int orderID;
-    private int orderTargetID;
-    private int secondaryOrderID;
+    private int orderId;
+    private int orderTargetId;
+    private int secondaryOrderId;
     private int rallyX;
     private int rallyY;
-    private int rallyUnitID;
-    private int addOnID;
-    private int transportID;
-    private int numLoadedUnits;
-    private int numLarva;
+    private int rallyUnitId;
+    private int addOnId;
+    private int nydusExitUnitId;
+    private int transportId;
+    private int loadedUnitsCount;
+    private int carrierUnitId;
+    private int hatcheryUnitId;
+    private int larvaCount;
+    private int powerUpUnitId;
     private boolean exists;
     private boolean nukeReady;
     private boolean accelerating;
@@ -160,22 +172,24 @@ public class Unit {
     private boolean upgrading;
     private boolean visible;
 
-    public Unit(final int id) {
+    public Unit(final int id, final IdLookup lookup) {
         this.id = id;
+        this.lookup = lookup;
     }
 
     public void setDestroyed() {
         exists = false;
     }
 
-    public void update(final int[] data, int index, final Broodwar broodwar) {
-        index++; // the first element is the id, which will be supplied during
-                 // construction
+    public void update(final int[] data, int index) {
+        index++; // ID = data[index++];
         replayId = data[index++];
-        owner = broodwar.getPlayer(data[index++]);
-        typeId = UnitTypes.values()[data[index++]];
-        location = new Location(data[index++], data[index++]);
-        tileLocation = new Location.Tile(data[index++], data[index++]);
+        playerId = data[index++];
+        typeId = data[index++];
+        x = data[index++];
+        y = data[index++];
+        tileX = data[index++];
+        tileY = data[index++];
         angle = data[index++] / TO_DEGREES;
         velocityX = data[index++] / FIXED_SCALE;
         velocityY = data[index++] / FIXED_SCALE;
@@ -185,8 +199,9 @@ public class Unit {
         resources = data[index++];
         resourceGroup = data[index++];
         lastCommandFrame = data[index++];
-        lastCommandID = data[index++];
-        initialTypeID = data[index++];
+        lastCommandId = data[index++];
+        lastAttackingPlayerId = data[index++];
+        initialTypeId = data[index++];
         initialX = data[index++];
         initialY = data[index++];
         initialTileX = data[index++];
@@ -212,28 +227,32 @@ public class Unit {
         removeTimer = data[index++];
         stasisTimer = data[index++];
         stimTimer = data[index++];
-        buildTypeID = data[index++];
+        buildTypeId = data[index++];
         trainingQueueSize = data[index++];
-        researchingTechID = data[index++];
-        upgradingUpgradeID = data[index++];
+        researchingTechId = data[index++];
+        upgradingUpgradeId = data[index++];
         remainingBuildTimer = data[index++];
         remainingTrainTime = data[index++];
         remainingResearchTime = data[index++];
         remainingUpgradeTime = data[index++];
-        buildUnitID = data[index++];
-        targetUnitID = data[index++];
+        buildUnitId = data[index++];
+        targetUnitId = data[index++];
         targetX = data[index++];
         targetY = data[index++];
-        orderID = data[index++];
-        orderTargetID = data[index++];
-        secondaryOrderID = data[index++];
+        orderId = data[index++];
+        orderTargetId = data[index++];
+        secondaryOrderId = data[index++];
         rallyX = data[index++];
         rallyY = data[index++];
-        rallyUnitID = data[index++];
-        addOnID = data[index++];
-        transportID = data[index++];
-        numLoadedUnits = data[index++];
-        numLarva = data[index++];
+        rallyUnitId = data[index++];
+        addOnId = data[index++];
+        nydusExitUnitId = data[index++];
+        transportId = data[index++];
+        loadedUnitsCount = data[index++];
+        carrierUnitId = data[index++];
+        hatcheryUnitId = data[index++];
+        larvaCount = data[index++];
+        powerUpUnitId = data[index++];
         exists = data[index++] == 1;
         nukeReady = data[index++] == 1;
         accelerating = data[index++] == 1;
@@ -288,6 +307,96 @@ public class Unit {
         visible = data[index++] == 1;
     }
 
+    @Override
+    public Unit clone() {
+        /*
+         * Safe to use clone for this class because it has only primitive fields and a reference to
+         * BWAPI, which should be shallow-copied. Beware when using equals or == with cloned Units
+         * as they will be considered equal (and not ==) regardless of any changes in their
+         * properties over time.
+         */
+        try {
+            return (Unit) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            // Should never happen, as this implements Cloneable and extends Object
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /** Returns the edge-to-edge distance between the current unit and the target unit. */
+    public double getDistance(final Unit target) {
+        if (!isExists() || (target == null) || !target.isExists()) {
+            return Integer.MAX_VALUE;
+        }
+
+        if (this == target) {
+            return 0;
+        }
+
+        int xDist = getLeft() - (target.getRight() + 1);
+        if (xDist < 0) {
+            xDist = target.getLeft() - (getRight() + 1);
+            if (xDist < 0) {
+                xDist = 0;
+            }
+        }
+        int yDist = getTop() - (target.getBottom() + 1);
+        if (yDist < 0) {
+            yDist = target.getTop() - (getBottom() + 1);
+            if (yDist < 0) {
+                yDist = 0;
+            }
+        }
+        return new Position(0, 0).getPDistance(new Position(xDist, yDist));
+    }
+
+    /** Returns the distance from the edge of the current unit to the target position. */
+    public double getDistance(final Position target) {
+        if (!isExists()) {
+            return Integer.MAX_VALUE;
+        }
+        int xDist = getLeft() - (target.getPX() + 1);
+        if (xDist < 0) {
+            xDist = target.getPX() - (getRight() + 1);
+            if (xDist < 0) {
+                xDist = 0;
+            }
+        }
+        int yDist = getTop() - (target.getPY() + 1);
+        if (yDist < 0) {
+            yDist = target.getPY() - (getBottom() + 1);
+            if (yDist < 0) {
+                yDist = 0;
+            }
+        }
+        return new Position(0, 0).getPDistance(new Position(xDist, yDist));
+    }
+
+    public Position getTopLeft() {
+        return new Position(getLeft(), getTop());
+    }
+
+    public Position getBottomRight() {
+        return new Position(getRight(), getBottom());
+    }
+
+    public int getLeft() {
+        return x - getType().getDimensionLeft();
+    }
+
+    public int getTop() {
+        return y - getType().getDimensionUp();
+    }
+
+    public int getRight() {
+        return x + getType().getDimensionRight();
+    }
+
+    public int getBottom() {
+        return y + getType().getDimensionDown();
+    }
+
     /**
      * Returns the unique ID for this unit.
      * 
@@ -301,20 +410,12 @@ public class Unit {
         return replayId;
     }
 
-    public Player getOwner() {
-        return owner;
+    public Player getPlayer() {
+        return lookup.getPlayer(playerId);
     }
 
-    public UnitTypes getTypeId() {
-        return typeId;
-    }
-
-    public Location getLocation() {
-        return location;
-    }
-
-    public Location.Tile getTileLocation() {
-        return tileLocation;
+    public UnitType getType() {
+        return UnitTypes.getUnitType(typeId);
     }
 
     public double getAngle() {
@@ -353,28 +454,20 @@ public class Unit {
         return lastCommandFrame;
     }
 
-    public int getLastCommandID() {
-        return lastCommandID;
+    public UnitCommandType getLastCommand() {
+        return UnitCommandTypes.getUnitCommandType(lastCommandId);
     }
 
-    public int getInitialTypeID() {
-        return initialTypeID;
+    public Player getLastAttackingPlayer() {
+        return lookup.getPlayer(lastAttackingPlayerId);
     }
 
-    public int getInitialX() {
-        return initialX;
+    public UnitType getInitialType() {
+        return UnitTypes.getUnitType(initialTypeId);
     }
 
-    public int getInitialY() {
-        return initialY;
-    }
-
-    public int getInitialTileX() {
-        return initialTileX;
-    }
-
-    public int getInitialTileY() {
-        return initialTileY;
+    public Position getInitialPosition() {
+        return new Position(initialX, initialY);
     }
 
     public int getInitialHitPoints() {
@@ -393,6 +486,7 @@ public class Unit {
         return acidSporeCount;
     }
 
+    /** @see #getInterceptors() TODO */
     public int getInterceptorCount() {
         return interceptorCount;
     }
@@ -461,20 +555,20 @@ public class Unit {
         return stimTimer;
     }
 
-    public int getBuildTypeID() {
-        return buildTypeID;
+    public UnitType getBuildType() {
+        return UnitTypes.getUnitType(buildTypeId);
     }
 
     public int getTrainingQueueSize() {
         return trainingQueueSize;
     }
 
-    public int getResearchingTechID() {
-        return researchingTechID;
+    public TechType getTech() {
+        return TechTypes.getTechType(researchingTechId);
     }
 
-    public int getUpgradingUpgradeID() {
-        return upgradingUpgradeID;
+    public UpgradeType getUpgrade() {
+        return UpgradeTypes.getUpgradeType(upgradingUpgradeId);
     }
 
     public int getRemainingBuildTimer() {
@@ -493,60 +587,70 @@ public class Unit {
         return remainingUpgradeTime;
     }
 
-    public int getBuildUnitID() {
-        return buildUnitID;
+    public Unit getBuildUnit() {
+        return lookup.getUnit(buildUnitId);
     }
 
-    public int getTargetUnitID() {
-        return targetUnitID;
+    public Unit getTarget() {
+        return lookup.getUnit(targetUnitId);
     }
 
-    public int getTargetX() {
-        return targetX;
+    public Position getTargetPosition() {
+        return new Position(targetX, targetY);
     }
 
-    public int getTargetY() {
-        return targetY;
+    public OrderType getOrder() {
+        return OrderTypes.getOrderType(orderId);
     }
 
-    public int getOrderID() {
-        return orderID;
+    public Unit getOrderTarget() {
+        return lookup.getUnit(orderTargetId);
     }
 
-    public int getOrderTargetUnitID() {
-        return orderTargetID;
+    public OrderType getSecondaryOrder() {
+        return OrderTypes.getOrderType(secondaryOrderId);
     }
 
-    public int getSecondaryOrderID() {
-        return secondaryOrderID;
+    public Position getRallyPosition() {
+        return new Position(rallyX, rallyY);
     }
 
-    public int getRallyX() {
-        return rallyX;
+    public Unit getRallyUnit() {
+        return lookup.getUnit(rallyUnitId);
     }
 
-    public int getRallyY() {
-        return rallyY;
+    public Unit getAddon() {
+        return lookup.getUnit(addOnId);
     }
 
-    public int getRallyUnitID() {
-        return rallyUnitID;
+    public Unit getNydusExit() {
+        return lookup.getUnit(nydusExitUnitId);
     }
 
-    public int getAddOnUnitID() {
-        return addOnID;
+    public Unit getTransport() {
+        return lookup.getUnit(transportId);
     }
 
-    public int getTransportUnitID() {
-        return transportID;
+    /** TODO @see #getLoadedUnits() */
+    public int getLoadedUnitsCount() {
+        return loadedUnitsCount;
     }
 
-    public int getNumLoadedUnits() {
-        return numLoadedUnits;
+    public Unit getCarrier() {
+        return lookup.getUnit(carrierUnitId);
     }
 
-    public int getNumLarva() {
-        return numLarva;
+    public Unit getHatchery() {
+        return lookup.getUnit(hatcheryUnitId);
+    }
+
+    /** TODO @see #getLarva() */
+    public int getLarvaCount() {
+        return larvaCount;
+    }
+
+    public Unit getPowerUp() {
+        return lookup.getUnit(powerUpUnitId);
     }
 
     public boolean isExists() {
@@ -761,13 +865,13 @@ public class Unit {
      * Orders this unit to attack move to a location. After issuing, orders will become
      * {@code OrderTypes.AttackMove}.
      * 
-     * @param location
-     *            location to move to
+     * @param position
+     *            position to move to
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean attack(final Location location) {
-        return attack(getId(), location.x, location.y);
+    public boolean attack(final Position position) {
+        return attack(getId(), position.getPX(), position.getPY());
     }
 
     private native boolean attack(final int unitId, final int x, final int y);
@@ -793,13 +897,13 @@ public class Unit {
      * @param building
      *            building to build
      * 
-     * @param location
-     *            location to build at
+     * @param position
+     *            position to build at
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean build(final UnitTypes building, final Location.Tile location) {
-        return build(getId(), building.getId(), location.x, location.y);
+    public boolean build(final UnitType building, final Position position) {
+        return build(getId(), building.getId(), position.getBX(), position.getBY());
     }
 
     private native boolean build(final int builderId, final int buildingId, final int tx,
@@ -832,7 +936,7 @@ public class Unit {
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean train(final UnitTypes unit) {
+    public boolean train(final UnitType unit) {
         return train(getId(), unit.getId());
     }
 
@@ -846,7 +950,7 @@ public class Unit {
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean morph(final UnitTypes target) {
+    public boolean morph(final UnitType target) {
         return morph(getId(), target.getId());
     }
 
@@ -860,7 +964,7 @@ public class Unit {
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean research(final TechTypes tech) {
+    public boolean research(final TechType tech) {
         return research(getId(), tech.getId());
     }
 
@@ -874,7 +978,7 @@ public class Unit {
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean upgrade(final UpgradeTypes upgrade) {
+    public boolean upgrade(final UpgradeType upgrade) {
         return upgrade(getId(), upgrade.getId());
     }
 
@@ -883,13 +987,13 @@ public class Unit {
     /**
      * Orders this unit to set its rally point to the specified location.
      * 
-     * @param location
-     *            location to rally to
+     * @param position
+     *            position to rally to
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean setRallyPoint(final Location location) {
-        return setRallyPoint(getId(), location.x, location.y);
+    public boolean setRallyPoint(final Position position) {
+        return setRallyPoint(getId(), position.getPX(), position.getPY());
     }
 
     private native boolean setRallyPoint(final int unitId, final int x, final int y);
@@ -912,13 +1016,13 @@ public class Unit {
      * Orders this unit to move to the specified location. After issuing, the orders will become
      * {@code OrderTypes.Move}.
      * 
-     * @param location
-     *            location to move to
+     * @param position
+     *            position to move to
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean move(final Location location) {
-        return move(getId(), location.x, location.y);
+    public boolean move(final Position position) {
+        return move(getId(), position.getPX(), position.getPY());
     }
 
     private native boolean move(final int unitId, final int x, final int y);
@@ -927,13 +1031,13 @@ public class Unit {
      * Orders this unit to patrol between its current position and the specified location. After
      * issuing, the orders will become {@code OrderTpes.Patrol}.
      * 
-     * @param location
-     *            location to patrol to
+     * @param position
+     *            position to patrol to
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean patrol(final Location location) {
-        return patrol(getId(), location.x, location.y);
+    public boolean patrol(final Position position) {
+        return patrol(getId(), position.getPX(), position.getPY());
     }
 
     private native boolean patrol(final int unitId, final int x, final int y);
@@ -1126,13 +1230,13 @@ public class Unit {
      * <p>
      * This unit should be a lifted Terran building.
      * 
-     * @param location
-     *            location to land the building
+     * @param position
+     *            position to land the building
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean land(final Location.Tile location) {
-        return land(getId(), location.x, location.y);
+    public boolean land(final Position position) {
+        return land(getId(), position.getBX(), position.getBY());
     }
 
     private native boolean land(final int unitId, final int x, final int y);
@@ -1198,13 +1302,13 @@ public class Unit {
      * Works like the right-click in the GUI (e.g. right-click on a location to order the unit to
      * move).
      * 
-     * @param location
-     *            location to right-click on
+     * @param position
+     *            position to right-click on
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean rightClick(final Location location) {
-        return rightClick(getId(), location.x, location.y);
+    public boolean rightClick(final Position position) {
+        return rightClick(getId(), position.getPX(), position.getPY());
     }
 
     private native boolean rightClick(final int unitId, final int x, final int y);
@@ -1312,7 +1416,7 @@ public class Unit {
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean useTech(final TechTypes tech) {
+    public boolean useTech(final TechType tech) {
         return useTech(getId(), tech.getId());
     }
 
@@ -1324,13 +1428,13 @@ public class Unit {
      * @param tech
      *            tech to use
      * 
-     * @param location
-     *            location to target the tech
+     * @param position
+     *            position to target the tech
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean useTech(final TechTypes tech, final Location location) {
-        return useTech(getId(), tech.getId(), location.x, location.y);
+    public boolean useTech(final TechType tech, final Position position) {
+        return useTech(getId(), tech.getId(), position.getPX(), position.getPY());
     }
 
     private native boolean useTech(final int unitId, final int techId, final int x, final int y);
@@ -1346,9 +1450,38 @@ public class Unit {
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean useTech(final TechTypes tech, final Unit target) {
+    public boolean useTech(final TechType tech, final Unit target) {
         return useTech(getId(), tech.getId(), target.getId());
     }
 
     private native boolean useTech(final int unitId, final int typeId, final int targetId);
+
+    public boolean placeCop(final Position position) {
+        return placeCop(getId(), position.getBX(), position.getBY());
+    }
+
+    private native boolean placeCop(final int unitId, final int x, final int y);
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Unit other = (Unit) obj;
+        if (id != other.id) {
+            return false;
+        }
+        return true;
+    }
 }
