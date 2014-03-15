@@ -98,7 +98,7 @@ public class Broodwar implements IdLookup {
     private final HashMap<Integer, ExplosionType> explosionTypes = new HashMap<>();
     private final HashMap<Integer, UnitCommandType> unitCommandTypes = new HashMap<>();
     private final HashMap<Integer, OrderType> orderTypes = new HashMap<>();
-    private final HashMap<Integer, EventType> eventTypes = new HashMap<>();
+    // private final HashMap<Integer, EventType> eventTypes = new HashMap<>();
 
     private int gameFrame = 0;
 
@@ -851,10 +851,13 @@ public class Broodwar implements IdLookup {
             units.put(id, unit);
             if ((self != null) && (unit.getPlayer() == self)) {
                 playerUnits.add(unit);
+
             } else if (allies.contains(unit.getPlayer())) {
                 alliedUnits.add(unit);
+
             } else if (enemies.contains(unit.getPlayer())) {
                 enemyUnits.add(unit);
+
             } else {
                 neutralUnits.add(unit);
             }
@@ -972,7 +975,7 @@ public class Broodwar implements IdLookup {
      */
     private void eventOccurred(final int eventTypeId, final int p1, final int p2, final String p3) {
 
-        final EventType event = eventTypes.get(eventTypeId);
+        final EventType event = EventType.getEventType(eventTypeId);
         switch (event) {
             case MatchStart :
                 listener.matchStart();

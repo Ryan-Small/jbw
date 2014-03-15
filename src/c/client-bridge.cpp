@@ -411,6 +411,7 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getResearchStatus(JNIEnv* env
 
 	std::set<TechType> techTypes = TechTypes::allTechTypes();
 	for (std::set<TechType>::iterator i = techTypes.begin(); i != techTypes.end(); ++i) {
+		intBuf[index++] = i->getID();
 		intBuf[index++] = p->hasResearched((*i)) ? 1 : 0;
 		intBuf[index++] = p->isResearching((*i)) ? 1 : 0;
 	}
@@ -426,7 +427,8 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getUpgradeStatus(JNIEnv* env,
 	Player* p = Broodwar->getPlayer(playerID);
 
 	std::set<UpgradeType> upTypes = UpgradeTypes::allUpgradeTypes();
-	for (std::set<UpgradeType>::iterator i = upTypes.begin();i != upTypes.end(); ++i) {
+	for (std::set<UpgradeType>::iterator i = upTypes.begin(); i != upTypes.end(); ++i) {
+		intBuf[index++] = i->getID();
 		intBuf[index++] = p->getUpgradeLevel((*i));
 		intBuf[index++] = p->isUpgrading((*i)) ? 1 : 0;
 	}
@@ -777,9 +779,9 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getOrderTypes(JNIEnv* env, jo
 }
 
 /**
-* Returns the list of active units in the game. 
+* Returns the list of active units in the game.
 *
-* Each unit takes up a fixed number of integer values. Currently: 118
+* Each unit takes up a fixed number of integer values. Currently: 123
 */
 JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getAllUnitsData(JNIEnv* env, jobject jObj)
 {
@@ -805,6 +807,10 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getAllUnitsData(JNIEnv* env, 
 		intBuf[index++] = (*i)->getResourceGroup();
 		intBuf[index++] = (*i)->getLastCommandFrame();
 		intBuf[index++] = (*i)->getLastCommand().getType().getID();
+		// getLastAttackingPlayer doesn't work as documented, have to check for "None" player
+		intBuf[index++] = ((*i)->getLastAttackingPlayer() != NULL
+			&& (*i)->getLastAttackingPlayer()->getType() != PlayerTypes::None)
+			? (*i)->getLastAttackingPlayer()->getID() : -1;
 		intBuf[index++] = (*i)->getInitialType().getID();
 		intBuf[index++] = (*i)->getInitialPosition().x();
 		intBuf[index++] = (*i)->getInitialPosition().y();
@@ -850,9 +856,14 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getAllUnitsData(JNIEnv* env, 
 		intBuf[index++] = (*i)->getRallyPosition().y();
 		intBuf[index++] = ((*i)->getRallyUnit() != NULL) ? (*i)->getRallyUnit()->getID() : -1;
 		intBuf[index++] = ((*i)->getAddon() != NULL) ? (*i)->getAddon()->getID() : -1;
+		intBuf[index++] = ((*i)->getNydusExit() != NULL) ? (*i)->getNydusExit()->getID() : -1;
 		intBuf[index++] = ((*i)->getTransport() != NULL) ? (*i)->getTransport()->getID() : -1;
-		intBuf[index++] = (*i)->getLoadedUnits().size();
-		intBuf[index++] = (*i)->getLarva().size();
+		intBuf[index++] = (*i)->getLoadedUnits().size(); // see separate getLoadedUnits method
+		intBuf[index++] = ((*i)->getCarrier() != NULL) ? (*i)->getCarrier()->getID() : -1;
+		// see getInterceptorCount and separate getInterceptors method
+		intBuf[index++] = ((*i)->getHatchery() != NULL) ? (*i)->getHatchery()->getID() : -1;
+		intBuf[index++] = (*i)->getLarva().size(); // see separate getLarva method
+		intBuf[index++] = ((*i)->getPowerUp() != NULL) ? (*i)->getPowerUp()->getID() : -1;
 		intBuf[index++] = (*i)->exists() ? 1 : 0;
 		intBuf[index++] = (*i)->hasNuke() ? 1 : 0;
 		intBuf[index++] = (*i)->isAccelerating() ? 1 : 0;
@@ -905,12 +916,57 @@ JNIEXPORT jintArray JNICALL Java_jnibwapi_Broodwar_getAllUnitsData(JNIEnv* env, 
 		intBuf[index++] = (*i)->isUnpowered() ? 1 : 0;
 		intBuf[index++] = (*i)->isUpgrading() ? 1 : 0;
 		intBuf[index++] = (*i)->isVisible() ? 1 : 0;
-		// last attacking player
-		// Nydus exit
-		// Carrier
-		// Interceptors
-		// Hatchery
-		// Power up
+	}
+
+	jintArray result = env->NewIntArray(index);
+	env->SetIntArrayRegion(result, 0, index, intBuf);
+	return result;
+}
+
+JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getLoadedUnits(JNIEnv* env, jobject, jint unitID)
+{
+	int index = 0;
+
+	Unit* unit = Broodwar->getUnit(unitID);
+	if (unit != NULL) {
+		std::set<Unit*> loaded = unit->getLoadedUnits();
+		for (std::set<Unit*>::const_iterator it = loaded.begin(); it != loaded.end(); it++){
+			intBuf[index++] = (*it)->getID();
+		}
+	}
+
+	jintArray result = env->NewIntArray(index);
+	env->SetIntArrayRegion(result, 0, index, intBuf);
+	return result;
+}
+
+JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getInterceptors(JNIEnv* env, jobject, jint unitID)
+{
+	int index = 0;
+
+	Unit* unit = Broodwar->getUnit(unitID);
+	if (unit != NULL) {
+		std::set<Unit*> loaded = unit->getInterceptors();
+		for (std::set<Unit*>::const_iterator it = loaded.begin(); it != loaded.end(); it++){
+			intBuf[index++] = (*it)->getID();
+		}
+	}
+
+	jintArray result = env->NewIntArray(index);
+	env->SetIntArrayRegion(result, 0, index, intBuf);
+	return result;
+}
+
+JNIEXPORT jintArray JNICALL Java_jnibwapi_JNIBWAPI_getLarva(JNIEnv* env, jobject, jint unitID)
+{
+	int index = 0;
+
+	Unit* unit = Broodwar->getUnit(unitID);
+	if (unit != NULL) {
+		std::set<Unit*> loaded = unit->getLarva();
+		for (std::set<Unit*>::const_iterator it = loaded.begin(); it != loaded.end(); it++){
+			intBuf[index++] = (*it)->getID();
+		}
 	}
 
 	jintArray result = env->NewIntArray(index);
@@ -1549,6 +1605,15 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_model_Unit_useTech__III(JNIEnv* env, jo
 	return JNI_FALSE;
 }
 
+JNIEXPORT jboolean JNICALL Java_jnibwapi_JNIBWAPI_placeCOP(JNIEnv* env, jobject jObj, jint unitID, jint tx, jint ty)
+{
+	Unit* unit = Broodwar->getUnit(unitID);
+	if (unit != NULL) {
+		return unit->placeCOP(BWAPI::TilePosition(tx, ty));
+	}
+	return JNI_FALSE;
+}
+
 /*****************************************************************************************************************/
 // Utility functions
 /*****************************************************************************************************************/
@@ -1734,11 +1799,11 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_isExplored(JNIEnv* env, jobjec
 
 JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_isBuildable(JNIEnv *, jobject, jint tx, jint ty, jboolean includeBuildings){
 	bool checkBuildings = false;
-	if(includeBuildings)
+	if (includeBuildings)
 	{
 		checkBuildings = true;
 	}
-	return Broodwar->isBuildable(tx, ty , checkBuildings);
+	return Broodwar->isBuildable(tx, ty, checkBuildings);
 }
 
 JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasCreep(JNIEnv* env, jobject jObj, jint tx, jint ty)
@@ -1809,20 +1874,6 @@ JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasPath__III(JNIEnv* env, jobj
 	}
 
 	return JNI_FALSE;
-}
-
-JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_hasLoadedUnit
-	(JNIEnv *, jobject, jint unitID1, jint unitID2){
-		Unit* unit = Broodwar->getUnit(unitID1);
-		if (unit != NULL) {
-			std::set<Unit*> loaded = unit->getLoadedUnits();
-			for(std::set<Unit*>::const_iterator it = loaded.begin(); it!=loaded.end(); it++){
-				if( (*it)->getID() == unitID2){
-					return true;
-				}
-			}
-		}
-		return false;
 }
 
 JNIEXPORT jboolean JNICALL Java_jnibwapi_Broodwar_canBuildHere__IIIZ(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
@@ -1939,5 +1990,5 @@ JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getLastError(JNIEnv *, jobject){
 
 JNIEXPORT jint JNICALL Java_jnibwapi_Broodwar_getRemainingLatencyFrames(JNIEnv *, jobject){
 
-		return Broodwar->getRemainingLatencyFrames();
+	return Broodwar->getRemainingLatencyFrames();
 }
