@@ -1,12 +1,17 @@
+.classpath
+.project
 
-/target
-/release
+.gradle/
+.settings/
 
-/src/c/*.opensdf
-/src/c/*.sdf
-/src/c/*.suo
-/src/c/*.user
-/src/c/ipch
+build/
+bin/
+
+*.opensdf
+*.sdf
+*.suo
+*.user
+ipch
 
 *.jbwta
 

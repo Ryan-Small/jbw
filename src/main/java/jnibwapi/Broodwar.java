@@ -41,13 +41,11 @@ public class Broodwar implements IdLookup {
 
     /* Load the JNI library. */
     static {
-        // final String clientBridgeDll = "client-bridge-" + System.getProperty("os.arch");
-        final String clientBridgeDll = "client-bridge-x86";
+        final File dll = new File("src/main/resources/", "client-bridge-x86.dll");
         try {
-            System.loadLibrary(clientBridgeDll);
+            System.load(dll.getAbsolutePath());
 
         } catch (final UnsatisfiedLinkError ex) {
-            final File dll = new File(clientBridgeDll + ".dll");
             if (!dll.exists()) {
                 System.err.println("Native code library not found: " + dll.getAbsolutePath());
             }
