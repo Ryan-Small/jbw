@@ -46,6 +46,10 @@ public interface BroodwarListener {
      * Invoked when the user hits a key in-game. This method is not invoked if user input has not
      * been {@link Broodwar#enableUserInput() enabled}.
      * 
+     * <p>
+     * This method enables the user to interact with the agent for various purposes (e.g. debugging,
+     * controlling).
+     * 
      * @param keyCode
      *            the key code of the key that was pressed by the user
      */
@@ -55,6 +59,10 @@ public interface BroodwarListener {
      * Invoked when the user attempts to sends a message in-game. This method is not invoked if user
      * input has not been {@link Broodwar#enableUserInput() enabled}.
      * 
+     * <p>
+     * This method can enable the user to interact with the agent for various purposes (e.g.
+     * debugging, controlling).
+     * 
      * @param message
      *            the message sent by the user
      */
@@ -63,6 +71,10 @@ public interface BroodwarListener {
     /**
      * Invoked when the agent receives a message from another {@code Player}. Messages sent by the
      * user or the agent will never invoke this method.
+     * 
+     * <p>
+     * This method enables other players or agents to interact with the agent for various purposes
+     * (e.g. debugging, controlling).
      * 
      * @param message
      *            the message sent by another player or agent
