@@ -106,13 +106,13 @@ public class SixPool extends BroodwarAgent {
         }
 
         // spawn overlords
-        if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf().getSupplyTotal())
-                && (broodwar.getSelf().getSupplyTotal() > supplyCap)) {
+        if (((broodwar.getMyself().getSupplyUsed() + 2) >= broodwar.getMyself().getSupplyTotal())
+                && (broodwar.getMyself().getSupplyTotal() > supplyCap)) {
             if (broodwar.canMake(UnitTypes.Zerg_Overlord)) {
                 for (final Unit larva : broodwar.getMyUnits()) {
                     if (larva.getType() == UnitTypes.Zerg_Larva) {
                         larva.morph(UnitTypes.Zerg_Overlord);
-                        supplyCap = broodwar.getSelf().getSupplyTotal();
+                        supplyCap = broodwar.getMyself().getSupplyTotal();
                     }
                 }
             }

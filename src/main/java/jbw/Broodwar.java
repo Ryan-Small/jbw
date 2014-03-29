@@ -36,12 +36,6 @@ public class Broodwar implements IdLookup {
         }
     }
 
-    /** listener for BWAPI callback events */
-    private final BroodwarListener listener;
-
-    /** indicates that BWTA should be enabled */
-    private final boolean enableBWTA;
-
     /** The character set to use when decoding Strings. */
     private static final Charset CHARACTER_SET = getCharset();
 
@@ -54,17 +48,24 @@ public class Broodwar implements IdLookup {
         }
     }
 
+    /** listener for BWAPI callback events */
+    private final BroodwarListener listener;
+
+    /** indicates that BWTA should be enabled */
+    private final boolean enableBWTA;
+
     private final HashMap<Integer, Unit> units = new HashMap<>();
     private final ArrayList<Unit> playerUnits = new ArrayList<>();
     private final ArrayList<Unit> alliedUnits = new ArrayList<>();
     private final ArrayList<Unit> enemyUnits = new ArrayList<>();
     private final ArrayList<Unit> neutralUnits = new ArrayList<>();
 
-    private Player self;
-    private Player neutralPlayer;
     private final HashMap<Integer, Player> players = new HashMap<>();
     private final ArrayList<Player> allies = new ArrayList<>();
     private final ArrayList<Player> enemies = new ArrayList<>();
+
+    private Player self;
+    private Player neutralPlayer;
 
     private Map map;
     private int gameFrame = 0;
@@ -106,8 +107,8 @@ public class Broodwar implements IdLookup {
         return neutralPlayer;
     }
 
-    public Collection<Player> getPlayers() {
-        return Collections.unmodifiableCollection(players.values());
+    public List<Player> getPlayers() {
+        return Collections.unmodifiableList(new ArrayList<>(players.values()));
     }
 
     public List<Player> getAllies() {
@@ -119,8 +120,8 @@ public class Broodwar implements IdLookup {
     }
 
     @Override
-    public Player getPlayer(final int playerID) {
-        return players.get(playerID);
+    public Player getPlayer(final int playerId) {
+        return players.get(playerId);
     }
 
     @Override
@@ -511,10 +512,10 @@ public class Broodwar implements IdLookup {
             self.update(getPlayerUpdate(self.getId()));
             self.updateResearch(getResearchStatus(self.getId()), getUpgradeStatus(self.getId()));
         } else {
-            for (final Integer playerID : players.keySet()) {
-                players.get(playerID).update(getPlayerUpdate(playerID));
-                players.get(playerID).updateResearch(getResearchStatus(playerID),
-                        getUpgradeStatus(playerID));
+            for (final Integer playerId : players.keySet()) {
+                players.get(playerId).update(getPlayerUpdate(playerId));
+                players.get(playerId).updateResearch(getResearchStatus(playerId),
+                        getUpgradeStatus(playerId));
             }
         }
         // update units

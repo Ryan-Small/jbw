@@ -8,7 +8,7 @@ import jbw.model.Player;
 import jbw.model.Unit;
 
 public interface IdLookup {
-    public Player getPlayer(int playerID);
+    public Player getPlayer(int playerId);
 
-    public Unit getUnit(int unitID);
+    public Unit getUnit(int unitId);
 }
