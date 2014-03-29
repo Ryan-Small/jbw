@@ -145,8 +145,7 @@ public class Broodwar implements IdLookup {
     }
 
     public List<Unit> getNeutralUnits() {
-        return neutralUnits;
-        // return Collections.unmodifiableList(neutralUnits);
+        return Collections.unmodifiableList(neutralUnits);
     }
 
     public List<Unit> getUnits(final Player p) {
@@ -521,10 +520,10 @@ public class Broodwar implements IdLookup {
         // update units
         final int[] unitData = getAllUnitsData();
         final HashSet<Integer> deadUnits = new HashSet<Integer>(units.keySet());
-        final ArrayList<Unit> playerList = new ArrayList<Unit>();
-        final ArrayList<Unit> alliedList = new ArrayList<Unit>();
-        final ArrayList<Unit> enemyList = new ArrayList<Unit>();
-        final ArrayList<Unit> neutralList = new ArrayList<Unit>();
+        playerUnits.clear();
+        alliedUnits.clear();
+        enemyUnits.clear();
+        neutralUnits.clear();
 
         for (int index = 0; index < unitData.length; index += Unit.NUM_ATTRIBUTES) {
             final int id = unitData[index];
@@ -541,28 +540,24 @@ public class Broodwar implements IdLookup {
 
             if (self != null) {
                 if (unit.getPlayer() == self) {
-                    playerList.add(unit);
+                    playerUnits.add(unit);
                 } else if (allies.contains(unit.getPlayer())) {
-                    alliedList.add(unit);
+                    alliedUnits.add(unit);
                 } else if (enemies.contains(unit.getPlayer())) {
-                    enemyList.add(unit);
+                    enemyUnits.add(unit);
                 } else {
-                    neutralList.add(unit);
+                    neutralUnits.add(unit);
                 }
             } else if (allies.contains(unit.getPlayer())) {
-                alliedList.add(unit);
+                alliedUnits.add(unit);
             } else if (enemies.contains(unit.getPlayer())) {
-                enemyList.add(unit);
+                enemyUnits.add(unit);
             } else {
-                neutralList.add(unit);
+                neutralUnits.add(unit);
             }
         }
 
         // update the unit lists
-        playerUnits.addAll(playerList);
-        alliedUnits.addAll(alliedList);
-        enemyUnits.addAll(enemyList);
-        neutralUnits.addAll(neutralList);
         for (final Integer unitID : deadUnits) {
             units.get(unitID).setDestroyed();
             units.remove(unitID);
