@@ -20,7 +20,7 @@ public enum BWColor {
         this.id = id;
     }
 
-    public int getID() {
+    public int getId() {
         return id;
     }
 }

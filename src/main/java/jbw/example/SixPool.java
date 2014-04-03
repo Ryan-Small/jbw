@@ -48,6 +48,7 @@ public class SixPool extends BroodwarAgent {
      */
     @Override
     public void matchFrame() {
+
         // spawn a drone
         if ((droneCount < 6) && (broodwar.canMake(UnitTypes.Zerg_Drone))) {
             for (final Unit unit : broodwar.getMyUnits()) {
@@ -60,7 +61,6 @@ public class SixPool extends BroodwarAgent {
         }
 
         // collect minerals
-
         for (final Unit unit : broodwar.getMyUnits()) {
             if (unit.getType() == UnitTypes.Zerg_Drone) {
                 if (unit.isIdle() && (unit.getId() != poolDrone)) {
@@ -103,13 +103,13 @@ public class SixPool extends BroodwarAgent {
         }
 
         // spawn overlords
-        if (((broodwar.getSelf().getSupplyUsed() + 2) >= broodwar.getSelf().getSupplyTotal())
-                && (broodwar.getSelf().getSupplyTotal() > supplyCap)) {
+        if (((broodwar.getMyself().getSupplyUsed() + 2) >= broodwar.getMyself().getSupplyTotal())
+                && (broodwar.getMyself().getSupplyTotal() > supplyCap)) {
             if (broodwar.canMake(UnitTypes.Zerg_Overlord)) {
                 for (final Unit larva : broodwar.getMyUnits()) {
                     if (larva.getType() == UnitTypes.Zerg_Larva) {
                         larva.morph(UnitTypes.Zerg_Overlord);
-                        supplyCap = broodwar.getSelf().getSupplyTotal();
+                        supplyCap = broodwar.getMyself().getSupplyTotal();
                     }
                 }
             }
@@ -145,52 +145,5 @@ public class SixPool extends BroodwarAgent {
             }
         }
         return false;
-    }
-
-    @Override
-    public void unitCreate(final Unit unit) {
-        System.out.println("Create: " + unit.getId() + unit.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void unitDiscover(final Unit unit) {
-        System.out.println("Discover: " + unit.getId() + unit.getType());
-    }
-
-    /**
-     * This method enables the user to interact with the agent for various purposes (e.g. debugging,
-     * controlling).
-     */
-    @Override
-    public void keyPressed(final int keyCode) {
-
-    }
-
-    /**
-     * This method can enable the user to interact with the agent for various purposes (e.g.
-     * debugging, controlling).
-     * 
-     * {@inheritDoc}
-     */
-    @Override
-    public void sendText(final String message) {
-
-    }
-
-    /**
-     * This method enables other players or agents to interact with the agent for various purposes
-     * (e.g. debugging, controlling).
-     */
-    @Override
-    public void receiveText(final String message) {
-
-    }
-
-    @Override
-    public void unitShow(final Unit unit) {
-        System.out.println("Show: " + unit.getId() + "\t" + unit.getType());
     }
 }

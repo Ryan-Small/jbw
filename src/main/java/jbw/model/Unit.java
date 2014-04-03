@@ -1,6 +1,6 @@
 package jbw.model;
 
-import jbw.IdLookup;
+import jbw.Broodwar;
 import jbw.types.*;
 import jbw.types.OrderType.OrderTypes;
 import jbw.types.TechType.TechTypes;
@@ -46,7 +46,7 @@ public class Unit {
     private static final double FIXED_SCALE = 100.0;
     private static final double TO_DEGREES = 180.0 / Math.PI;
 
-    private final IdLookup lookup;
+    private final Broodwar broodwar;
 
     private final int id;
     private int replayId;
@@ -172,9 +172,9 @@ public class Unit {
     private boolean upgrading;
     private boolean visible;
 
-    public Unit(final int id, final IdLookup lookup) {
+    public Unit(final int id, final Broodwar broodwar) {
         this.id = id;
-        this.lookup = lookup;
+        this.broodwar = broodwar;
     }
 
     public void setDestroyed() {
@@ -411,7 +411,7 @@ public class Unit {
     }
 
     public Player getPlayer() {
-        return lookup.getPlayer(playerId);
+        return broodwar.getPlayer(playerId);
     }
 
     public UnitType getType() {
@@ -459,7 +459,7 @@ public class Unit {
     }
 
     public Player getLastAttackingPlayer() {
-        return lookup.getPlayer(lastAttackingPlayerId);
+        return broodwar.getPlayer(lastAttackingPlayerId);
     }
 
     public UnitType getInitialType() {
@@ -588,11 +588,11 @@ public class Unit {
     }
 
     public Unit getBuildUnit() {
-        return lookup.getUnit(buildUnitId);
+        return broodwar.getUnit(buildUnitId);
     }
 
     public Unit getTarget() {
-        return lookup.getUnit(targetUnitId);
+        return broodwar.getUnit(targetUnitId);
     }
 
     public Position getTargetPosition() {
@@ -604,7 +604,7 @@ public class Unit {
     }
 
     public Unit getOrderTarget() {
-        return lookup.getUnit(orderTargetId);
+        return broodwar.getUnit(orderTargetId);
     }
 
     public OrderType getSecondaryOrder() {
@@ -616,19 +616,19 @@ public class Unit {
     }
 
     public Unit getRallyUnit() {
-        return lookup.getUnit(rallyUnitId);
+        return broodwar.getUnit(rallyUnitId);
     }
 
     public Unit getAddon() {
-        return lookup.getUnit(addOnId);
+        return broodwar.getUnit(addOnId);
     }
 
     public Unit getNydusExit() {
-        return lookup.getUnit(nydusExitUnitId);
+        return broodwar.getUnit(nydusExitUnitId);
     }
 
     public Unit getTransport() {
-        return lookup.getUnit(transportId);
+        return broodwar.getUnit(transportId);
     }
 
     /** TODO @see #getLoadedUnits() */
@@ -637,11 +637,11 @@ public class Unit {
     }
 
     public Unit getCarrier() {
-        return lookup.getUnit(carrierUnitId);
+        return broodwar.getUnit(carrierUnitId);
     }
 
     public Unit getHatchery() {
-        return lookup.getUnit(hatcheryUnitId);
+        return broodwar.getUnit(hatcheryUnitId);
     }
 
     /** TODO @see #getLarva() */
@@ -650,7 +650,7 @@ public class Unit {
     }
 
     public Unit getPowerUp() {
-        return lookup.getUnit(powerUpUnitId);
+        return broodwar.getUnit(powerUpUnitId);
     }
 
     public boolean isExists() {
@@ -909,12 +909,12 @@ public class Unit {
     private native boolean build(final int builderId, final int buildingId, final int tx,
             final int ty);
 
-/**
+    /**
      * Orders this unit to build an addon.
      * 
      * <p>
-     * This unit should be a Terran building that can build addons of the specified type. The 
-     * {@link #build(UnitTypes, jbw.model.Location.Build)
+     * This unit should be a Terran building that can build addons of the specified type. The
+     * {@link #build(UnitType, Position)}.
      * 
      * @param addon
      *            unit to addon
@@ -1292,8 +1292,8 @@ public class Unit {
      * 
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean unloadAll(final Location location) {
-        return unloadAll(getId(), location.x, location.y);
+    public boolean unloadAll(final Position position) {
+        return unloadAll(getId(), position.getPX(), position.getPY());
     }
 
     private native boolean unloadAll(final int unitId, final int x, final int y);

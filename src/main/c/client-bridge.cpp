@@ -923,7 +923,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getAllUnitsData(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_JNIBWAPI_getLoadedUnits(JNIEnv* env, jobject, jint unitID)
+JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getLoadedUnits(JNIEnv* env, jobject, jint unitID)
 {
 	int index = 0;
 
@@ -940,7 +940,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_JNIBWAPI_getLoadedUnits(JNIEnv* env, jobjec
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_JNIBWAPI_getInterceptors(JNIEnv* env, jobject, jint unitID)
+JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getInterceptors(JNIEnv* env, jobject, jint unitID)
 {
 	int index = 0;
 
@@ -957,7 +957,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_JNIBWAPI_getInterceptors(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_JNIBWAPI_getLarva(JNIEnv* env, jobject, jint unitID)
+JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getLarva(JNIEnv* env, jobject, jint unitID)
 {
 	int index = 0;
 
@@ -1018,7 +1018,7 @@ JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getMapHash(JNIEnv* env, jobject jObj
 	return env->NewStringUTF(Broodwar->mapHash().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getHeightData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getMapDepth(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -1605,7 +1605,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_useTech__III(JNIEnv* env, jobject
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_JNIBWAPI_placeCOP(JNIEnv* env, jobject jObj, jint unitID, jint tx, jint ty)
+JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_placeCOP(JNIEnv* env, jobject jObj, jint unitID, jint tx, jint ty)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1963,13 +1963,6 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canUpgrade__II(JNIEnv* env, jobject
 JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isReplay(JNIEnv *env, jobject jObj)
 {
 	return Broodwar->isReplay();
-}
-
-JNIEXPORT void JNICALL Java_jbw_Broodwar_printText(JNIEnv* env, jobject jObj, jstring message)
-{
-	const char* messagechars = env->GetStringUTFChars(message, 0);
-	Broodwar->printf("%s", messagechars);
-	env->ReleaseStringUTFChars(message, messagechars);
 }
 
 JNIEXPORT void JNICALL Java_jbw_Broodwar_sendText(JNIEnv* env, jobject jObj, jstring message)

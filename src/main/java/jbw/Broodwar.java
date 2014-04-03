@@ -7,6 +7,7 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 
 import jbw.model.*;
+import jbw.model.Position.Positions;
 import jbw.model.Map;
 import jbw.types.*;
 import jbw.types.BulletType.BulletTypes;
@@ -22,29 +23,12 @@ import jbw.types.UpgradeType.UpgradeTypes;
 import jbw.types.WeaponType.WeaponTypes;
 import jbw.util.BWColor;
 
-/**
- * JNI interface for the Brood War API.<br>
- * 
- * This focus of this interface is to provide the callback and game state query functionality in
- * BWAPI.<br>
- * 
- * Note: for thread safety and game state sanity, all native calls should be invoked from the
- * callback methods.<br>
- * 
- * For BWAPI documentation see: {@link http://code.google.com/p/bwapi/}<br>
- * 
- * API Pages<br>
- * Game: {@link http://code.google.com/p/bwapi/wiki/Game}<br>
- * Unit: {@link http://code.google.com/p/bwapi/wiki/Unit}<br>
- */
-public class Broodwar implements IdLookup {
+public class Broodwar {
 
-    /* Load the JNI library. */
     static {
         final File dll = new File("src/main/resources/", "client-bridge-x86.dll");
         try {
             System.load(dll.getAbsolutePath());
-
         } catch (final UnsatisfiedLinkError ex) {
             if (!dll.exists()) {
                 System.err.println("Native code library not found: " + dll.getAbsolutePath());
@@ -53,17 +37,10 @@ public class Broodwar implements IdLookup {
         }
     }
 
-    /** The listener for BWAPI callback events */
-    private final BroodwarListener listener;
-
-    /** Indicates of BWTA should be enabled */
-    private final boolean enableBWTA;
-
     /** The character set to use when decoding Strings. */
     private static final Charset CHARACTER_SET = getCharset();
 
     private static Charset getCharset() {
-
         try {
             return Charset.forName("Cp949");
         } catch (final UnsupportedCharsetException e) {
@@ -72,38 +49,25 @@ public class Broodwar implements IdLookup {
         }
     }
 
-    private final HashMap<Integer, Unit> units = new HashMap<>();
-    private ArrayList<Unit> playerUnits = new ArrayList<>();
-    private ArrayList<Unit> alliedUnits = new ArrayList<>();
-    private ArrayList<Unit> enemyUnits = new ArrayList<>();
-    private ArrayList<Unit> neutralUnits = new ArrayList<>();
+    private final BroodwarListener listener;
 
-    private final HashSet<Integer> allyIds = new HashSet<>();
-    private final HashSet<Integer> enemyIds = new HashSet<>();
+    private final boolean enableTerrainAnalysis;
+
+    private final HashMap<Integer, Unit> units = new HashMap<>();
+    private final ArrayList<Unit> playerUnits = new ArrayList<>();
+    private final ArrayList<Unit> alliedUnits = new ArrayList<>();
+    private final ArrayList<Unit> enemyUnits = new ArrayList<>();
+    private final ArrayList<Unit> neutralUnits = new ArrayList<>();
 
     private final HashMap<Integer, Player> players = new HashMap<>();
     private final ArrayList<Player> allies = new ArrayList<>();
     private final ArrayList<Player> enemies = new ArrayList<>();
 
-    private final HashMap<Integer, UnitType> unitTypes = new HashMap<>();
-    private final HashMap<Integer, RaceType> raceTypes = new HashMap<>();
-    private final HashMap<Integer, TechType> techTypes = new HashMap<>();
-    private final HashMap<Integer, UpgradeType> upgradeTypes = new HashMap<>();
-    private final HashMap<Integer, WeaponType> weaponTypes = new HashMap<>();
-    private final HashMap<Integer, UnitSizeType> unitSizeTypes = new HashMap<>();
-    private final HashMap<Integer, BulletType> bulletTypes = new HashMap<>();
-    private final HashMap<Integer, DamageType> damageTypes = new HashMap<>();
-    private final HashMap<Integer, ExplosionType> explosionTypes = new HashMap<>();
-    private final HashMap<Integer, UnitCommandType> unitCommandTypes = new HashMap<>();
-    private final HashMap<Integer, OrderType> orderTypes = new HashMap<>();
-    // private final HashMap<Integer, EventType> eventTypes = new HashMap<>();
-
-    private int gameFrame = 0;
-
-    private Map map;
-
     private Player self;
     private Player neutralPlayer;
+
+    private Map map;
+    private int gameFrame = 0;
 
     /**
      * Instantiates a BWAPI instance, but does not connect to the bridge. To connect, the start
@@ -115,369 +79,13 @@ public class Broodwar implements IdLookup {
      * @param enableBWTA
      *            {@code true} if BWTA should be enabled; {@code false} otherwise
      */
-    public Broodwar(final BroodwarListener listener, final boolean enableBWTA) {
+    public Broodwar(final BroodwarListener listener, final boolean enableTerrainAnalysis) {
         this.listener = listener;
-        this.enableBWTA = enableBWTA;
+        this.enableTerrainAnalysis = enableTerrainAnalysis;
     }
 
-    /**
-     * Connects the client to BWAPI.
-     * 
-     * <p>
-     * This method will block until Broodwar has been closed.
-     */
-    public void start() {
-        startClient(this);
-    }
-
-    // invokes the main native method
-    private native void startClient(Broodwar jniBWAPI);
-
-    private native int getFrame();
-
-    public native int getReplayFrameTotal();
-
-    private native int[] getPlayersData();
-
-    private native int[] getPlayerUpdate(int playerId);
-
-    /** Returns string as a byte[] to properly handle ASCII-extended characters */
-    private native byte[] getPlayerName(int playerId);
-
-    private native int[] getResearchStatus(int playerId);
-
-    private native int[] getUpgradeStatus(int playerId);
-
-    private native int[] getAllUnitsData();
-
-    private native int[] getRaceTypes();
-
-    private native String getRaceTypeName(int unitTypeId);
-
-    private native int[] getUnitTypes();
-
-    private native String getUnitTypeName(int unitTypeId);
-
-    private native int[] getRequiredUnits(int unitTypeId);
-
-    private native int[] getTechTypes();
-
-    private native String getTechTypeName(int techId);
-
-    private native int[] getUpgradeTypes();
-
-    private native String getUpgradeTypeName(int upgradeId);
-
-    private native int[] getWeaponTypes();
-
-    private native String getWeaponTypeName(int weaponId);
-
-    private native int[] getUnitSizeTypes();
-
-    private native String getUnitSizeTypeName(int sizeId);
-
-    private native int[] getBulletTypes();
-
-    private native String getBulletTypeName(int bulletId);
-
-    private native int[] getDamageTypes();
-
-    private native String getDamageTypeName(int damageId);
-
-    private native int[] getExplosionTypes();
-
-    private native String getExplosionTypeName(int explosionId);
-
-    private native int[] getUnitCommandTypes();
-
-    private native String getUnitCommandTypeName(int unitCommandId);
-
-    private native int[] getOrderTypes();
-
-    private native String getOrderTypeName(int unitCommandId);
-
-    private native int[] getUnitIdsOnTile(int tx, int ty);
-
-    private native void analyzeTerrain();
-
-    private native int getMapWidth();
-
-    private native int getMapHeight();
-
-    /** Returns string as a byte[] to properly handle ASCII-extended characters */
-    private native byte[] getMapName();
-
-    private native String getMapFileName();
-
-    private native String getMapHash();
-
-    // TODO: Change to getMapHeightData();
-    private native int[] getHeightData();
-
-    /** Returns the regionId for each map tile */
-    private native int[] getRegionMap();
-
-    private native int[] getWalkableData();
-
-    private native int[] getBuildableData();
-
-    private native int[] getChokePoints();
-
-    private native int[] getRegions();
-
-    private native int[] getPolygon(int regionId);
-
-    private native int[] getBaseLocations();
-
-    // utility commands
-    public native void drawHealth(boolean enable);
-
-    public native void drawTargets(boolean enable);
-
-    public native void drawIDs(boolean enable);
-
-    public native void enableUserInput();
-
-    public native void enablePerfectInformation();
-
-    public native void setGameSpeed(int speed);
-
-    public native void setFrameSkip(int frameSkip);
-
-    public native void leaveGame();
-
-    // draw commands
-    private native void drawBox(int left, int top, int right, int bottom, int color, boolean fill,
-            boolean screenCoords);
-
-    public void drawBox(final Position topLeft, final Position bottomRight, final BWColor bWColor,
-            final boolean fill, final boolean screenCoords) {
-        drawBox(topLeft.getPX(), topLeft.getPY(), bottomRight.getPX(), bottomRight.getPY(),
-                bWColor.getID(), fill, screenCoords);
-    }
-
-    private native void drawCircle(int x, int y, int radius, int color, boolean fill,
-            boolean screenCoords);
-
-    public void drawCircle(final Position p, final int radius, final BWColor bWColor,
-            final boolean fill, final boolean screenCoords) {
-        drawCircle(p.getPX(), p.getPY(), radius, bWColor.getID(), fill, screenCoords);
-    }
-
-    private native void drawLine(int x1, int y1, int x2, int y2, int color, boolean screenCoords);
-
-    public void drawLine(final Position start, final Position end, final BWColor bWColor,
-            final boolean screenCoords) {
-        drawLine(start.getPX(), start.getPY(), end.getPX(), end.getPY(), bWColor.getID(),
-                screenCoords);
-    }
-
-    private native void drawDot(int x, int y, int color, boolean screenCoords);
-
-    public void drawDot(final Position p, final BWColor bWColor, final boolean screenCoords) {
-        drawDot(p.getPX(), p.getPY(), bWColor.getID(), screenCoords);
-    }
-
-    private native void drawText(int x, int y, String msg, boolean screenCoords);
-
-    public void drawText(final Position a, final String msg, final boolean screenCoords) {
-        drawText(a.getPX(), a.getPY(), msg, screenCoords);
-    }
-
-    // Extended Commands
-    private native boolean isVisible(int tileX, int tileY);
-
-    public boolean isVisible(final Position p) {
-        return isVisible(p.getBX(), p.getBY());
-    }
-
-    private native boolean isExplored(int tileX, int tileY);
-
-    public boolean isExplored(final Position p) {
-        return isExplored(p.getBX(), p.getBY());
-    }
-
-    private native boolean isBuildable(int tx, int ty, boolean includeBuildings);
-
-    public boolean isBuildable(final Position p, final boolean includeBuildings) {
-        return isBuildable(p.getBX(), p.getBY(), includeBuildings);
-    }
-
-    public native boolean hasCreep(int tileX, int tileY);
-
-    public native boolean hasPower(int tileX, int tileY);
-
-    public native boolean hasPower(int tileX, int tileY, int unitTypeId);
-
-    public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight);
-
-    public native boolean hasPower(int tileX, int tileY, int tileWidth, int tileHeight,
-            int unitTypeId);
-
-    public native boolean hasPowerPrecise(int x, int y);
-
-    public native boolean hasPath(int fromX, int fromY, int toX, int toY);
-
-    public native boolean hasPath(int unitId, int targetId);
-
-    public native boolean hasPath(int unitId, int toX, int toY);
-
-    public native int[] getLoadedUnits(int unitId);
-
-    public native int[] getInterceptors(int unitId);
-
-    public native int[] getLarva(int unitId);
-
-    public native boolean canBuildHere(int tileX, int tileY, int unitTypeId, boolean checkExplored);
-
-    public native boolean canBuildHere(int unitId, int tileX, int tileY, int unitTypeId,
-            boolean checkExplored);
-
-    public boolean canMake(final UnitType unitType) {
-        return canMake(unitType.getId());
-    }
-
-    public native boolean canMake(int unitTypeId);
-
-    public native boolean canMake(int unitId, int unitTypeId);
-
-    public boolean canResearch(final TechType techType) {
-        return canResearch(techType.getId());
-    }
-
-    public native boolean canResearch(int techTypeId);
-
-    public native boolean canResearch(int unitId, int techTypeId);
-
-    public native boolean canUpgrade(int upgradeTypeId);
-
-    public native boolean canUpgrade(int unitId, int upgradeTypeId);
-
-    public native void printText(String message);
-
-    public native void sendText(String message);
-
-    public native void setCommandOptimizationLevel(int level);
-
-    public native boolean isReplay();
-
-    private native boolean isVisibleToPlayer(int unitId, int playerId);
-
-    public boolean isVisibleToPlayer(final Unit u, final Player p) {
-        return isVisibleToPlayer(u.getId(), p.getId());
-    }
-
-    public native int getLastError();
-
-    public native int getRemainingLatencyFrames();
-
-    // //////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // public UnitType getUnitType(final UnitTypes typeId) {
-    // return unitTypes.get(typeId);
-    // }
-    //
-    // public RaceType getRaceType(final int typeId) {
-    // return raceTypes.get(typeId);
-    // }
-    //
-    // public TechType getTechType(final int typeId) {
-    // return techTypes.get(typeId);
-    // }
-    //
-    // public UpgradeType getUpgradeType(final int upgradeId) {
-    // return upgradeTypes.get(upgradeId);
-    // }
-    //
-    // public WeaponType getWeaponType(final int weaponId) {
-    // return weaponTypes.get(weaponId);
-    // }
-    //
-    // public UnitSizeType getUnitSizeType(final int sizeId) {
-    // return unitSizeTypes.get(sizeId);
-    // }
-    //
-    // public BulletType getBulletType(final int bulletId) {
-    // return bulletTypes.get(bulletId);
-    // }
-    //
-    // public DamageType getDamageType(final int damageId) {
-    // return damageTypes.get(damageId);
-    // }
-    //
-    // public ExplosionType getExplosionType(final int explosionId) {
-    // return explosionTypes.get(explosionId);
-    // }
-    //
-    // public UnitCommandType getUnitCommandType(final int unitCommandId) {
-    // return unitCommandTypes.get(unitCommandId);
-    // }
-    //
-    // public OrderType getOrderType(final int orderId) {
-    // return orderTypes.get(orderId);
-    // }
-    //
-    // public Collection<UnitType> unitTypes() {
-    // return Collections.unmodifiableCollection(unitTypes.values());
-    // }
-    //
-    // public Collection<RaceType> raceTypes() {
-    // return Collections.unmodifiableCollection(raceTypes.values());
-    // }
-    //
-    // public Collection<TechType> techTypes() {
-    // return Collections.unmodifiableCollection(techTypes.values());
-    // }
-    //
-    // public Collection<UpgradeType> upgradeTypes() {
-    // return Collections.unmodifiableCollection(upgradeTypes.values());
-    // }
-    //
-    // public Collection<WeaponType> weaponTypes() {
-    // return Collections.unmodifiableCollection(weaponTypes.values());
-    // }
-    //
-    // public Collection<UnitSizeType> unitSizeTypes() {
-    // return Collections.unmodifiableCollection(unitSizeTypes.values());
-    // }
-    //
-    // public Collection<BulletType> bulletTypes() {
-    // return Collections.unmodifiableCollection(bulletTypes.values());
-    // }
-    //
-    // public Collection<DamageType> damageTypes() {
-    // return Collections.unmodifiableCollection(damageTypes.values());
-    // }
-    //
-    // public Collection<ExplosionType> explosionTypes() {
-    // return Collections.unmodifiableCollection(explosionTypes.values());
-    // }
-    //
-    // public Collection<UnitCommandType> unitCommandTypes() {
-    // return Collections.unmodifiableCollection(unitCommandTypes.values());
-    // }
-    //
-    // public Collection<OrderType> orderTypes() {
-    // return Collections.unmodifiableCollection(orderTypes.values());
-    // }
-
-    public int getFrameCount() {
-        return gameFrame;
-    }
-
-    public Player getSelf() {
-        return self;
-    }
-
-    public Player getNeutralPlayer() {
-        return neutralPlayer;
-    }
-
-    // public Player getPlayer(final int playerId) {
-    // return players.get(playerId);
-    // }
-
-    public Collection<Player> getPlayers() {
-        return Collections.unmodifiableCollection(players.values());
+    public List<Player> getPlayers() {
+        return Collections.unmodifiableList(new ArrayList<>(players.values()));
     }
 
     public List<Player> getAllies() {
@@ -488,22 +96,20 @@ public class Broodwar implements IdLookup {
         return Collections.unmodifiableList(enemies);
     }
 
-    @Override
-    public Player getPlayer(final int playerID) {
-        return players.get(playerID);
+    public Player getMyself() {
+        return self;
     }
 
-    @Override
-    public Unit getUnit(final int unitId) {
-        return units.get(unitId);
+    public Player getNeutralPlayer() {
+        return neutralPlayer;
     }
 
-    public Collection<Unit> getAllUnits() {
-        return Collections.unmodifiableCollection(units.values());
+    public Player getPlayer(final int playerId) {
+        return players.get(playerId);
     }
 
-    public List<Unit> getMyUnits() {
-        return Collections.unmodifiableList(playerUnits);
+    public List<Unit> getUnits() {
+        return Collections.unmodifiableList(new ArrayList<>(units.values()));
     }
 
     public List<Unit> getAlliedUnits() {
@@ -514,18 +120,30 @@ public class Broodwar implements IdLookup {
         return Collections.unmodifiableList(enemyUnits);
     }
 
+    public List<Unit> getMyUnits() {
+        return Collections.unmodifiableList(playerUnits);
+    }
+
     public List<Unit> getNeutralUnits() {
         return Collections.unmodifiableList(neutralUnits);
     }
 
-    public List<Unit> getUnits(final Player p) {
-        final List<Unit> pUnits = new ArrayList<Unit>();
-        for (final Unit u : units.values()) {
-            if (u.getPlayer() == p) {
-                pUnits.add(u);
+    public Unit getUnit(final int unitId) {
+        return units.get(unitId);
+    }
+
+    public List<Unit> getUnits(final Player player) {
+        final List<Unit> playerUnits = new ArrayList<Unit>();
+        for (final Unit unit : units.values()) {
+            if (unit.getPlayer() == player) {
+                playerUnits.add(unit);
             }
         }
-        return pUnits;
+        return playerUnits;
+    }
+
+    public int getFrameCount() {
+        return gameFrame;
     }
 
     public List<Unit> getUnitsOnTile(final int x, final int y) {
@@ -537,14 +155,7 @@ public class Broodwar implements IdLookup {
         return units;
     }
 
-    /**
-     * Returns the map currently being used.
-     * 
-     * @return the map currently being used
-     */
-    public Map getMap() {
-        return map;
-    }
+    private native int[] getUnitIdsOnTile(final int tx, final int ty);
 
     /**
      * Loads type data from BWAPI.
@@ -634,20 +245,28 @@ public class Broodwar implements IdLookup {
         }
     }
 
-    private void loadMapData() {
+    /**
+     * Returns the map currently being used.
+     * 
+     * @return the map currently being used
+     */
+    public Map getMap() {
+        return map;
+    }
 
+    private void loadMapData() {
         final String mapName = new String(getMapName(), CHARACTER_SET);
         final String fileName = getMapFileName();
         final String hash = getMapHash();
         final int x = getMapWidth();
         final int y = getMapHeight();
-        final int[] z = getHeightData();
+        final int[] z = getMapDepth();
         final int[] buildable = getBuildableData();
         final int[] walkable = getWalkableData();
 
         map = new Map(mapName, fileName, hash, x, y, z, buildable, walkable);
 
-        if (enableBWTA) {
+        if (enableTerrainAnalysis) {
             loadMapDetails();
         }
     }
@@ -781,10 +400,22 @@ public class Broodwar implements IdLookup {
      * <p>
      * C++ callback function.
      */
-    private void javaPrint(final String msg) {
+    void javaPrint(final String msg) {
         // TODO: Allow agent to decide how best to print the message.
         System.out.println("Bridge: " + msg);
     }
+
+    /**
+     * Connects the client to BWAPI.
+     * 
+     * <p>
+     * This method will block until Broodwar has been closed.
+     */
+    public void start() {
+        startClient(this);
+    }
+
+    private native void startClient(final Broodwar broodwar);
 
     /**
      * Notifies the client and event listener that a connection has been formed to the bridge.
@@ -792,7 +423,7 @@ public class Broodwar implements IdLookup {
      * <p>
      * C++ callback function.
      */
-    private void connected() {
+    void connected() {
         loadTypeData();
         listener.connected();
     }
@@ -808,8 +439,7 @@ public class Broodwar implements IdLookup {
      * <p>
      * C++ callback function.
      */
-    private void gameStarted() {
-        // get the players
+    void gameStarted() {
         self = null;
         allies.clear();
         enemies.clear();
@@ -875,26 +505,26 @@ public class Broodwar implements IdLookup {
      * <p>
      * C++ callback function.
      */
-    private void gameUpdate() {
+    void gameUpdate() {
         // update game state
         gameFrame = getFrame();
         if (!isReplay()) {
             self.update(getPlayerUpdate(self.getId()));
             self.updateResearch(getResearchStatus(self.getId()), getUpgradeStatus(self.getId()));
         } else {
-            for (final Integer playerID : players.keySet()) {
-                players.get(playerID).update(getPlayerUpdate(playerID));
-                players.get(playerID).updateResearch(getResearchStatus(playerID),
-                        getUpgradeStatus(playerID));
+            for (final Integer playerId : players.keySet()) {
+                players.get(playerId).update(getPlayerUpdate(playerId));
+                players.get(playerId).updateResearch(getResearchStatus(playerId),
+                        getUpgradeStatus(playerId));
             }
         }
         // update units
         final int[] unitData = getAllUnitsData();
         final HashSet<Integer> deadUnits = new HashSet<Integer>(units.keySet());
-        final ArrayList<Unit> playerList = new ArrayList<Unit>();
-        final ArrayList<Unit> alliedList = new ArrayList<Unit>();
-        final ArrayList<Unit> enemyList = new ArrayList<Unit>();
-        final ArrayList<Unit> neutralList = new ArrayList<Unit>();
+        playerUnits.clear();
+        alliedUnits.clear();
+        enemyUnits.clear();
+        neutralUnits.clear();
 
         for (int index = 0; index < unitData.length; index += Unit.NUM_ATTRIBUTES) {
             final int id = unitData[index];
@@ -911,28 +541,24 @@ public class Broodwar implements IdLookup {
 
             if (self != null) {
                 if (unit.getPlayer() == self) {
-                    playerList.add(unit);
+                    playerUnits.add(unit);
                 } else if (allies.contains(unit.getPlayer())) {
-                    alliedList.add(unit);
+                    alliedUnits.add(unit);
                 } else if (enemies.contains(unit.getPlayer())) {
-                    enemyList.add(unit);
+                    enemyUnits.add(unit);
                 } else {
-                    neutralList.add(unit);
+                    neutralUnits.add(unit);
                 }
             } else if (allies.contains(unit.getPlayer())) {
-                alliedList.add(unit);
+                alliedUnits.add(unit);
             } else if (enemies.contains(unit.getPlayer())) {
-                enemyList.add(unit);
+                enemyUnits.add(unit);
             } else {
-                neutralList.add(unit);
+                neutralUnits.add(unit);
             }
         }
 
         // update the unit lists
-        playerUnits = playerList;
-        alliedUnits = alliedList;
-        enemyUnits = enemyList;
-        neutralUnits = neutralList;
         for (final Integer unitID : deadUnits) {
             units.get(unitID).setDestroyed();
             units.remove(unitID);
@@ -945,7 +571,7 @@ public class Broodwar implements IdLookup {
      * <p>
      * C++ callback function.
      */
-    private void gameEnded() {
+    void gameEnded() {
         // TODO: Implement gameEnded for listener.
     }
 
@@ -971,7 +597,7 @@ public class Broodwar implements IdLookup {
      * @param p3
      *            third parameter for the event
      */
-    private void eventOccurred(final int eventTypeId, final int p1, final int p2, final String p3) {
+    void eventOccurred(final int eventTypeId, final int p1, final int p2, final String p3) {
 
         final EventType event = EventType.getEventType(eventTypeId);
         switch (event) {
@@ -1005,9 +631,9 @@ public class Broodwar implements IdLookup {
 
             case NukeDetect :
                 if ((p1 == -1) || (p2 == -1)) {
-                    listener.nukeDetect(Location.UNKNOWN);
+                    listener.nukeDetect(Positions.Unknown);
                 } else {
-                    listener.nukeDetect(new Location(p1, p2));
+                    listener.nukeDetect(new Position(p1, p2));
                 }
                 break;
 
@@ -1070,7 +696,308 @@ public class Broodwar implements IdLookup {
      * @param keyCode
      *            key pressed by the user
      */
-    private void keyPressed(final int keyCode) {
+    void keyPressed(final int keyCode) {
         listener.keyPressed(keyCode);
     }
+
+    public native int getFrame();
+
+    public native int getRemainingLatencyFrames();
+
+    public native int getReplayFrameTotal();
+
+    public native boolean isReplay();
+
+    public native int getLastError();
+
+    public native void leaveGame();
+
+    public native void enableUserInput();
+
+    public native void enablePerfectInformation();
+
+    public native void setGameSpeed(final int speed);
+
+    public native void setFrameSkip(final int frameSkip);
+
+    public native void setCommandOptimizationLevel(final int level);
+
+    public native void sendText(final String message);
+
+    private native int[] getLoadedUnits(final int unitId);
+
+    private native int[] getInterceptors(final int unitId);
+
+    private native int[] getLarva(final int unitId);
+
+    public boolean isVisible(final Position position) {
+        return isVisible(position.getBX(), position.getBY());
+    }
+
+    private native boolean isVisible(final int tileX, final int tileY);
+
+    public boolean isVisibleToPlayer(final Unit unit, final Player player) {
+        return isVisibleToPlayer(unit.getId(), player.getId());
+    }
+
+    private native boolean isVisibleToPlayer(final int unitId, final int playerId);
+
+    public boolean isExplored(final Position position) {
+        return isExplored(position.getBX(), position.getBY());
+    }
+
+    private native boolean isExplored(final int tileX, final int tileY);
+
+    public boolean isBuildable(final Position position, final boolean includeBuildings) {
+        return isBuildable(position.getBX(), position.getBY(), includeBuildings);
+    }
+
+    private native boolean isBuildable(final int tileX, final int tileY,
+            final boolean includeBuildings);
+
+    public boolean canBuildHere(final Position p, final UnitType ut, final boolean checkExplored) {
+        return canBuildHere(p.getBX(), p.getBY(), ut.getId(), checkExplored);
+    }
+
+    private native boolean canBuildHere(final int tileX, final int tileY, final int unitTypeId,
+            final boolean checkExplored);
+
+    public boolean canBuildHere(final Unit u, final Position p, final UnitType ut,
+            final boolean checkExplored) {
+        return canBuildHere(u.getId(), p.getBX(), p.getBY(), ut.getId(), checkExplored);
+    }
+
+    private native boolean canBuildHere(final int unitId, final int tileX, final int tileY,
+            final int unitTypeId, boolean checkExplored);
+
+    public boolean hasCreep(final Position position) {
+        return hasCreep(position.getBX(), position.getBY());
+    }
+
+    private native boolean hasCreep(final int tileX, final int tileY);
+
+    public boolean hasPower(final Position position) {
+        return hasPower(position, UnitTypes.None);
+    }
+
+    public boolean hasPower(final Position position, final UnitType unitType) {
+        return hasPower(position.getBX(), position.getBY(), unitType.getId());
+    }
+
+    private native boolean hasPower(final int tileX, final int tileY, final int unitTypeId);
+
+    public boolean hasPower(final Position position, final int tileWidth, final int tileHeight) {
+        return hasPower(position, tileWidth, tileHeight, UnitTypes.None);
+    }
+
+    public boolean hasPower(final Position position, final int tileWidth, final int tileHeight,
+            final UnitType unitType) {
+        return hasPower(position.getBX(), position.getBY(), tileWidth, tileHeight, unitType.getId());
+    }
+
+    private native boolean hasPower(final int tileX, final int tileY, final int tileWidth,
+            final int tileHeight, final int unitTypeId);
+
+    public boolean hasPowerPrecise(final Position position) {
+        return hasPowerPrecise(position, UnitTypes.None);
+    }
+
+    public boolean hasPowerPrecise(final Position position, final UnitType unitType) {
+        return hasPowerPrecise(position.getPX(), position.getPY(), unitType.getId());
+    }
+
+    private native boolean hasPowerPrecise(final int x, final int y, final int unitTypeId);
+
+    public boolean hasPath(final Position from, final Position to) {
+        return hasPath(from.getPX(), from.getPY(), to.getPX(), to.getPY());
+    }
+
+    private native boolean hasPath(final int fromX, final int fromY, final int toX, final int toY);
+
+    public boolean hasPath(final Unit u, final Unit target) {
+        return hasPath(u.getId(), target.getId());
+    }
+
+    private native boolean hasPath(final int unitID, final int targetID);
+
+    public boolean hasPath(final Unit u, final Position to) {
+        return hasPath(u.getId(), to.getPX(), to.getPY());
+    }
+
+    private native boolean hasPath(final int unitID, final int toX, final int toY);
+
+    public boolean canResearch(final TechType techType) {
+        return canResearch(techType.getId());
+    }
+
+    private native boolean canResearch(final int techTypeId);
+
+    public boolean canMake(final UnitType unitType) {
+        return canMake(unitType.getId());
+    }
+
+    private native boolean canMake(final int unitTypeId);
+
+    public boolean canMake(final UnitType unitType1, final UnitType unitType2) {
+        return canMake(unitType1.getId(), unitType2.getId());
+    }
+
+    private native boolean canMake(final int unitId, final int unitTypeId);
+
+    public boolean canResearch(final Unit unit, final TechType techType) {
+        return canResearch(unit.getId(), techType.getId());
+    }
+
+    private native boolean canResearch(final int unitId, final int techTypeId);
+
+    public boolean canUpgrade(final UpgradeType unitType) {
+        return canUpgrade(unitType.getId());
+    }
+
+    private native boolean canUpgrade(int upgradeTypeId);
+
+    public boolean canUpgrade(final Unit u, final UpgradeType ut) {
+        return canUpgrade(u.getId(), ut.getId());
+    }
+
+    private native boolean canUpgrade(final int unitId, final int upgradeTypeId);
+
+    // *********************************************************************************************
+    // Data Commands
+    // *********************************************************************************************
+
+    private native int[] getPlayersData();
+
+    private native int[] getAllUnitsData();
+
+    private native int[] getPlayerUpdate(final int playerId);
+
+    private native byte[] getPlayerName(final int playerId);
+
+    private native int[] getResearchStatus(final int playerId);
+
+    private native int[] getUpgradeStatus(final int playerId);
+
+    private native int[] getRaceTypes();
+
+    private native String getRaceTypeName(final int unitTypeId);
+
+    private native int[] getUnitTypes();
+
+    private native String getUnitTypeName(final int unitTypeId);
+
+    private native int[] getRequiredUnits(final int unitTypeId);
+
+    private native int[] getTechTypes();
+
+    private native String getTechTypeName(final int techId);
+
+    private native int[] getUpgradeTypes();
+
+    private native String getUpgradeTypeName(final int upgradeId);
+
+    private native int[] getWeaponTypes();
+
+    private native String getWeaponTypeName(final int weaponId);
+
+    private native int[] getUnitSizeTypes();
+
+    private native String getUnitSizeTypeName(final int sizeId);
+
+    private native int[] getBulletTypes();
+
+    private native String getBulletTypeName(final int bulletId);
+
+    private native int[] getDamageTypes();
+
+    private native String getDamageTypeName(final int damageId);
+
+    private native int[] getExplosionTypes();
+
+    private native String getExplosionTypeName(final int explosionId);
+
+    private native int[] getUnitCommandTypes();
+
+    private native String getUnitCommandTypeName(final int unitCommandId);
+
+    private native int[] getOrderTypes();
+
+    private native String getOrderTypeName(final int unitCommandId);
+
+    // *********************************************************************************************
+    // Map Commands
+    // *********************************************************************************************
+    private native void analyzeTerrain();
+
+    private native byte[] getMapName();
+
+    private native String getMapFileName();
+
+    private native String getMapHash();
+
+    private native int getMapWidth();
+
+    private native int getMapHeight();
+
+    private native int[] getMapDepth();
+
+    private native int[] getRegionMap();
+
+    private native int[] getWalkableData();
+
+    private native int[] getBuildableData();
+
+    private native int[] getChokePoints();
+
+    private native int[] getRegions();
+
+    private native int[] getPolygon(final int regionId);
+
+    private native int[] getBaseLocations();
+
+    // *********************************************************************************************
+    // Drawing Commands
+    // *********************************************************************************************
+
+    public native void drawHealth(final boolean enable);
+
+    public native void drawTargets(final boolean enable);
+
+    public native void drawIDs(final boolean enable);
+
+    public void drawBox(final Position p1, final Position p2, final BWColor c, final boolean fill,
+            final boolean onScreen) {
+        drawBox(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), c.getId(), fill, onScreen);
+    }
+
+    private native void drawBox(final int left, final int top, final int right, final int bottom,
+            final int color, final boolean fill, final boolean screenCoords);
+
+    public void drawCircle(final Position p, final int r, final BWColor c, final boolean fill,
+            final boolean onScreen) {
+        drawCircle(p.getPX(), p.getPY(), r, c.getId(), fill, onScreen);
+    }
+
+    private native void drawCircle(final int x, final int y, final int radius, final int color,
+            final boolean fill, final boolean onScreen);
+
+    public void drawLine(final Position p1, final Position p2, final BWColor c,
+            final boolean onScreen) {
+        drawLine(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), c.getId(), onScreen);
+    }
+
+    private native void drawLine(final int x1, final int y1, final int x2, final int y2,
+            final int c, final boolean onScreen);
+
+    public void drawDot(final Position p, final BWColor c, final boolean onScreen) {
+        drawDot(p.getPX(), p.getPY(), c.getId(), onScreen);
+    }
+
+    private native void drawDot(final int x, final int y, final int color, final boolean onScreen);
+
+    public void drawText(final Position position, final String msg, final boolean onScreen) {
+        drawText(position.getPX(), position.getPY(), msg, onScreen);
+    }
+
+    private native void drawText(final int x, final int y, final String msg, final boolean onScreen);
 }

@@ -1,7 +1,8 @@
 package jbw;
 
-import jbw.model.Location;
 import jbw.model.Player;
+import jbw.model.Position;
+import jbw.model.Position.Positions;
 import jbw.model.Unit;
 
 /**
@@ -46,6 +47,10 @@ public interface BroodwarListener {
      * Invoked when the user hits a key in-game. This method is not invoked if user input has not
      * been {@link Broodwar#enableUserInput() enabled}.
      * 
+     * <p>
+     * This method enables the user to interact with the agent for various purposes (e.g. debugging,
+     * controlling).
+     * 
      * @param keyCode
      *            the key code of the key that was pressed by the user
      */
@@ -55,6 +60,10 @@ public interface BroodwarListener {
      * Invoked when the user attempts to sends a message in-game. This method is not invoked if user
      * input has not been {@link Broodwar#enableUserInput() enabled}.
      * 
+     * <p>
+     * This method can enable the user to interact with the agent for various purposes (e.g.
+     * debugging, controlling).
+     * 
      * @param message
      *            the message sent by the user
      */
@@ -63,6 +72,10 @@ public interface BroodwarListener {
     /**
      * Invoked when the agent receives a message from another {@code Player}. Messages sent by the
      * user or the agent will never invoke this method.
+     * 
+     * <p>
+     * This method enables other players or agents to interact with the agent for various purposes
+     * (e.g. debugging, controlling).
      * 
      * @param message
      *            the message sent by another player or agent
@@ -89,18 +102,12 @@ public interface BroodwarListener {
 
     /**
      * Invoked when a nuke has been launched. If the location is not visible, the provided location
-     * will be {@link Location#UNKNOWN unknown}.
+     * will be {@link Positions#Unknown unknown}.
      * 
-     * @param location
-     *            the location the nuke is targeted for
+     * @param position
+     *            the position the nuke is targeted for
      */
-    public void nukeDetect(final Location location);
-
-    // TODO: Decided if we still want this?
-    // /**
-    // * Invoked when a nuke has been launched and the location is not visible.
-    // */
-    // public void nukeDetect();
+    public void nukeDetect(final Position position);
 
     /**
      * Invoked only when an accessible unit is created. This method will not be Invoked for enemy
@@ -255,16 +262,8 @@ public interface BroodwarListener {
          * {@inheritDoc}
          */
         @Override
-        public void nukeDetect(final Location location) {
+        public void nukeDetect(final Position position) {
         }
-
-        // TODO: Decide if we still want this.
-        /**
-         * {@inheritDoc}
-         */
-        // @Override
-        // public void nukeDetect() {
-        // }
 
         /**
          * {@inheritDoc}
