@@ -41,9 +41,6 @@ public class SixPool extends BroodwarAgent {
         broodwar.enablePerfectInformation();
     }
 
-    private final int lastFrameCount = 0;
-    private final long time = System.currentTimeMillis();
-
     /**
      * The agent's primary logic will be executed here.
      * 
@@ -148,23 +145,5 @@ public class SixPool extends BroodwarAgent {
             }
         }
         return false;
-    }
-
-    @Override
-    public void unitCreate(final Unit unit) {
-        // System.out.println("Create: " + unit.getId() + unit.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void unitDiscover(final Unit unit) {
-        // System.out.println("Discover: " + unit.getId() + unit.getType());
-    }
-
-    @Override
-    public void unitShow(final Unit unit) {
-        // System.out.println("Show: " + unit.getId() + "\t" + unit.getType());
     }
 }

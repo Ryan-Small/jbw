@@ -1018,7 +1018,7 @@ JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getMapHash(JNIEnv* env, jobject jObj
 	return env->NewStringUTF(Broodwar->mapHash().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getHeightData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getMapDepth(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -1963,13 +1963,6 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canUpgrade__II(JNIEnv* env, jobject
 JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isReplay(JNIEnv *env, jobject jObj)
 {
 	return Broodwar->isReplay();
-}
-
-JNIEXPORT void JNICALL Java_jbw_Broodwar_printText(JNIEnv* env, jobject jObj, jstring message)
-{
-	const char* messagechars = env->GetStringUTFChars(message, 0);
-	Broodwar->printf("%s", messagechars);
-	env->ReleaseStringUTFChars(message, messagechars);
 }
 
 JNIEXPORT void JNICALL Java_jbw_Broodwar_sendText(JNIEnv* env, jobject jObj, jstring message)

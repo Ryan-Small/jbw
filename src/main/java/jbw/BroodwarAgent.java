@@ -24,12 +24,12 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      * The agent will still need to be {@link #start() started} in order for it to be notified of
      * game {@link BroodwarListener events}.
      * 
-     * @param mapDetailsEenabled
+     * @param enableTerrainAnalysis
      *            {@code true} if the Broodwar map should be {@link Map#isMapDetailsEnabled()
      *            analyzed}; {@code false} otherwise
      */
-    public BroodwarAgent(final boolean mapDetailsEenabled) {
-        broodwar = new Broodwar(this, mapDetailsEenabled);
+    public BroodwarAgent(final boolean enableTerrainAnalysis) {
+        broodwar = new Broodwar(this, enableTerrainAnalysis);
     }
 
     /**
