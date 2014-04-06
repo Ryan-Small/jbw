@@ -1,11 +1,13 @@
+#include <jni.h>
+#include <BWTA.h>
 #include <BWAPI.h>
 #include <BWAPI/Client.h>
-#include <BWTA.h>
-#include <jni.h>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include "jbw_Broodwar.h"
-#include "jbw_model_Unit.h"
+
+#include "com_harbinger_jbw_Broodwar.h"
+#include "com_harbinger_jbw_model_Unit.h"
 
 #define JNI_NULL 0
 
@@ -56,7 +58,7 @@ double fixedScale = 100.0;
 /**
 * Entry point from Java
 */
-JNIEXPORT void JNICALL Java_jbw_Broodwar_startClient(JNIEnv* env, jobject jObj, jobject classRef)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_startClient(JNIEnv* env, jobject jObj, jobject classRef)
 {
 	// get the java callback functions
 	jEnv = env;
@@ -290,42 +292,42 @@ void loadTypeData(void)
 // Game options
 /*****************************************************************************************************************/
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawHealth(JNIEnv* env, jobject jObj, jboolean enable)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawHealth(JNIEnv* env, jobject jObj, jboolean enable)
 {
 	showHealth = enable != JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawTargets(JNIEnv* env, jobject jObj, jboolean enable)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawTargets(JNIEnv* env, jobject jObj, jboolean enable)
 {
 	showTargets = enable != JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawIDs(JNIEnv* env, jobject jObj, jboolean enable)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawIDs(JNIEnv* env, jobject jObj, jboolean enable)
 {
 	showIDs = enable != JNI_FALSE;
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_enableUserInput(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_enableUserInput(JNIEnv* env, jobject jObj)
 {
 	Broodwar->enableFlag(Flag::UserInput);
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_enablePerfectInformation(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_enablePerfectInformation(JNIEnv* env, jobject jObj)
 {
 	Broodwar->enableFlag(Flag::CompleteMapInformation);
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_setGameSpeed(JNIEnv* env, jobject jObj, jint speed)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setGameSpeed(JNIEnv* env, jobject jObj, jint speed)
 {
 	Broodwar->setLocalSpeed(speed);
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_setFrameSkip(JNIEnv* env, jobject jObj, jint skip)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setFrameSkip(JNIEnv* env, jobject jObj, jint skip)
 {
 	Broodwar->setFrameSkip(skip);
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_leaveGame(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_leaveGame(JNIEnv* env, jobject jObj)
 {
 	Broodwar->leaveGame();
 }
@@ -334,17 +336,17 @@ JNIEXPORT void JNICALL Java_jbw_Broodwar_leaveGame(JNIEnv* env, jobject jObj)
 // Game state queries
 /*****************************************************************************************************************/
 
-JNIEXPORT jint JNICALL Java_jbw_Broodwar_getFrame(JNIEnv* env, jobject jObj)
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getFrame(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->getFrameCount();
 }
 
-JNIEXPORT jint JNICALL Java_jbw_Broodwar_getReplayFrameTotal(JNIEnv* env, jobject jObj)
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getReplayFrameTotal(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->getReplayFrameCount();
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getPlayersData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getPlayersData(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -375,7 +377,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getPlayersData(JNIEnv* env, jobjec
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getPlayerUpdate(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getPlayerUpdate(JNIEnv* env, jobject jObj, jint playerID)
 {
 	int index = 0;
 	Player* p = Broodwar->getPlayer(playerID);
@@ -395,7 +397,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getPlayerUpdate(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_jbw_Broodwar_getPlayerName(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jbyteArray JNICALL Java_com_harbinger_jbw_Broodwar_getPlayerName(JNIEnv* env, jobject jObj, jint playerID)
 {
 	// NewStringUTF causes issues with unusual characters like Korean symbols
 	std::string str = Broodwar->getPlayer(playerID)->getName();
@@ -404,7 +406,7 @@ JNIEXPORT jbyteArray JNICALL Java_jbw_Broodwar_getPlayerName(JNIEnv* env, jobjec
 	return jbArray;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getResearchStatus(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getResearchStatus(JNIEnv* env, jobject jObj, jint playerID)
 {
 	int index = 0;
 	Player* p = Broodwar->getPlayer(playerID);
@@ -421,7 +423,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getResearchStatus(JNIEnv* env, job
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUpgradeStatus(JNIEnv* env, jobject jObj, jint playerID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getUpgradeStatus(JNIEnv* env, jobject jObj, jint playerID)
 {
 	int index = 0;
 	Player* p = Broodwar->getPlayer(playerID);
@@ -438,7 +440,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUpgradeStatus(JNIEnv* env, jobj
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getUnitTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -520,12 +522,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitTypes(JNIEnv* env, jobject 
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getUnitTypeName(JNIEnv* env, jobject jObj, jint unitTypeID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getUnitTypeName(JNIEnv* env, jobject jObj, jint unitTypeID)
 {
 	return env->NewStringUTF(unitTypeMap[unitTypeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRequiredUnits(JNIEnv* env, jobject jObj, jint unitTypeID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRequiredUnits(JNIEnv* env, jobject jObj, jint unitTypeID)
 {
 	int index = 0;
 	std::map<UnitType, int> requiredUnits = unitTypeMap[unitTypeID].requiredUnits();
@@ -539,7 +541,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRequiredUnits(JNIEnv* env, jobj
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRaceTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRaceTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -559,12 +561,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRaceTypes(JNIEnv* env, jobject 
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getRaceTypeName(JNIEnv* env, jobject jObj, jint typeID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getRaceTypeName(JNIEnv* env, jobject jObj, jint typeID)
 {
 	return env->NewStringUTF(raceTypeMap[typeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getTechTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getTechTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -589,12 +591,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getTechTypes(JNIEnv* env, jobject 
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getTechTypeName(JNIEnv* env, jobject jObj, jint techID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getTechTypeName(JNIEnv* env, jobject jObj, jint techID)
 {
 	return env->NewStringUTF(techTypeMap[techID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUpgradeTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getUpgradeTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -617,12 +619,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUpgradeTypes(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getUpgradeTypeName(JNIEnv* env, jobject jObj, jint upgradeID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getUpgradeTypeName(JNIEnv* env, jobject jObj, jint upgradeID)
 {
 	return env->NewStringUTF(upgradeTypeMap[upgradeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getWeaponTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getWeaponTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -659,12 +661,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getWeaponTypes(JNIEnv* env, jobjec
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getWeaponTypeName(JNIEnv* env, jobject jObj, jint weaponID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getWeaponTypeName(JNIEnv* env, jobject jObj, jint weaponID)
 {
 	return env->NewStringUTF(weaponTypeMap[weaponID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitSizeTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getUnitSizeTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -678,12 +680,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitSizeTypes(JNIEnv* env, jobj
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getUnitSizeTypeName(JNIEnv* env, jobject jObj, jint sizeID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getUnitSizeTypeName(JNIEnv* env, jobject jObj, jint sizeID)
 {
 	return env->NewStringUTF(unitSizeTypeMap[sizeID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getBulletTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBulletTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -697,12 +699,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getBulletTypes(JNIEnv* env, jobjec
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getBulletTypeName(JNIEnv* env, jobject jObj, jint bulletID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getBulletTypeName(JNIEnv* env, jobject jObj, jint bulletID)
 {
 	return env->NewStringUTF(bulletTypeMap[bulletID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getDamageTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getDamageTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -716,12 +718,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getDamageTypes(JNIEnv* env, jobjec
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getDamageTypeName(JNIEnv* env, jobject jObj, jint damageID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getDamageTypeName(JNIEnv* env, jobject jObj, jint damageID)
 {
 	return env->NewStringUTF(damageTypeMap[damageID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getExplosionTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getExplosionTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -735,17 +737,17 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getExplosionTypes(JNIEnv* env, job
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getExplosionTypeName(JNIEnv* env, jobject jObj, jint explosionID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getExplosionTypeName(JNIEnv* env, jobject jObj, jint explosionID)
 {
 	return env->NewStringUTF(explosionTypeMap[explosionID].getName().c_str());
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getUnitCommandTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getUnitCommandTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
 {
 	return env->NewStringUTF(unitCommandTypeMap[unitCommandID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitCommandTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getUnitCommandTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -759,12 +761,12 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitCommandTypes(JNIEnv* env, j
 	return result;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getOrderTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getOrderTypeName(JNIEnv* env, jobject jObj, jint unitCommandID)
 {
 	return env->NewStringUTF(orderTypeMap[unitCommandID].getName().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getOrderTypes(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getOrderTypes(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -783,7 +785,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getOrderTypes(JNIEnv* env, jobject
 *
 * Each unit takes up a fixed number of integer values. Currently: 123
 */
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getAllUnitsData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getAllUnitsData(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -923,7 +925,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getAllUnitsData(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getLoadedUnits(JNIEnv* env, jobject, jint unitID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getLoadedUnits(JNIEnv* env, jobject, jint unitID)
 {
 	int index = 0;
 
@@ -940,7 +942,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getLoadedUnits(JNIEnv* env, jobjec
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getInterceptors(JNIEnv* env, jobject, jint unitID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getInterceptors(JNIEnv* env, jobject, jint unitID)
 {
 	int index = 0;
 
@@ -957,7 +959,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getInterceptors(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getLarva(JNIEnv* env, jobject, jint unitID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getLarva(JNIEnv* env, jobject, jint unitID)
 {
 	int index = 0;
 
@@ -974,7 +976,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getLarva(JNIEnv* env, jobject, jin
 	return result;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isVisibleToPlayer(JNIEnv* env, jobject jObj, jint unitID, jint playerID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isVisibleToPlayer(JNIEnv* env, jobject jObj, jint unitID, jint playerID)
 {
 	Unit* u = Broodwar->getUnit(unitID);
 	Player* p = Broodwar->getPlayer(playerID);
@@ -989,22 +991,22 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isVisibleToPlayer(JNIEnv* env, jobj
 // Map queries
 /*****************************************************************************************************************/
 
-JNIEXPORT jint JNICALL Java_jbw_Broodwar_getMapWidth(JNIEnv* env, jobject jObj)
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getMapWidth(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->mapWidth();
 }
 
-JNIEXPORT jint JNICALL Java_jbw_Broodwar_getMapHeight(JNIEnv* env, jobject jObj)
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getMapHeight(JNIEnv* env, jobject jObj)
 {
 	return Broodwar->mapHeight();
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getMapFileName(JNIEnv* env, jobject jObj)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getMapFileName(JNIEnv* env, jobject jObj)
 {
 	return env->NewStringUTF(Broodwar->mapFileName().c_str());
 }
 
-JNIEXPORT jbyteArray JNICALL Java_jbw_Broodwar_getMapName(JNIEnv* env, jobject jObj)
+JNIEXPORT jbyteArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapName(JNIEnv* env, jobject jObj)
 {
 	// NewStringUTF causes issues with unusual characters like Korean symbols
 	std::string str = Broodwar->mapName();
@@ -1013,12 +1015,12 @@ JNIEXPORT jbyteArray JNICALL Java_jbw_Broodwar_getMapName(JNIEnv* env, jobject j
 	return jbArray;
 }
 
-JNIEXPORT jstring JNICALL Java_jbw_Broodwar_getMapHash(JNIEnv* env, jobject jObj)
+JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getMapHash(JNIEnv* env, jobject jObj)
 {
 	return env->NewStringUTF(Broodwar->mapHash().c_str());
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getMapDepth(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapDepth(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -1036,7 +1038,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getMapDepth(JNIEnv* env, jobject j
 }
 
 // Returns the regionId for each map tile
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRegionMap(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRegionMap(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -1054,7 +1056,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRegionMap(JNIEnv* env, jobject 
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getWalkableData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getWalkableData(JNIEnv* env, jobject jObj)
 {
 	// Note: walk tiles are 8x8 pixels, build tiles are 32x32 pixels
 	int index = 0;	
@@ -1072,7 +1074,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getWalkableData(JNIEnv* env, jobje
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getBuildableData(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBuildableData(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 	int width = Broodwar->mapWidth();
@@ -1089,7 +1091,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getBuildableData(JNIEnv* env, jobj
 	return result;
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_analyzeTerrain(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_analyzeTerrain(JNIEnv* env, jobject jObj)
 {
 	regionMap.clear();
 	BWTA::readMap();
@@ -1103,7 +1105,7 @@ JNIEXPORT void JNICALL Java_jbw_Broodwar_analyzeTerrain(JNIEnv* env, jobject jOb
 	}
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getChokePoints(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getChokePoints(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -1125,7 +1127,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getChokePoints(JNIEnv* env, jobjec
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRegions(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRegions(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -1141,7 +1143,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getRegions(JNIEnv* env, jobject jO
 	return result;
 } 
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getPolygon(JNIEnv* env, jobject jObj, jint regionID)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getPolygon(JNIEnv* env, jobject jObj, jint regionID)
 {
 	int index = 0;
 	std::set<BWTA::Region*> regions = BWTA::getRegions();
@@ -1159,7 +1161,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getPolygon(JNIEnv* env, jobject jO
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getBaseLocations(JNIEnv* env, jobject jObj)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBaseLocations(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
 
@@ -1182,7 +1184,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getBaseLocations(JNIEnv* env, jobj
 	return result;
 }
 
-JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitIdsOnTile(JNIEnv * env, jobject jObj, jint tx, jint ty)
+JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getUnitIdsOnTile(JNIEnv * env, jobject jObj, jint tx, jint ty)
 {
 	std::set<Unit*> unitsOnTile = Broodwar->getUnitsOnTile(tx, ty);
 	int index = 0;
@@ -1200,7 +1202,7 @@ JNIEXPORT jintArray JNICALL Java_jbw_Broodwar_getUnitIdsOnTile(JNIEnv * env, job
 // Unit Commands
 /*****************************************************************************************************************/
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_attack__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_attack__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1209,7 +1211,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_attack__III(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_attack__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_attack__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1219,7 +1221,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_attack__II(JNIEnv* env, jobject j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_build(JNIEnv* env, jobject jObj, jint unitID, jint typeID, jint tx, jint ty)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_build(JNIEnv* env, jobject jObj, jint unitID, jint typeID, jint tx, jint ty)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1230,7 +1232,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_build(JNIEnv* env, jobject jObj, 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_buildAddon(JNIEnv* env, jobject jObj, jint unitID, jint typeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_buildAddon(JNIEnv* env, jobject jObj, jint unitID, jint typeID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1241,7 +1243,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_buildAddon(JNIEnv* env, jobject j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_train(JNIEnv* env, jobject jObj, jint unitID, jint typeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_train(JNIEnv* env, jobject jObj, jint unitID, jint typeID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1252,7 +1254,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_train(JNIEnv* env, jobject jObj, 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_morph(JNIEnv* env, jobject jObj, jint unitID, jint typeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_morph(JNIEnv* env, jobject jObj, jint unitID, jint typeID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1263,7 +1265,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_morph(JNIEnv* env, jobject jObj, 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_research(JNIEnv* env, jobject jObj, jint unitID, jint techID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_research(JNIEnv* env, jobject jObj, jint unitID, jint techID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1274,7 +1276,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_research(JNIEnv* env, jobject jOb
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_upgrade(JNIEnv* env, jobject jObj, jint unitID, jint upgradeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_upgrade(JNIEnv* env, jobject jObj, jint unitID, jint upgradeID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1285,7 +1287,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_upgrade(JNIEnv* env, jobject jObj
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_setRallyPoint__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_setRallyPoint__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1294,7 +1296,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_setRallyPoint__III(JNIEnv* env, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_setRallyPoint__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_setRallyPoint__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1304,7 +1306,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_setRallyPoint__II(JNIEnv* env, jo
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_move(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_move(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1313,7 +1315,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_move(JNIEnv* env, jobject jObj, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_patrol(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_patrol(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1322,7 +1324,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_patrol(JNIEnv* env, jobject jObj,
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_holdPosition(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_holdPosition(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1331,7 +1333,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_holdPosition(JNIEnv* env, jobject
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_stop(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_stop(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1340,7 +1342,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_stop(JNIEnv* env, jobject jObj, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_follow(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_follow(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1350,7 +1352,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_follow(JNIEnv* env, jobject jObj,
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_gather(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_gather(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1360,7 +1362,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_gather(JNIEnv* env, jobject jObj,
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_returnCargo(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_returnCargo(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1369,7 +1371,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_returnCargo(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_repair(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_repair(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1379,7 +1381,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_repair(JNIEnv* env, jobject jObj,
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_burrow(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_burrow(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1388,7 +1390,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_burrow(JNIEnv* env, jobject jObj,
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unburrow(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_unburrow(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1397,7 +1399,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unburrow(JNIEnv* env, jobject jOb
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cloak(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_cloak(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1406,7 +1408,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cloak(JNIEnv* env, jobject jObj, 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_decloak(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_decloak(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1415,7 +1417,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_decloak(JNIEnv* env, jobject jObj
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_siege(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_siege(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1424,7 +1426,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_siege(JNIEnv* env, jobject jObj, 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unsiege(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_unsiege(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1433,7 +1435,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unsiege(JNIEnv* env, jobject jObj
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_lift(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_lift(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1442,7 +1444,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_lift(JNIEnv* env, jobject jObj, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_land(JNIEnv* env, jobject jObj, jint unitID, jint tx, jint ty)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_land(JNIEnv* env, jobject jObj, jint unitID, jint tx, jint ty)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1451,7 +1453,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_land(JNIEnv* env, jobject jObj, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_load(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_load(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1461,7 +1463,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_load(JNIEnv* env, jobject jObj, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unload(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_unload(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1471,7 +1473,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unload(JNIEnv* env, jobject jObj,
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unloadAll__I(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_unloadAll__I(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1480,7 +1482,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unloadAll__I(JNIEnv* env, jobject
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unloadAll__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_unloadAll__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1489,7 +1491,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_unloadAll__III(JNIEnv* env, jobje
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_rightClick__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_rightClick__III(JNIEnv* env, jobject jObj, jint unitID, jint x, jint y)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1498,7 +1500,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_rightClick__III(JNIEnv* env, jobj
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_rightClick__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_rightClick__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1508,7 +1510,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_rightClick__II(JNIEnv* env, jobje
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_haltConstruction(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_haltConstruction(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1517,7 +1519,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_haltConstruction(JNIEnv* env, job
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelConstruction(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_cancelConstruction(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1526,7 +1528,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelConstruction(JNIEnv* env, j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelAddon(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_cancelAddon(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1535,7 +1537,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelAddon(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelTrain(JNIEnv* env, jobject jObj, jint unitID, jint slot)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_cancelTrain(JNIEnv* env, jobject jObj, jint unitID, jint slot)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1544,7 +1546,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelTrain(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelMorph(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_cancelMorph(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1553,7 +1555,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelMorph(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelResearch(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_cancelResearch(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1562,7 +1564,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelResearch(JNIEnv* env, jobje
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelUpgrade(JNIEnv* env, jobject jObj, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_cancelUpgrade(JNIEnv* env, jobject jObj, jint unitID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1571,7 +1573,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_cancelUpgrade(JNIEnv* env, jobjec
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_useTech__II(JNIEnv* env, jobject jObj, jint unitID, jint techID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_useTech__II(JNIEnv* env, jobject jObj, jint unitID, jint techID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1582,7 +1584,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_useTech__II(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_useTech__IIII(JNIEnv* env, jobject jObj, jint unitID, jint techID, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_useTech__IIII(JNIEnv* env, jobject jObj, jint unitID, jint techID, jint x, jint y)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1593,7 +1595,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_useTech__IIII(JNIEnv* env, jobjec
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_useTech__III(JNIEnv* env, jobject jObj, jint unitID, jint techID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_model_Unit_useTech__III(JNIEnv* env, jobject jObj, jint unitID, jint techID, jint targetID)
 { 
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1605,7 +1607,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_model_Unit_useTech__III(JNIEnv* env, jobject
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_placeCOP(JNIEnv* env, jobject jObj, jint unitID, jint tx, jint ty)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_placeCOP(JNIEnv* env, jobject jObj, jint unitID, jint tx, jint ty)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 	if (unit != NULL) {
@@ -1618,7 +1620,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_placeCOP(JNIEnv* env, jobject jObj,
 // Utility functions
 /*****************************************************************************************************************/
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawBox(JNIEnv* env, jobject jObj, jint left, jint top, jint right, jint bottom, jint color, jboolean fill, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawBox(JNIEnv* env, jobject jObj, jint left, jint top, jint right, jint bottom, jint color, jboolean fill, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawBoxScreen(left, top, right, bottom, BWAPI::Color(color), fill ? true : false);
@@ -1627,7 +1629,7 @@ JNIEXPORT void JNICALL Java_jbw_Broodwar_drawBox(JNIEnv* env, jobject jObj, jint
 	}
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawCircle(JNIEnv* env, jobject jObj, jint x, jint y, jint radius, jint color, jboolean fill, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawCircle(JNIEnv* env, jobject jObj, jint x, jint y, jint radius, jint color, jboolean fill, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawCircleScreen(x, y, radius, BWAPI::Color(color), fill ? true : false);
@@ -1636,7 +1638,7 @@ JNIEXPORT void JNICALL Java_jbw_Broodwar_drawCircle(JNIEnv* env, jobject jObj, j
 	}
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawLine(JNIEnv* env, jobject jObj, jint x1, jint y1, jint x2, jint y2, jint color, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawLine(JNIEnv* env, jobject jObj, jint x1, jint y1, jint x2, jint y2, jint color, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawLineScreen(x1, y1, x2, y2, BWAPI::Color(color));
@@ -1645,7 +1647,7 @@ JNIEXPORT void JNICALL Java_jbw_Broodwar_drawLine(JNIEnv* env, jobject jObj, jin
 	}
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawDot(JNIEnv* env, jobject jObj, jint x, jint y, jint color, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawDot(JNIEnv* env, jobject jObj, jint x, jint y, jint color, jboolean screenCoords)
 {
 	if (screenCoords) {
 		Broodwar->drawDotScreen(x, y, BWAPI::Color(color));	  
@@ -1654,7 +1656,7 @@ JNIEXPORT void JNICALL Java_jbw_Broodwar_drawDot(JNIEnv* env, jobject jObj, jint
 	}
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_drawText(JNIEnv* env, jobject jObj, jint x, jint y, jstring msg, jboolean screenCoords)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawText(JNIEnv* env, jobject jObj, jint x, jint y, jstring msg, jboolean screenCoords)
 {
 	const char* text = env->GetStringUTFChars(msg, 0);
 
@@ -1787,17 +1789,17 @@ void drawIDs(void) {
 // Extended functions
 /*****************************************************************************************************************/
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isVisible(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isVisible(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
 {
 	return Broodwar->isVisible(tileX, tileY);
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isExplored(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isExplored(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
 {
 	return Broodwar->isExplored(tileX, tileY);
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isBuildable(JNIEnv *, jobject, jint tx, jint ty, jboolean includeBuildings){
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isBuildable(JNIEnv *, jobject, jint tx, jint ty, jboolean includeBuildings){
 	bool checkBuildings = false;
 	if (includeBuildings)
 	{
@@ -1806,17 +1808,17 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isBuildable(JNIEnv *, jobject, jint
 	return Broodwar->isBuildable(tx, ty, checkBuildings);
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasCreep(JNIEnv* env, jobject jObj, jint tx, jint ty)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasCreep(JNIEnv* env, jobject jObj, jint tx, jint ty)
 {
 	return Broodwar->hasCreep(tx, ty);
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPower__II(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPower__II(JNIEnv* env, jobject jObj, jint tileX, jint tileY)
 {
 	return Broodwar->hasPower(tileX, tileY);
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPower__III(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPower__III(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 
@@ -1827,12 +1829,12 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPower__III(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPower__IIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPower__IIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight)
 {
 	return Broodwar->hasPower(tileX, tileY, tileWidth, tileHeight);
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPower__IIIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight, jint unitID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPower__IIIII(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint tileWidth, jint tileHeight, jint unitID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 
@@ -1843,17 +1845,17 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPower__IIIII(JNIEnv* env, jobjec
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPowerPrecise(JNIEnv* env, jobject jObj, jint x, jint y)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPowerPrecise(JNIEnv* env, jobject jObj, jint x, jint y)
 {
 	return Broodwar->hasPowerPrecise(x, y);
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPath__IIII(JNIEnv* env, jobject jObj, jint fromX, jint fromY, jint toX, jint toY)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPath__IIII(JNIEnv* env, jobject jObj, jint fromX, jint fromY, jint toX, jint toY)
 {
 	return Broodwar->hasPath(BWAPI::Position(fromX, fromY), BWAPI::Position(toX, toY));
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPath__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPath__II(JNIEnv* env, jobject jObj, jint unitID, jint targetID)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 	Unit* target = Broodwar->getUnit(targetID);
@@ -1865,7 +1867,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPath__II(JNIEnv* env, jobject jO
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPath__III(JNIEnv* env, jobject jObj, jint unitID, jint toX, jint toY)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPath__III(JNIEnv* env, jobject jObj, jint unitID, jint toX, jint toY)
 {
 	Unit* unit = Broodwar->getUnit(unitID);
 
@@ -1876,7 +1878,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_hasPath__III(JNIEnv* env, jobject j
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canBuildHere__IIIZ(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canBuildHere__IIIZ(JNIEnv* env, jobject jObj, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::UnitType unitType = unitTypeMap[unitTypeID];
@@ -1886,7 +1888,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canBuildHere__IIIZ(JNIEnv* env, job
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canBuildHere__IIIIZ(JNIEnv* env, jobject jObj, jint unitID, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canBuildHere__IIIIZ(JNIEnv* env, jobject jObj, jint unitID, jint tileX, jint tileY, jint unitTypeID, jboolean checkExplored)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1897,7 +1899,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canBuildHere__IIIIZ(JNIEnv* env, jo
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canMake__I(JNIEnv* env, jobject jObj, jint unitTypeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canMake__I(JNIEnv* env, jobject jObj, jint unitTypeID)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::UnitType unitType = unitTypeMap[unitTypeID];
@@ -1907,7 +1909,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canMake__I(JNIEnv* env, jobject jOb
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canMake__II(JNIEnv* env, jobject jObj, jint unitID, jint unitTypeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canMake__II(JNIEnv* env, jobject jObj, jint unitID, jint unitTypeID)
 {
 	if (unitTypeMap.count(unitTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1918,7 +1920,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canMake__II(JNIEnv* env, jobject jO
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canResearch__I(JNIEnv* env, jobject jObj, jint techTypeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canResearch__I(JNIEnv* env, jobject jObj, jint techTypeID)
 {
 	if (techTypeMap.count(techTypeID) > 0) {
 		BWAPI::TechType techType = techTypeMap[techTypeID];
@@ -1928,7 +1930,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canResearch__I(JNIEnv* env, jobject
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canResearch__II(JNIEnv* env, jobject jObj, jint unitID, jint techTypeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canResearch__II(JNIEnv* env, jobject jObj, jint unitID, jint techTypeID)
 {
 	if (techTypeMap.count(techTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1939,7 +1941,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canResearch__II(JNIEnv* env, jobjec
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canUpgrade__I(JNIEnv* env, jobject jObj, jint upgradeTypeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canUpgrade__I(JNIEnv* env, jobject jObj, jint upgradeTypeID)
 {
 	if (upgradeTypeMap.count(upgradeTypeID) > 0) {
 		BWAPI::UpgradeType upgradeType = upgradeTypeMap[upgradeTypeID];
@@ -1949,7 +1951,7 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canUpgrade__I(JNIEnv* env, jobject 
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canUpgrade__II(JNIEnv* env, jobject jObj, jint unitID, jint upgradeTypeID)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canUpgrade__II(JNIEnv* env, jobject jObj, jint unitID, jint upgradeTypeID)
 {
 	if (upgradeTypeMap.count(upgradeTypeID) > 0) {
 		BWAPI::Unit* unit = Broodwar->getUnit(unitID);
@@ -1960,28 +1962,28 @@ JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_canUpgrade__II(JNIEnv* env, jobject
 	return JNI_FALSE;
 }
 
-JNIEXPORT jboolean JNICALL Java_jbw_Broodwar_isReplay(JNIEnv *env, jobject jObj)
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isReplay(JNIEnv *env, jobject jObj)
 {
 	return Broodwar->isReplay();
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_sendText(JNIEnv* env, jobject jObj, jstring message)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_sendText(JNIEnv* env, jobject jObj, jstring message)
 {
 	const char* messagechars = env->GetStringUTFChars(message, 0);
 	Broodwar->sendText("%s", messagechars);
 	env->ReleaseStringUTFChars(message, messagechars);
 }
 
-JNIEXPORT void JNICALL Java_jbw_Broodwar_setCommandOptimizationLevel(JNIEnv* env, jobject jObj, jint level)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setCommandOptimizationLevel(JNIEnv* env, jobject jObj, jint level)
 {
 	Broodwar->setCommandOptimizationLevel(level);
 }
 
-JNIEXPORT jint JNICALL Java_jbw_Broodwar_getLastError(JNIEnv *, jobject){
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getLastError(JNIEnv *, jobject){
 	return Broodwar->getLastError().getID();
 }
 
-JNIEXPORT jint JNICALL Java_jbw_Broodwar_getRemainingLatencyFrames(JNIEnv *, jobject){
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getRemainingLatencyFrames(JNIEnv *, jobject){
 
 	return Broodwar->getRemainingLatencyFrames();
 }

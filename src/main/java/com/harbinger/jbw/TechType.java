@@ -1,11 +1,11 @@
-package jbw.types;
+package com.harbinger.jbw;
+
+import com.harbinger.jbw.UnitType.UnitTypes;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import jbw.types.UnitType.UnitTypes;
 
 /**
  * Represents a StarCraft tech (research) type.

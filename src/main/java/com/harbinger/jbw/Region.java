@@ -1,4 +1,4 @@
-package jbw.model;
+package com.harbinger.jbw;
 
 import java.util.*;
 
@@ -61,8 +61,8 @@ public class Region {
     public Set<Region> getAllConnectedRegions() {
         // Evaluate on first call
         if (allConnectedRegions == null) {
-            allConnectedRegions = new HashSet<Region>();
-            final LinkedList<Region> unexplored = new LinkedList<Region>();
+            allConnectedRegions = new HashSet<>();
+            final LinkedList<Region> unexplored = new LinkedList<>();
             unexplored.add(this);
             while (!unexplored.isEmpty()) {
                 final Region current = unexplored.remove();

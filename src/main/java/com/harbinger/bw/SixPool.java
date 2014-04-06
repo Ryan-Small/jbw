@@ -1,16 +1,17 @@
-package jbw.example;
+package com.harbinger.bw;
+
+import com.harbinger.jbw.BroodwarAgent;
+import com.harbinger.jbw.Position;
+import com.harbinger.jbw.Unit;
+import com.harbinger.jbw.UnitType.UnitTypes;
 
 import java.util.HashSet;
-
-import jbw.BroodwarAgent;
-import jbw.model.Position;
-import jbw.model.Unit;
-import jbw.types.UnitType.UnitTypes;
+import java.util.Set;
 
 public class SixPool extends BroodwarAgent {
 
     /** Used for mineral splits. */
-    private final HashSet<Integer> claimed = new HashSet<Integer>();
+    private final Set<Integer> claimed = new HashSet<>();
 
     /** Number of drones. Game starts with four. */
     private int droneCount = 4;

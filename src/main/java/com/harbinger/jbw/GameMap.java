@@ -1,17 +1,14 @@
-package jbw.model;
+package com.harbinger.jbw;
+
+import com.harbinger.jbw.Position.Type;
 
 import java.awt.Point;
 import java.util.*;
 
-import jbw.Broodwar;
-import jbw.model.Position.Type;
-import jbw.types.UnitType;
-import jbw.util.BWColor;
-
 /**
  * Stores information about a StarCraft map.
  */
-public class Map {
+public class GameMap {
     public static final int TILE_SIZE = 32;
 
     private final Position size;
@@ -32,7 +29,7 @@ public class Map {
     private List<BaseLocation> baseLocations = null;
     private HashMap<Integer, Region> idToRegion = null;
 
-    public Map(final String name, final String fileName, final String hash, final int width,
+    public GameMap(final String name, final String fileName, final String hash, final int width,
             final int height, final int[] heightMap, final int[] buildable, final int[] walkable) {
         size = new Position(width, height, Type.BUILD);
         this.name = name;
@@ -266,10 +263,10 @@ public class Map {
         // Distance of 10 per build tile, or sqrt(10^2 + 10^2) ~= 14 diagonally
         final int mvmtCost = 10;
         final int mvmtCostDiag = 14;
-        final PriorityQueue<AStarTile> openTiles = new PriorityQueue<AStarTile>(); // min heap
+        final PriorityQueue<AStarTile> openTiles = new PriorityQueue<>(); // min heap
         // Map from tile to distance
-        final HashMap<Point, Integer> gmap = new HashMap<Point, Integer>();
-        final HashSet<Point> closedTiles = new HashSet<Point>();
+        final HashMap<Point, Integer> gmap = new HashMap<>();
+        final HashSet<Point> closedTiles = new HashSet<>();
         final Point start = new Point(startTx, startTy);
         final Point end = new Point(endTx, endTy);
         openTiles.add(new AStarTile(start, 0));

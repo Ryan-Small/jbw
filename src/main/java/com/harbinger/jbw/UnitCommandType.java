@@ -1,4 +1,4 @@
-package jbw.types;
+package com.harbinger.jbw;
 
 import java.util.Collection;
 import java.util.Collections;

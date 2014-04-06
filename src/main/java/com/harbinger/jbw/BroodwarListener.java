@@ -1,9 +1,6 @@
-package jbw;
+package com.harbinger.jbw;
 
-import jbw.model.Player;
-import jbw.model.Position;
-import jbw.model.Position.Positions;
-import jbw.model.Unit;
+import com.harbinger.jbw.Position.Positions;
 
 /**
  * Serves as a callback interface for {@link Broodwar}, which will notify the implementing class of

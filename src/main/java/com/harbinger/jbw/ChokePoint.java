@@ -1,4 +1,4 @@
-package jbw.model;
+package com.harbinger.jbw;
 
 import java.util.Map;
 

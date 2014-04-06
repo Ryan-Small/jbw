@@ -1,8 +1,8 @@
-package jbw.model;
+package com.harbinger.jbw;
+
+import com.harbinger.jbw.Position.Type;
 
 import java.util.Map;
-
-import jbw.model.Position.Type;
 
 /**
  * Represents a location on the map where it makes sense to place a base (e.g. near minerals).

@@ -1,11 +1,11 @@
-package jbw.types;
+package com.harbinger.jbw;
+
+import com.harbinger.jbw.UnitSizeType.UnitSizeTypes;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import jbw.types.UnitSizeType.UnitSizeTypes;
 
 /**
  * Represents a StarCraft unit type.

@@ -1,4 +1,4 @@
-package jbw.types;
+package com.harbinger.jbw;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -60,7 +60,7 @@ public class BulletType {
         }
     }
 
-    public static final int NUM_ATTRIBUTES = 1;
+    static final int NUM_ATTRIBUTES = 1;
 
     private String name;
     private final int id;
@@ -70,17 +70,23 @@ public class BulletType {
         idToBulletType.put(id, this);
     }
 
-    public void initialize(final int[] data, int index, final String name) {
+    void initialize(final int[] data, int index, final String name) {
         if (id != data[index++]) {
             throw new IllegalArgumentException();
         }
         this.name = name;
     }
 
+    /**
+     * @return name for this bullet
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return unique id for this bullet
+     */
     public int getId() {
         return id;
     }

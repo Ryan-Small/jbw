@@ -1,10 +1,10 @@
-package jbw.model;
+package com.harbinger.jbw;
 
-import jbw.model.Position.Type;
-import jbw.types.*;
-import jbw.types.RaceType.RaceTypes;
-import jbw.types.TechType.TechTypes;
-import jbw.types.UpgradeType.UpgradeTypes;
+import com.harbinger.jbw.Position.Type;
+import com.harbinger.jbw.RaceType.RaceTypes;
+import com.harbinger.jbw.TechType.TechTypes;
+import com.harbinger.jbw.UpgradeType.UpgradeTypes;
+import com.harbinger.jbw.types.*;
 
 /**
  * Represents a StarCraft player.

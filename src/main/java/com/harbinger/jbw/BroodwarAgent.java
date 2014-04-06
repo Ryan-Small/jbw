@@ -1,6 +1,5 @@
-package jbw;
+package com.harbinger.jbw;
 
-import jbw.model.Map;
 
 /**
  * Serves as the base class for an agent by providing the functionality for launching the agent on a
@@ -25,7 +24,7 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      * game {@link BroodwarListener events}.
      * 
      * @param enableTerrainAnalysis
-     *            {@code true} if the Broodwar map should be {@link Map#isMapDetailsEnabled()
+     *            {@code true} if the Broodwar map should be {@link GameMap#isMapDetailsEnabled()
      *            analyzed}; {@code false} otherwise
      */
     public BroodwarAgent(final boolean enableTerrainAnalysis) {

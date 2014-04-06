@@ -1,12 +1,11 @@
-package jbw.model;
+package com.harbinger.jbw;
 
-import jbw.Broodwar;
-import jbw.types.*;
-import jbw.types.OrderType.OrderTypes;
-import jbw.types.TechType.TechTypes;
-import jbw.types.UnitCommandType.UnitCommandTypes;
-import jbw.types.UnitType.UnitTypes;
-import jbw.types.UpgradeType.UpgradeTypes;
+import com.harbinger.jbw.OrderType.OrderTypes;
+import com.harbinger.jbw.TechType.TechTypes;
+import com.harbinger.jbw.UnitCommandType.UnitCommandTypes;
+import com.harbinger.jbw.UnitType.UnitTypes;
+import com.harbinger.jbw.UpgradeType.UpgradeTypes;
+import com.harbinger.jbw.types.*;
 
 /**
  * This class is used to get information about individual units as well as issue order to units.

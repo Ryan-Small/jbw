@@ -4,14 +4,15 @@ archivesBaseName = "jbw"
 group = "com.harbinger"
 version = "1.0.0-SNAPSHOT"
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.8
 
 repositories { 
     mavenCentral() 
 }
 
 dependencies {
-
     testCompile group: "junit", name: "junit", version: "4.11"
     testCompile group: "org.mockito", name: "mockito-all", version: "1.9.5"
 }
+
+compileJava.options.compilerArgs << "-h" << "${projectDir}/src/main/c"

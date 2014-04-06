@@ -1,4 +1,4 @@
-package jbw.util;
+package com.harbinger.jbw;
 
 public enum BWColor {
     Red(111),

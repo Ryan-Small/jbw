@@ -1,27 +1,25 @@
-package jbw;
+package com.harbinger.jbw;
+
+import com.harbinger.jbw.BulletType.BulletTypes;
+import com.harbinger.jbw.DamageType.DamageTypes;
+import com.harbinger.jbw.ExplosionType.ExplosionTypes;
+import com.harbinger.jbw.OrderType.OrderTypes;
+import com.harbinger.jbw.Position.Positions;
+import com.harbinger.jbw.RaceType.RaceTypes;
+import com.harbinger.jbw.TechType.TechTypes;
+import com.harbinger.jbw.UnitCommandType.UnitCommandTypes;
+import com.harbinger.jbw.UnitSizeType.UnitSizeTypes;
+import com.harbinger.jbw.UnitType.UnitTypes;
+import com.harbinger.jbw.UpgradeType.UpgradeTypes;
+import com.harbinger.jbw.WeaponType.WeaponTypes;
+import com.harbinger.jbw.model.*;
+import com.harbinger.jbw.types.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
-
-import jbw.model.*;
-import jbw.model.Position.Positions;
-import jbw.model.Map;
-import jbw.types.*;
-import jbw.types.BulletType.BulletTypes;
-import jbw.types.DamageType.DamageTypes;
-import jbw.types.ExplosionType.ExplosionTypes;
-import jbw.types.OrderType.OrderTypes;
-import jbw.types.RaceType.RaceTypes;
-import jbw.types.TechType.TechTypes;
-import jbw.types.UnitCommandType.UnitCommandTypes;
-import jbw.types.UnitSizeType.UnitSizeTypes;
-import jbw.types.UnitType.UnitTypes;
-import jbw.types.UpgradeType.UpgradeTypes;
-import jbw.types.WeaponType.WeaponTypes;
-import jbw.util.BWColor;
 
 public class Broodwar {
 
@@ -66,16 +64,16 @@ public class Broodwar {
     private Player self;
     private Player neutralPlayer;
 
-    private Map map;
+    private GameMap map;
     private int gameFrame = 0;
 
     /**
      * Instantiates a BWAPI instance, but does not connect to the bridge. To connect, the start
      * method must be invoked.
-     * 
+     *
      * @param listener
      *            listener for BWAPI callback events.
-     * 
+     *
      * @param enableBWTA
      *            {@code true} if BWTA should be enabled; {@code false} otherwise
      */
@@ -133,7 +131,7 @@ public class Broodwar {
     }
 
     public List<Unit> getUnits(final Player player) {
-        final List<Unit> playerUnits = new ArrayList<Unit>();
+        final List<Unit> playerUnits = new ArrayList<>();
         for (final Unit unit : units.values()) {
             if (unit.getPlayer() == player) {
                 playerUnits.add(unit);
@@ -148,7 +146,7 @@ public class Broodwar {
 
     public List<Unit> getUnitsOnTile(final int x, final int y) {
         // Most tiles will have 0 units on tile.
-        final List<Unit> units = new ArrayList<Unit>(0);
+        final List<Unit> units = new ArrayList<>(0);
         for (final int id : getUnitIdsOnTile(x, y)) {
             units.add(getUnit(id));
         }
@@ -157,9 +155,6 @@ public class Broodwar {
 
     private native int[] getUnitIdsOnTile(final int tx, final int ty);
 
-    /**
-     * Loads type data from BWAPI.
-     */
     private void loadTypeData() {
         // race types
         final int[] raceTypeData = getRaceTypes();
@@ -247,10 +242,10 @@ public class Broodwar {
 
     /**
      * Returns the map currently being used.
-     * 
+     *
      * @return the map currently being used
      */
-    public Map getMap() {
+    public GameMap getMap() {
         return map;
     }
 
@@ -264,7 +259,7 @@ public class Broodwar {
         final int[] buildable = getBuildableData();
         final int[] walkable = getWalkableData();
 
-        map = new Map(mapName, fileName, hash, x, y, z, buildable, walkable);
+        map = new GameMap(mapName, fileName, hash, x, y, z, buildable, walkable);
 
         if (enableTerrainAnalysis) {
             loadMapDetails();
@@ -341,18 +336,6 @@ public class Broodwar {
         }
     }
 
-    /**
-     * Convenience method to write integers to a out each part of BWTA map data to a stream.
-     * 
-     * @param writer
-     *            {@code BufferedWriter} to write to
-     * 
-     * @param data
-     *            integers to write
-     * 
-     * @throws IOException
-     *             if the data cannot be written
-     */
     private static void writeMapData(final Writer writer, final int[] data) throws IOException {
         boolean first = true;
         for (final int val : data) {
@@ -366,17 +349,6 @@ public class Broodwar {
         writer.write("\n");
     }
 
-    /**
-     * Convenience method to read a line of integers separated by commas.
-     * 
-     * @param reader
-     *            {@code BufferedReader} to read from
-     * 
-     * @return integers that were read from the line or {@code null} when end-of-stream is reached
-     * 
-     * @throws IOException
-     *             if the data cannot be read
-     */
     private static int[] readMapData(final BufferedReader reader) throws IOException {
 
         final String line = reader.readLine();
@@ -396,7 +368,7 @@ public class Broodwar {
 
     /**
      * Utility function for printing to the java console from C++.
-     * 
+     *
      * <p>
      * C++ callback function.
      */
@@ -407,7 +379,7 @@ public class Broodwar {
 
     /**
      * Connects the client to BWAPI.
-     * 
+     *
      * <p>
      * This method will block until Broodwar has been closed.
      */
@@ -419,7 +391,7 @@ public class Broodwar {
 
     /**
      * Notifies the client and event listener that a connection has been formed to the bridge.
-     * 
+     *
      * <p>
      * C++ callback function.
      */
@@ -432,10 +404,10 @@ public class Broodwar {
      * Notifies the client that a game has started. This method is always called before
      * {@code BWAPIEventListener.matchStart()}, and is meant as a way of notifying the client to
      * initialize state.
-     * 
+     *
      * <p>
      * The listener is not notified of this invocation.
-     * 
+     *
      * <p>
      * C++ callback function.
      */
@@ -498,14 +470,14 @@ public class Broodwar {
      * Notifies the client that game data has been updated. This method is always called before
      * {@code BWAPIEventListener.matchFrame()}, and is meant as a way of notifying the client to
      * update the game state.
-     * 
+     *
      * <p>
      * The listener is not notified of this invocation.
-     * 
+     *
      * <p>
      * C++ callback function.
      */
-    void gameUpdate() {
+    private void gameUpdate() {
         // update game state
         gameFrame = getFrame();
         if (!isReplay()) {
@@ -520,7 +492,7 @@ public class Broodwar {
         }
         // update units
         final int[] unitData = getAllUnitsData();
-        final HashSet<Integer> deadUnits = new HashSet<Integer>(units.keySet());
+        final HashSet<Integer> deadUnits = new HashSet<>(units.keySet());
         playerUnits.clear();
         alliedUnits.clear();
         enemyUnits.clear();
@@ -567,7 +539,7 @@ public class Broodwar {
 
     /**
      * Notifies the event listener that the game has terminated.
-     * 
+     *
      * <p>
      * C++ callback function.
      */
@@ -577,23 +549,23 @@ public class Broodwar {
 
     /**
      * Sends BWAPI callback events to the event listener.
-     * 
+     *
      * <p>
      * The meaning of the parameters is dependent on the event type itself. In some cases, none of
      * the parameters are used.
-     * 
+     *
      * <p>
      * C++ callback function.
-     * 
+     *
      * @param eventTypeId
      *            id of the event that occurred
-     * 
+     *
      * @param p1
      *            first parameter for the event
-     * 
+     *
      * @param p2
      *            second parameter for the event
-     * 
+     *
      * @param p3
      *            third parameter for the event
      */
@@ -684,15 +656,18 @@ public class Broodwar {
             case None :
                 // Not currently used.
                 break;
+
+            default :
+                break;
         }
     }
 
     /**
      * Notifies the event listener that a key was pressed.
-     * 
+     *
      * <p>
      * C++ callback function.
-     * 
+     *
      * @param keyCode
      *            key pressed by the user
      */
