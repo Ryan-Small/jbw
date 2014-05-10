@@ -1,268 +1,253 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.UnitSizeType.UnitSizeTypes;
-
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Represents a StarCraft unit type.
- * 
+ *
  * For a description of fields see: http://code.google.com/p/bwapi/wiki/UnitType
  */
-public class UnitType {
+public enum UnitType {
 
-    private static Map<Integer, UnitType> idToUnitType = new HashMap<>();
+    Terran_Marine(0),
+    Terran_Ghost(1),
+    Terran_Vulture(2),
+    Terran_Goliath(3),
+    Undefined4(4), // Goliath Turret
+    Terran_Siege_Tank_Tank_Mode(5),
+    Undefined6(6), // Siege Tank Turret (Tank Mode)
+    Terran_SCV(7),
+    Terran_Wraith(8),
+    Terran_Science_Vessel(9),
+    Hero_Gui_Montag(10),
+    Terran_Dropship(11),
+    Terran_Battlecruiser(12),
+    Terran_Vulture_Spider_Mine(13),
+    Terran_Nuclear_Missile(14),
+    Terran_Civilian(15),
+    Hero_Sarah_Kerrigan(16),
+    Hero_Alan_Schezar(17),
+    Undefined18(18), // Alan Schezar Turret
+    Hero_Jim_Raynor_Vulture(19),
+    Hero_Jim_Raynor_Marine(20),
+    Hero_Tom_Kazansky(21),
+    Hero_Magellan(22),
+    Hero_Edmund_Duke_Tank_Mode(23),
+    Undefined24(24), // Edmund Duke Turret (Tank Mode)
+    Hero_Edmund_Duke_Siege_Mode(25),
+    Undefined26(26), // Edmund Duke Turret (Siege Mode)
+    Hero_Arcturus_Mengsk(27),
+    Hero_Hyperion(28),
+    Hero_Norad_II(29),
+    Terran_Siege_Tank_Siege_Mode(30),
+    Undefined31(31), // Siege Tank Turret (Siege Mode)
+    Terran_Firebat(32),
+    Spell_Scanner_Sweep(33),
+    Terran_Medic(34),
+    Zerg_Larva(35),
+    Zerg_Egg(36),
+    Zerg_Zergling(37),
+    Zerg_Hydralisk(38),
+    Zerg_Ultralisk(39),
+    Zerg_Broodling(40),
+    Zerg_Drone(41),
+    Zerg_Overlord(42),
+    Zerg_Mutalisk(43),
+    Zerg_Guardian(44),
+    Zerg_Queen(45),
+    Zerg_Defiler(46),
+    Zerg_Scourge(47),
+    Hero_Torrasque(48),
+    Hero_Matriarch(49),
+    Zerg_Infested_Terran(50),
+    Hero_Infested_Kerrigan(51),
+    Hero_Unclean_One(52),
+    Hero_Hunter_Killer(53),
+    Hero_Devouring_One(54),
+    Hero_Kukulza_Mutalisk(55),
+    Hero_Kukulza_Guardian(56),
+    Hero_Yggdrasill(57),
+    Terran_Valkyrie(58),
+    Zerg_Cocoon(59),
+    Protoss_Corsair(60),
+    Protoss_Dark_Templar(61),
+    Zerg_Devourer(62),
+    Protoss_Dark_Archon(63),
+    Protoss_Probe(64),
+    Protoss_Zealot(65),
+    Protoss_Dragoon(66),
+    Protoss_High_Templar(67),
+    Protoss_Archon(68),
+    Protoss_Shuttle(69),
+    Protoss_Scout(70),
+    Protoss_Arbiter(71),
+    Protoss_Carrier(72),
+    Protoss_Interceptor(73),
+    Hero_Dark_Templar(74),
+    Hero_Zeratul(75),
+    Hero_Tassadar_Zeratul_Archon(76),
+    Hero_Fenix_Zealot(77),
+    Hero_Fenix_Dragoon(78),
+    Hero_Tassadar(79),
+    Hero_Mojo(80),
+    Hero_Warbringer(81),
+    Hero_Gantrithor(82),
+    Protoss_Reaver(83),
+    Protoss_Observer(84),
+    Protoss_Scarab(85),
+    Hero_Danimoth(86),
+    Hero_Aldaris(87),
+    Hero_Artanis(88),
+    Critter_Rhynadon(89),
+    Critter_Bengalaas(90),
+    Special_Cargo_Ship(91),
+    Special_Mercenary_Gunship(92),
+    Critter_Scantid(93),
+    Critter_Kakaru(94),
+    Critter_Ragnasaur(95),
+    Critter_Ursadon(96),
+    Zerg_Lurker_Egg(97),
+    Hero_Raszagal(98),
+    Hero_Samir_Duran(99),
+    Hero_Alexei_Stukov(100),
+    Special_Map_Revealer(101),
+    Hero_Gerard_DuGalle(102),
+    Zerg_Lurker(103),
+    Hero_Infested_Duran(104),
+    Spell_Disruption_Web(105),
+    Terran_Command_Center(106),
+    Terran_Comsat_Station(107),
+    Terran_Nuclear_Silo(108),
+    Terran_Supply_Depot(109),
+    Terran_Refinery(110),
+    Terran_Barracks(111),
+    Terran_Academy(112),
+    Terran_Factory(113),
+    Terran_Starport(114),
+    Terran_Control_Tower(115),
+    Terran_Science_Facility(116),
+    Terran_Covert_Ops(117),
+    Terran_Physics_Lab(118),
+    Undefined119(119), // Starbase (Unused)
+    Terran_Machine_Shop(120),
+    Undefined121(121), // Repair Bay (Unused)
+    Terran_Engineering_Bay(122),
+    Terran_Armory(123),
+    Terran_Missile_Turret(124),
+    Terran_Bunker(125),
+    Special_Crashed_Norad_II(126),
+    Special_Ion_Cannon(127),
+    Powerup_Uraj_Crystal(128),
+    Powerup_Khalis_Crystal(129),
+    Zerg_Infested_Command_Center(130),
+    Zerg_Hatchery(131),
+    Zerg_Lair(132),
+    Zerg_Hive(133),
+    Zerg_Nydus_Canal(134),
+    Zerg_Hydralisk_Den(135),
+    Zerg_Defiler_Mound(136),
+    Zerg_Greater_Spire(137),
+    Zerg_Queens_Nest(138),
+    Zerg_Evolution_Chamber(139),
+    Zerg_Ultralisk_Cavern(140),
+    Zerg_Spire(141),
+    Zerg_Spawning_Pool(142),
+    Zerg_Creep_Colony(143),
+    Zerg_Spore_Colony(144),
+    Undefined145(145), // Unused Zerg Building 1
+    Zerg_Sunken_Colony(146),
+    Special_Overmind_With_Shell(147),
+    Special_Overmind(148),
+    Zerg_Extractor(149),
+    Special_Mature_Chrysalis(150),
+    Special_Cerebrate(151),
+    Special_Cerebrate_Daggoth(152),
+    Undefined153(153), // Unused Zerg Building 2
+    Protoss_Nexus(154),
+    Protoss_Robotics_Facility(155),
+    Protoss_Pylon(156),
+    Protoss_Assimilator(157),
+    Undefined158(158), // Unused Protoss Building 1
+    Protoss_Observatory(159),
+    Protoss_Gateway(160),
+    Undefined161(161), // Unused Protoss Building 2
+    Protoss_Photon_Cannon(162),
+    Protoss_Citadel_of_Adun(163),
+    Protoss_Cybernetics_Core(164),
+    Protoss_Templar_Archives(165),
+    Protoss_Forge(166),
+    Protoss_Stargate(167),
+    Special_Stasis_Cell_Prison(168),
+    Protoss_Fleet_Beacon(169),
+    Protoss_Arbiter_Tribunal(170),
+    Protoss_Robotics_Support_Bay(171),
+    Protoss_Shield_Battery(172),
+    Special_Khaydarin_Crystal_Form(173),
+    Special_Protoss_Temple(174),
+    Special_XelNaga_Temple(175),
+    Resource_Mineral_Field(176),
+    Resource_Mineral_Field_Type_2(177),
+    Resource_Mineral_Field_Type_3(178),
+    Undefined179(179), // Cave (Unused)
+    Undefined180(180), // Cave-in (Unused)
+    Undefined181(181), // Cantina (Unused)
+    Undefined182(182), // Mining Platform (Unused)
+    Undefined183(183), // Independent Command Center (Unused)
+    Special_Independant_Starport(184),
+    Undefined185(185), // Independent Jump Gate (Unused)
+    Undefined186(186), // Ruins (Unused)
+    Undefined187(187), // Khaydarin Crystal Formation (Unused)
+    Resource_Vespene_Geyser(188),
+    Special_Warp_Gate(189),
+    Special_Psi_Disrupter(190),
+    Undefined191(191), // Zerg Marker (Unused)
+    Undefined192(192), // Terran Marker (Unused)
+    Undefined193(193), // Protoss Marker (Unused)
+    Special_Zerg_Beacon(194),
+    Special_Terran_Beacon(195),
+    Special_Protoss_Beacon(196),
+    Special_Zerg_Flag_Beacon(197),
+    Special_Terran_Flag_Beacon(198),
+    Special_Protoss_Flag_Beacon(199),
+    Special_Power_Generator(200),
+    Special_Overmind_Cocoon(201),
+    Spell_Dark_Swarm(202),
+    Special_Floor_Missile_Trap(203),
+    Special_Floor_Hatch(204),
+    Special_Upper_Level_Door(205),
+    Special_Right_Upper_Level_Door(206),
+    Special_Pit_Door(207),
+    Special_Right_Pit_Door(208),
+    Special_Floor_Gun_Trap(209),
+    Special_Wall_Missile_Trap(210),
+    Special_Wall_Flame_Trap(211),
+    Special_Right_Wall_Missile_Trap(212),
+    Special_Right_Wall_Flame_Trap(213),
+    Special_Start_Location(214),
+    Powerup_Flag(215),
+    Powerup_Young_Chrysalis(216),
+    Powerup_Psi_Emitter(217),
+    Powerup_Data_Disk(218),
+    Powerup_Khaydarin_Crystal(219),
+    Powerup_Mineral_Cluster_Type_1(220),
+    Powerup_Mineral_Cluster_Type_2(221),
+    Powerup_Protoss_Gas_Orb_Type_1(222),
+    Powerup_Protoss_Gas_Orb_Type_2(223),
+    Powerup_Zerg_Gas_Sac_Type_1(224),
+    Powerup_Zerg_Gas_Sac_Type_2(225),
+    Powerup_Terran_Gas_Tank_Type_1(226),
+    Powerup_Terran_Gas_Tank_Type_2(227),
+    None(228),
+    Undefined229(229), // All Units (BWAPI4)
+    Undefined230(230), // Men (BWAPI4)
+    Undefined231(231), // Buildings (BWAPI4)
+    Undefined232(232), // Factories (BWAPI4)
+    Unknown(233);
 
-    public static class UnitTypes {
-        public static final UnitType Terran_Marine = new UnitType(0);
-        public static final UnitType Terran_Ghost = new UnitType(1);
-        public static final UnitType Terran_Vulture = new UnitType(2);
-        public static final UnitType Terran_Goliath = new UnitType(3);
-        // 4 Goliath Turret
-        public static final UnitType Terran_Siege_Tank_Tank_Mode = new UnitType(5);
-        // 6 Siege Tank Turret (Tank Mode)
-        public static final UnitType Terran_SCV = new UnitType(7);
-        public static final UnitType Terran_Wraith = new UnitType(8);
-        public static final UnitType Terran_Science_Vessel = new UnitType(9);
-        public static final UnitType Hero_Gui_Montag = new UnitType(10);
-        public static final UnitType Terran_Dropship = new UnitType(11);
-        public static final UnitType Terran_Battlecruiser = new UnitType(12);
-        public static final UnitType Terran_Vulture_Spider_Mine = new UnitType(13);
-        public static final UnitType Terran_Nuclear_Missile = new UnitType(14);
-        public static final UnitType Terran_Civilian = new UnitType(15);
-        public static final UnitType Hero_Sarah_Kerrigan = new UnitType(16);
-        public static final UnitType Hero_Alan_Schezar = new UnitType(17);
-        // 18 Alan Schezar Turret
-        public static final UnitType Hero_Jim_Raynor_Vulture = new UnitType(19);
-        public static final UnitType Hero_Jim_Raynor_Marine = new UnitType(20);
-        public static final UnitType Hero_Tom_Kazansky = new UnitType(21);
-        public static final UnitType Hero_Magellan = new UnitType(22);
-        public static final UnitType Hero_Edmund_Duke_Tank_Mode = new UnitType(23);
-        // 24 Edmund Duke Turret (Tank Mode)
-        public static final UnitType Hero_Edmund_Duke_Siege_Mode = new UnitType(25);
-        // 26 Edmund Duke Turret (Siege Mode)
-        public static final UnitType Hero_Arcturus_Mengsk = new UnitType(27);
-        public static final UnitType Hero_Hyperion = new UnitType(28);
-        public static final UnitType Hero_Norad_II = new UnitType(29);
-        public static final UnitType Terran_Siege_Tank_Siege_Mode = new UnitType(30);
-        // 31 Siege Tank Turret (Siege Mode)
-        public static final UnitType Terran_Firebat = new UnitType(32);
-        public static final UnitType Spell_Scanner_Sweep = new UnitType(33);
-        public static final UnitType Terran_Medic = new UnitType(34);
-        public static final UnitType Zerg_Larva = new UnitType(35);
-        public static final UnitType Zerg_Egg = new UnitType(36);
-        public static final UnitType Zerg_Zergling = new UnitType(37);
-        public static final UnitType Zerg_Hydralisk = new UnitType(38);
-        public static final UnitType Zerg_Ultralisk = new UnitType(39);
-        public static final UnitType Zerg_Broodling = new UnitType(40);
-        public static final UnitType Zerg_Drone = new UnitType(41);
-        public static final UnitType Zerg_Overlord = new UnitType(42);
-        public static final UnitType Zerg_Mutalisk = new UnitType(43);
-        public static final UnitType Zerg_Guardian = new UnitType(44);
-        public static final UnitType Zerg_Queen = new UnitType(45);
-        public static final UnitType Zerg_Defiler = new UnitType(46);
-        public static final UnitType Zerg_Scourge = new UnitType(47);
-        public static final UnitType Hero_Torrasque = new UnitType(48);
-        public static final UnitType Hero_Matriarch = new UnitType(49);
-        public static final UnitType Zerg_Infested_Terran = new UnitType(50);
-        public static final UnitType Hero_Infested_Kerrigan = new UnitType(51);
-        public static final UnitType Hero_Unclean_One = new UnitType(52);
-        public static final UnitType Hero_Hunter_Killer = new UnitType(53);
-        public static final UnitType Hero_Devouring_One = new UnitType(54);
-        public static final UnitType Hero_Kukulza_Mutalisk = new UnitType(55);
-        public static final UnitType Hero_Kukulza_Guardian = new UnitType(56);
-        public static final UnitType Hero_Yggdrasill = new UnitType(57);
-        public static final UnitType Terran_Valkyrie = new UnitType(58);
-        public static final UnitType Zerg_Cocoon = new UnitType(59);
-        public static final UnitType Protoss_Corsair = new UnitType(60);
-        public static final UnitType Protoss_Dark_Templar = new UnitType(61);
-        public static final UnitType Zerg_Devourer = new UnitType(62);
-        public static final UnitType Protoss_Dark_Archon = new UnitType(63);
-        public static final UnitType Protoss_Probe = new UnitType(64);
-        public static final UnitType Protoss_Zealot = new UnitType(65);
-        public static final UnitType Protoss_Dragoon = new UnitType(66);
-        public static final UnitType Protoss_High_Templar = new UnitType(67);
-        public static final UnitType Protoss_Archon = new UnitType(68);
-        public static final UnitType Protoss_Shuttle = new UnitType(69);
-        public static final UnitType Protoss_Scout = new UnitType(70);
-        public static final UnitType Protoss_Arbiter = new UnitType(71);
-        public static final UnitType Protoss_Carrier = new UnitType(72);
-        public static final UnitType Protoss_Interceptor = new UnitType(73);
-        public static final UnitType Hero_Dark_Templar = new UnitType(74);
-        public static final UnitType Hero_Zeratul = new UnitType(75);
-        public static final UnitType Hero_Tassadar_Zeratul_Archon = new UnitType(76);
-        public static final UnitType Hero_Fenix_Zealot = new UnitType(77);
-        public static final UnitType Hero_Fenix_Dragoon = new UnitType(78);
-        public static final UnitType Hero_Tassadar = new UnitType(79);
-        public static final UnitType Hero_Mojo = new UnitType(80);
-        public static final UnitType Hero_Warbringer = new UnitType(81);
-        public static final UnitType Hero_Gantrithor = new UnitType(82);
-        public static final UnitType Protoss_Reaver = new UnitType(83);
-        public static final UnitType Protoss_Observer = new UnitType(84);
-        public static final UnitType Protoss_Scarab = new UnitType(85);
-        public static final UnitType Hero_Danimoth = new UnitType(86);
-        public static final UnitType Hero_Aldaris = new UnitType(87);
-        public static final UnitType Hero_Artanis = new UnitType(88);
-        public static final UnitType Critter_Rhynadon = new UnitType(89);
-        public static final UnitType Critter_Bengalaas = new UnitType(90);
-        public static final UnitType Special_Cargo_Ship = new UnitType(91);
-        public static final UnitType Special_Mercenary_Gunship = new UnitType(92);
-        public static final UnitType Critter_Scantid = new UnitType(93);
-        public static final UnitType Critter_Kakaru = new UnitType(94);
-        public static final UnitType Critter_Ragnasaur = new UnitType(95);
-        public static final UnitType Critter_Ursadon = new UnitType(96);
-        public static final UnitType Zerg_Lurker_Egg = new UnitType(97);
-        public static final UnitType Hero_Raszagal = new UnitType(98);
-        public static final UnitType Hero_Samir_Duran = new UnitType(99);
-        public static final UnitType Hero_Alexei_Stukov = new UnitType(100);
-        public static final UnitType Special_Map_Revealer = new UnitType(101);
-        public static final UnitType Hero_Gerard_DuGalle = new UnitType(102);
-        public static final UnitType Zerg_Lurker = new UnitType(103);
-        public static final UnitType Hero_Infested_Duran = new UnitType(104);
-        public static final UnitType Spell_Disruption_Web = new UnitType(105);
-        public static final UnitType Terran_Command_Center = new UnitType(106);
-        public static final UnitType Terran_Comsat_Station = new UnitType(107);
-        public static final UnitType Terran_Nuclear_Silo = new UnitType(108);
-        public static final UnitType Terran_Supply_Depot = new UnitType(109);
-        public static final UnitType Terran_Refinery = new UnitType(110);
-        public static final UnitType Terran_Barracks = new UnitType(111);
-        public static final UnitType Terran_Academy = new UnitType(112);
-        public static final UnitType Terran_Factory = new UnitType(113);
-        public static final UnitType Terran_Starport = new UnitType(114);
-        public static final UnitType Terran_Control_Tower = new UnitType(115);
-        public static final UnitType Terran_Science_Facility = new UnitType(116);
-        public static final UnitType Terran_Covert_Ops = new UnitType(117);
-        public static final UnitType Terran_Physics_Lab = new UnitType(118);
-        // 119 Starbase (Unused)
-        public static final UnitType Terran_Machine_Shop = new UnitType(120);
-        // 121 Repair Bay (Unused)
-        public static final UnitType Terran_Engineering_Bay = new UnitType(122);
-        public static final UnitType Terran_Armory = new UnitType(123);
-        public static final UnitType Terran_Missile_Turret = new UnitType(124);
-        public static final UnitType Terran_Bunker = new UnitType(125);
-        public static final UnitType Special_Crashed_Norad_II = new UnitType(126);
-        public static final UnitType Special_Ion_Cannon = new UnitType(127);
-        public static final UnitType Powerup_Uraj_Crystal = new UnitType(128);
-        public static final UnitType Powerup_Khalis_Crystal = new UnitType(129);
-        public static final UnitType Zerg_Infested_Command_Center = new UnitType(130);
-        public static final UnitType Zerg_Hatchery = new UnitType(131);
-        public static final UnitType Zerg_Lair = new UnitType(132);
-        public static final UnitType Zerg_Hive = new UnitType(133);
-        public static final UnitType Zerg_Nydus_Canal = new UnitType(134);
-        public static final UnitType Zerg_Hydralisk_Den = new UnitType(135);
-        public static final UnitType Zerg_Defiler_Mound = new UnitType(136);
-        public static final UnitType Zerg_Greater_Spire = new UnitType(137);
-        public static final UnitType Zerg_Queens_Nest = new UnitType(138);
-        public static final UnitType Zerg_Evolution_Chamber = new UnitType(139);
-        public static final UnitType Zerg_Ultralisk_Cavern = new UnitType(140);
-        public static final UnitType Zerg_Spire = new UnitType(141);
-        public static final UnitType Zerg_Spawning_Pool = new UnitType(142);
-        public static final UnitType Zerg_Creep_Colony = new UnitType(143);
-        public static final UnitType Zerg_Spore_Colony = new UnitType(144);
-        // 144 Unused Zerg Building 1
-        public static final UnitType Zerg_Sunken_Colony = new UnitType(146);
-        public static final UnitType Special_Overmind_With_Shell = new UnitType(147);
-        public static final UnitType Special_Overmind = new UnitType(148);
-        public static final UnitType Zerg_Extractor = new UnitType(149);
-        public static final UnitType Special_Mature_Chrysalis = new UnitType(150);
-        public static final UnitType Special_Cerebrate = new UnitType(151);
-        public static final UnitType Special_Cerebrate_Daggoth = new UnitType(152);
-        // 153 Unused Zerg Building 2
-        public static final UnitType Protoss_Nexus = new UnitType(154);
-        public static final UnitType Protoss_Robotics_Facility = new UnitType(155);
-        public static final UnitType Protoss_Pylon = new UnitType(156);
-        public static final UnitType Protoss_Assimilator = new UnitType(157);
-        // 158 Unused Protoss Building 1
-        public static final UnitType Protoss_Observatory = new UnitType(159);
-        public static final UnitType Protoss_Gateway = new UnitType(160);
-        // 161 Unused Protoss Building 2
-        public static final UnitType Protoss_Photon_Cannon = new UnitType(162);
-        public static final UnitType Protoss_Citadel_of_Adun = new UnitType(163);
-        public static final UnitType Protoss_Cybernetics_Core = new UnitType(164);
-        public static final UnitType Protoss_Templar_Archives = new UnitType(165);
-        public static final UnitType Protoss_Forge = new UnitType(166);
-        public static final UnitType Protoss_Stargate = new UnitType(167);
-        public static final UnitType Special_Stasis_Cell_Prison = new UnitType(168);
-        public static final UnitType Protoss_Fleet_Beacon = new UnitType(169);
-        public static final UnitType Protoss_Arbiter_Tribunal = new UnitType(170);
-        public static final UnitType Protoss_Robotics_Support_Bay = new UnitType(171);
-        public static final UnitType Protoss_Shield_Battery = new UnitType(172);
-        public static final UnitType Special_Khaydarin_Crystal_Form = new UnitType(173);
-        public static final UnitType Special_Protoss_Temple = new UnitType(174);
-        public static final UnitType Special_XelNaga_Temple = new UnitType(175);
-        public static final UnitType Resource_Mineral_Field = new UnitType(176);
-        public static final UnitType Resource_Mineral_Field_Type_2 = new UnitType(177);
-        public static final UnitType Resource_Mineral_Field_Type_3 = new UnitType(178);
-        // 179 Cave (Unused)
-        // 180 Cave-in (Unused)
-        // 181 Cantina (Unused)
-        // 182 Mining Platform (Unused)
-        // 183 Independent Command Center (Unused)
-        public static final UnitType Special_Independant_Starport = new UnitType(184);
-        // 185 Independent Jump Gate (Unused)
-        // 186 Ruins (Unused)
-        // 187 Khaydarin Crystal Formation (Unused)
-        public static final UnitType Resource_Vespene_Geyser = new UnitType(188);
-        public static final UnitType Special_Warp_Gate = new UnitType(189);
-        public static final UnitType Special_Psi_Disrupter = new UnitType(190);
-        // 191 Zerg Marker (Unused)
-        // 192 Terran Marker (Unused)
-        // 193 Protoss Marker (Unused)
-        public static final UnitType Special_Zerg_Beacon = new UnitType(194);
-        public static final UnitType Special_Terran_Beacon = new UnitType(195);
-        public static final UnitType Special_Protoss_Beacon = new UnitType(196);
-        public static final UnitType Special_Zerg_Flag_Beacon = new UnitType(197);
-        public static final UnitType Special_Terran_Flag_Beacon = new UnitType(198);
-        public static final UnitType Special_Protoss_Flag_Beacon = new UnitType(199);
-        public static final UnitType Special_Power_Generator = new UnitType(200);
-        public static final UnitType Special_Overmind_Cocoon = new UnitType(201);
-        public static final UnitType Spell_Dark_Swarm = new UnitType(202);
-        public static final UnitType Special_Floor_Missile_Trap = new UnitType(203);
-        public static final UnitType Special_Floor_Hatch = new UnitType(204);
-        public static final UnitType Special_Upper_Level_Door = new UnitType(205);
-        public static final UnitType Special_Right_Upper_Level_Door = new UnitType(206);
-        public static final UnitType Special_Pit_Door = new UnitType(207);
-        public static final UnitType Special_Right_Pit_Door = new UnitType(208);
-        public static final UnitType Special_Floor_Gun_Trap = new UnitType(209);
-        public static final UnitType Special_Wall_Missile_Trap = new UnitType(210);
-        public static final UnitType Special_Wall_Flame_Trap = new UnitType(211);
-        public static final UnitType Special_Right_Wall_Missile_Trap = new UnitType(212);
-        public static final UnitType Special_Right_Wall_Flame_Trap = new UnitType(213);
-        public static final UnitType Special_Start_Location = new UnitType(214);
-        public static final UnitType Powerup_Flag = new UnitType(215);
-        public static final UnitType Powerup_Young_Chrysalis = new UnitType(216);
-        public static final UnitType Powerup_Psi_Emitter = new UnitType(217);
-        public static final UnitType Powerup_Data_Disk = new UnitType(218);
-        public static final UnitType Powerup_Khaydarin_Crystal = new UnitType(219);
-        public static final UnitType Powerup_Mineral_Cluster_Type_1 = new UnitType(220);
-        public static final UnitType Powerup_Mineral_Cluster_Type_2 = new UnitType(221);
-        public static final UnitType Powerup_Protoss_Gas_Orb_Type_1 = new UnitType(222);
-        public static final UnitType Powerup_Protoss_Gas_Orb_Type_2 = new UnitType(223);
-        public static final UnitType Powerup_Zerg_Gas_Sac_Type_1 = new UnitType(224);
-        public static final UnitType Powerup_Zerg_Gas_Sac_Type_2 = new UnitType(225);
-        public static final UnitType Powerup_Terran_Gas_Tank_Type_1 = new UnitType(226);
-        public static final UnitType Powerup_Terran_Gas_Tank_Type_2 = new UnitType(227);
-        public static final UnitType None = new UnitType(228);
-        // 229 All Units (BWAPI4)
-        // 230 Men (BWAPI4)
-        // 231 Buildings (BWAPI4)
-        // 232 Factories (BWAPI4)
-        public static final UnitType Unknown = new UnitType(233);
-
-        public static UnitType getUnitType(final int id) {
-            return idToUnitType.get(id);
-        }
-
-        public static Collection<UnitType> getAllUnitTypes() {
-            return Collections.unmodifiableCollection(idToUnitType.values());
-        }
-    }
-
-    public static final int NUM_ATTRIBUTES = 57;
-    public static final double fixedScale = 100.0;
+    static final int NUM_ATTRIBUTES = 57;
+    private static final double fixedScale = 100.0;
 
     private final int id;
     private int raceId;
@@ -325,9 +310,17 @@ public class UnitType {
     private String name;
     private final Map<Integer, Integer> requiredUnits = new HashMap<>();
 
+    public static UnitType getUnitType(final int id) {
+        for (final UnitType type : UnitType.values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     private UnitType(final int id) {
         this.id = id;
-        idToUnitType.put(id, this);
     }
 
     public void initialize(final int[] data, int index, final String name, final int[] requiredUnits) {
@@ -470,7 +463,7 @@ public class UnitType {
     }
 
     public UnitSizeType getSize() {
-        return UnitSizeTypes.getUnitSizeType(sizeID);
+        return UnitSizeType.values()[sizeID];
     }
 
     public int getTileWidth() {
@@ -635,8 +628,8 @@ public class UnitType {
     }
 
     public boolean isMineralField() {
-        return (this == UnitTypes.Resource_Mineral_Field)
-                || (this == UnitTypes.Resource_Mineral_Field_Type_2)
-                || (this == UnitTypes.Resource_Mineral_Field_Type_3);
+        return (this == UnitType.Resource_Mineral_Field)
+                || (this == UnitType.Resource_Mineral_Field_Type_2)
+                || (this == UnitType.Resource_Mineral_Field_Type_3);
     }
 }

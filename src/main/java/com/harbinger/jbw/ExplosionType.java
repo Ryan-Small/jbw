@@ -1,75 +1,72 @@
 package com.harbinger.jbw;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * http://code.google.com/p/bwapi/wiki/ExplosionType
  */
-public class ExplosionType {
+public enum ExplosionType {
 
-    private static Map<Integer, ExplosionType> idToExplosionType = new HashMap<>();
+    NONE(0),
+    NORMAL(1),
+    RADIAL_SPLASH(2),
+    ENEMY_SPLASH(3),
+    LOCKDOWN(4),
+    NUCLEAR_MISSILE(5),
+    PARASITE(6),
+    BROODLINGS(7),
+    EMP_SHOCKWAVE(8),
+    IRRADIATE(9),
+    ENSNARE(10),
+    PLAGUE(11),
+    STASIS_FIELD(12),
+    DARK_SWARM(13),
+    CONSUME(14),
+    YAMATO_GUN(15),
+    RESTORATION(16),
+    DISRUPTION_WEB(17),
+    CORROSIVE_ACID(18),
+    MIND_CONTROL(19),
+    FEEDBACK(20),
+    OPTICAL_FLARE(21),
+    MAELSTROM(22),
+    UNDEFINED23(23),
+    AIR_SPLASH(24),
+    UNKNOWN(25);
 
-    public static class ExplosionTypes {
-        public static final ExplosionType None = new ExplosionType(0);
-        public static final ExplosionType Normal = new ExplosionType(1);
-        public static final ExplosionType Radial_Splash = new ExplosionType(2);
-        public static final ExplosionType Enemy_Splash = new ExplosionType(3);
-        public static final ExplosionType Lockdown = new ExplosionType(4);
-        public static final ExplosionType Nuclear_Missile = new ExplosionType(5);
-        public static final ExplosionType Parasite = new ExplosionType(6);
-        public static final ExplosionType Broodlings = new ExplosionType(7);
-        public static final ExplosionType EMP_Shockwave = new ExplosionType(8);
-        public static final ExplosionType Irradiate = new ExplosionType(9);
-        public static final ExplosionType Ensnare = new ExplosionType(10);
-        public static final ExplosionType Plague = new ExplosionType(11);
-        public static final ExplosionType Stasis_Field = new ExplosionType(12);
-        public static final ExplosionType Dark_Swarm = new ExplosionType(13);
-        public static final ExplosionType Consume = new ExplosionType(14);
-        public static final ExplosionType Yamato_Gun = new ExplosionType(15);
-        public static final ExplosionType Restoration = new ExplosionType(16);
-        public static final ExplosionType Disruption_Web = new ExplosionType(17);
-        public static final ExplosionType Corrosive_Acid = new ExplosionType(18);
-        public static final ExplosionType Mind_Control = new ExplosionType(19);
-        public static final ExplosionType Feedback = new ExplosionType(20);
-        public static final ExplosionType Optical_Flare = new ExplosionType(21);
-        public static final ExplosionType Maelstrom = new ExplosionType(22);
-        public static final ExplosionType Undefined23 = new ExplosionType(23);
-        public static final ExplosionType Air_Splash = new ExplosionType(24);
-        public static final ExplosionType Unknown = new ExplosionType(25);
-
-        public static ExplosionType getExplosionType(final int id) {
-            return idToExplosionType.get(id);
-        }
-
-        public static Collection<ExplosionType> getAllExplosionTypes() {
-            return Collections.unmodifiableCollection(idToExplosionType.values());
-        }
-    }
-
-    public static final int NUM_ATTRIBUTES = 1;
+    static final int NUM_ATTRIBUTES = 1;
 
     private String name;
     private final int id;
 
-    private ExplosionType(final int id) {
-        this.id = id;
-        idToExplosionType.put(id, this);
+    public static ExplosionType getExplosionType(final int id) {
+        for (final ExplosionType type : ExplosionType.values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
     }
 
-    public void initialize(final int[] data, int index, final String name) {
+    private ExplosionType(final int id) {
+        this.id = id;
+    }
+
+    void initialize(final int[] data, int index, final String name) {
         if (id != data[index++]) {
             throw new IllegalArgumentException();
         }
         this.name = name;
     }
 
+    /**
+     * @return name for this type of explosion
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return unique id for this type of explosion
+     */
     public int getId() {
         return id;
     }

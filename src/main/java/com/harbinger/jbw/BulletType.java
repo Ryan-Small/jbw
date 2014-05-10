@@ -1,73 +1,64 @@
 package com.harbinger.jbw;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * http://code.google.com/p/bwapi/wiki/BulletType
+ * Represents an individual bullets, missiles, spells, and generally any sort of non-melee attack.
  */
-public class BulletType {
+public enum BulletType {
 
-    private static Map<Integer, BulletType> idToBulletType = new HashMap<>();
-
-    public static class BulletTypes {
-        public static final BulletType Melee = new BulletType(0);
-        public static final BulletType Fusion_Cutter_Hit = new BulletType(141);
-        public static final BulletType Gauss_Rifle_Hit = new BulletType(142);
-        public static final BulletType C_10_Canister_Rifle_Hit = new BulletType(143);
-        public static final BulletType Gemini_Missiles = new BulletType(144);
-        public static final BulletType Fragmentation_Grenade = new BulletType(145);
-        public static final BulletType Longbolt_Missile = new BulletType(146);
-        public static final BulletType Undefined147 = new BulletType(147);
-        public static final BulletType ATS_ATA_Laser_Battery = new BulletType(148);
-        public static final BulletType Burst_Lasers = new BulletType(149);
-        public static final BulletType Arclite_Shock_Cannon_Hit = new BulletType(150);
-        public static final BulletType EMP_Missile = new BulletType(151);
-        public static final BulletType Dual_Photon_Blasters_Hit = new BulletType(152);
-        public static final BulletType Particle_Beam_Hit = new BulletType(153);
-        public static final BulletType Anti_Matter_Missile = new BulletType(154);
-        public static final BulletType Pulse_Cannon = new BulletType(155);
-        public static final BulletType Psionic_Shockwave_Hit = new BulletType(156);
-        public static final BulletType Psionic_Storm = new BulletType(157);
-        public static final BulletType Yamato_Gun = new BulletType(158);
-        public static final BulletType Phase_Disruptor = new BulletType(159);
-        public static final BulletType STA_STS_Cannon_Overlay = new BulletType(160);
-        public static final BulletType Sunken_Colony_Tentacle = new BulletType(161);
-        public static final BulletType Acid_Spore = new BulletType(163);
-        public static final BulletType Glave_Wurm = new BulletType(165);
-        public static final BulletType Seeker_Spores = new BulletType(166);
-        public static final BulletType Queen_Spell_Carrier = new BulletType(167);
-        public static final BulletType Plague_Cloud = new BulletType(168);
-        public static final BulletType Consume = new BulletType(169);
-        public static final BulletType Needle_Spine_Hit = new BulletType(171);
-        public static final BulletType Invisible = new BulletType(172);
-        public static final BulletType Optical_Flare_Grenade = new BulletType(201);
-        public static final BulletType Halo_Rockets = new BulletType(202);
-        public static final BulletType Subterranean_Spines = new BulletType(203);
-        public static final BulletType Corrosive_Acid_Shot = new BulletType(204);
-        public static final BulletType Neutron_Flare = new BulletType(206);
-        public static final BulletType None = new BulletType(209);
-        public static final BulletType Unknown = new BulletType(210);
-
-        public static BulletType getBulletType(final int id) {
-            return idToBulletType.get(id);
-        }
-
-        public static Collection<BulletType> getAllBulletTypes() {
-            return Collections.unmodifiableCollection(idToBulletType.values());
-        }
-    }
+    MELEE(0),
+    FUSION_CUTTER(141),
+    GAUSS_RIFLE(142),
+    C_10_CANISTER_RIFLE(143),
+    GEMINI_MISSILES(144),
+    FRAGMENTATION_GRENDAE(145),
+    LONGBOLT_MISSILE(146),
+    UNDEFINED147(147),
+    ATS_ATA_LASER_BATTERY(148),
+    BURST_LASERS(149),
+    ARCLITE_SHOCK_CANNON(150),
+    EMP_MISSILE(151),
+    DIAL_PHOTON_BLASTERS(152),
+    PARTICLE_BEAM(153),
+    ANTI_MATTER_MISSILE(154),
+    PULSE_CANNON(155),
+    PSIONIC_SHOCKWAVE(156),
+    PSIONIC_STORM(157),
+    YAMATO_GUN(158),
+    PHASE_DISRUPTOR(159),
+    STA_STS_CANNON_OVERLAY(160),
+    SUNKEN_COLONY_TENTACLE(161),
+    ACID_SPORE(163),
+    GLAVE_WURM(165),
+    SEEKER_SPORES(166),
+    QUEEN_SPELL_CARRIER(167),
+    PLAGUE_CLOUD(168),
+    CONSUME(169),
+    NEEDLE_SPINE(171),
+    INVISIBLE(172),
+    OPTICAL_FLARE_GRENADE(201),
+    HALO_ROCKETS(202),
+    SUBTERRANEAN_SPINES(203),
+    CORROSIVE_ACID_SHOT(204),
+    NEUTRON_FLARE(206),
+    NONE(209),
+    UNKNOWN(210);
 
     static final int NUM_ATTRIBUTES = 1;
 
     private String name;
     private final int id;
 
+    public static BulletType getBulletType(final int id) {
+        for (final BulletType type : BulletType.values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     private BulletType(final int id) {
         this.id = id;
-        idToBulletType.put(id, this);
     }
 
     void initialize(final int[] data, int index, final String name) {
@@ -78,14 +69,14 @@ public class BulletType {
     }
 
     /**
-     * @return name for this bullet
+     * @return name for this type of bullet
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @return unique id for this bullet
+     * @return unique id for this type of bullet
      */
     public int getId() {
         return id;

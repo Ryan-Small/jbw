@@ -1,22 +1,15 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.OrderType.OrderTypes;
-import com.harbinger.jbw.TechType.TechTypes;
-import com.harbinger.jbw.UnitCommandType.UnitCommandTypes;
-import com.harbinger.jbw.UnitType.UnitTypes;
-import com.harbinger.jbw.UpgradeType.UpgradeTypes;
-import com.harbinger.jbw.types.*;
-
 /**
  * This class is used to get information about individual units as well as issue order to units.
  * Each unit in the game has a unique Unit object, and Unit objects are not deleted until the end of
  * the match.
- * 
+ *
  * <p>
  * Every Unit in the game is either accessible or inaccessible. To determine if an AI can access a
  * particular unit, BWAPI checks to see if Flag::CompleteMapInformation is enabled. So there are two
  * cases to consider - either the flag is enabled, or it is disabled:
- * 
+ *
  * <p>
  * If Flag::CompleteMapInformation is disabled, then a unit is accessible if and only if it is
  * visible. Some properties of visible enemy units will not be made available to the AI (such as the
@@ -25,17 +18,17 @@ import com.harbinger.jbw.types.*;
  * information on invisible enemy units is made available. To determine if an enemy unit has been
  * destroyed, the agent must watch for AIModule::onUnitDestroy messages from BWAPI, which is only
  * called for visible units which get destroyed.
- * 
+ *
  * <p>
  * If Flag::CompleteMapInformation is enabled, then all units that exist in the game are accessible,
  * and UnitInterface::exists is accurate for all units. Similarly AIModule::onUnitDestroy messages
  * are generated for all units that get destroyed, not just visible ones.
- * 
+ *
  * <p>
  * If a Unit is not accessible, then only the getInitial__ functions will be available to the agent.
  * However for units that were owned by the player, getPlayer and getType will continue to work for
  * units that have been destroyed.
- * 
+ *
  * For a description of fields see: http://code.google.com/p/bwapi/wiki/Unit
  */
 public class Unit {
@@ -398,7 +391,7 @@ public class Unit {
 
     /**
      * Returns the unique ID for this unit.
-     * 
+     *
      * @return the unique ID for this unit
      */
     public int getId() {
@@ -414,7 +407,7 @@ public class Unit {
     }
 
     public UnitType getType() {
-        return UnitTypes.getUnitType(typeId);
+        return UnitType.getUnitType(typeId);
     }
 
     public double getAngle() {
@@ -453,8 +446,8 @@ public class Unit {
         return lastCommandFrame;
     }
 
-    public UnitCommandType getLastCommand() {
-        return UnitCommandTypes.getUnitCommandType(lastCommandId);
+    public CommandType getLastCommand() {
+        return CommandType.getCommandType(lastCommandId);
     }
 
     public Player getLastAttackingPlayer() {
@@ -462,7 +455,7 @@ public class Unit {
     }
 
     public UnitType getInitialType() {
-        return UnitTypes.getUnitType(initialTypeId);
+        return UnitType.getUnitType(initialTypeId);
     }
 
     public Position getInitialPosition() {
@@ -555,7 +548,7 @@ public class Unit {
     }
 
     public UnitType getBuildType() {
-        return UnitTypes.getUnitType(buildTypeId);
+        return UnitType.getUnitType(buildTypeId);
     }
 
     public int getTrainingQueueSize() {
@@ -563,11 +556,11 @@ public class Unit {
     }
 
     public TechType getTech() {
-        return TechTypes.getTechType(researchingTechId);
+        return TechType.getTechType(researchingTechId);
     }
 
     public UpgradeType getUpgrade() {
-        return UpgradeTypes.getUpgradeType(upgradingUpgradeId);
+        return UpgradeType.getUpgradeType(upgradingUpgradeId);
     }
 
     public int getRemainingBuildTimer() {
@@ -599,7 +592,7 @@ public class Unit {
     }
 
     public OrderType getOrder() {
-        return OrderTypes.getOrderType(orderId);
+        return OrderType.getOrderType(orderId);
     }
 
     public Unit getOrderTarget() {
@@ -607,7 +600,7 @@ public class Unit {
     }
 
     public OrderType getSecondaryOrder() {
-        return OrderTypes.getOrderType(secondaryOrderId);
+        return OrderType.getOrderType(secondaryOrderId);
     }
 
     public Position getRallyPosition() {
@@ -863,10 +856,10 @@ public class Unit {
     /**
      * Orders this unit to attack move to a location. After issuing, orders will become
      * {@code OrderTypes.AttackMove}.
-     * 
+     *
      * @param position
      *            position to move to
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean attack(final Position position) {
@@ -878,10 +871,10 @@ public class Unit {
     /**
      * Orders this unit to attack another unit. After issuing, orders will become
      * {@code OrderTypes.AttackUnit}.
-     * 
+     *
      * @param target
      *            unit to attack
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean attack(final Unit target) {
@@ -892,13 +885,13 @@ public class Unit {
 
     /**
      * Orders this unit to build.
-     * 
+     *
      * @param building
      *            building to build
-     * 
+     *
      * @param position
      *            position to build at
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean build(final UnitType building, final Position position) {
@@ -910,14 +903,14 @@ public class Unit {
 
     /**
      * Orders this unit to build an addon.
-     * 
+     *
      * <p>
      * This unit should be a Terran building that can build addons of the specified type. The
      * {@link #build(UnitType, Position)}.
-     * 
+     *
      * @param addon
      *            unit to addon
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean buildAddon(final Unit addon) {
@@ -929,10 +922,10 @@ public class Unit {
     /**
      * Orders this unit to add the specified unit type to the training queue. This command can also
      * be used to make interceptors and scarabs.
-     * 
+     *
      * @param unit
      *            unit to train
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean train(final UnitType unit) {
@@ -943,10 +936,10 @@ public class Unit {
 
     /**
      * Orders this unit to morph into the specified unit type.
-     * 
+     *
      * @param target
      *            unit to build
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean morph(final UnitType target) {
@@ -957,10 +950,10 @@ public class Unit {
 
     /**
      * Orders this unit to research the given tech.
-     * 
+     *
      * @param tech
      *            tech to research
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean research(final TechType tech) {
@@ -971,10 +964,10 @@ public class Unit {
 
     /**
      * Orders this unit to upgrade the specified type.
-     * 
+     *
      * @param upgrade
      *            upgrade to start
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean upgrade(final UpgradeType upgrade) {
@@ -985,10 +978,10 @@ public class Unit {
 
     /**
      * Orders this unit to set its rally point to the specified location.
-     * 
+     *
      * @param position
      *            position to rally to
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean setRallyPoint(final Position position) {
@@ -999,10 +992,10 @@ public class Unit {
 
     /**
      * Orders this unit to set its rally point to the specified target.
-     * 
+     *
      * @param target
      *            target to rally to
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean setRallyPoint(final Unit target) {
@@ -1014,10 +1007,10 @@ public class Unit {
     /**
      * Orders this unit to move to the specified location. After issuing, the orders will become
      * {@code OrderTypes.Move}.
-     * 
+     *
      * @param position
      *            position to move to
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean move(final Position position) {
@@ -1029,10 +1022,10 @@ public class Unit {
     /**
      * Orders this unit to patrol between its current position and the specified location. After
      * issuing, the orders will become {@code OrderTpes.Patrol}.
-     * 
+     *
      * @param position
      *            position to patrol to
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean patrol(final Position position) {
@@ -1044,10 +1037,10 @@ public class Unit {
     /**
      * Orders this unit to hold its position. After issuing, the orders become
      * {@code OrderTypes.HoldPosition} while transitioning.
-     * 
+     *
      * <p>
      * Reavers and Carriers can only hold position if they have at least one Scarab or Interceptor.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean holdPosition() {
@@ -1058,7 +1051,7 @@ public class Unit {
 
     /**
      * Orders this unit to stop. After issuing, the orders will become {@code OrderTypes.Stop}.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean stop() {
@@ -1070,10 +1063,10 @@ public class Unit {
     /**
      * Orders this unit to follow the specified unit. After issuing, the orders will become
      * {@code OrderTypes.Follow}.
-     * 
+     *
      * @param target
      *            target unit to follow
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean follow(final Unit target) {
@@ -1084,14 +1077,14 @@ public class Unit {
 
     /**
      * Orders this unit to gather the specified unit.
-     * 
+     *
      * <p>
      * This unit should be an Drone, Probe, or SCV. The target should be a mineral patch, Refinery,
      * Assimilator, or Extractor.
-     * 
+     *
      * @param target
      *            target to gather
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean gather(final Unit target) {
@@ -1103,7 +1096,7 @@ public class Unit {
     /**
      * Orders this unit to return its cargo to a nearby resource depot such as a Command Center.
      * Only workers that are carrying minerals or gas can be ordered to return cargo.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean returnCargo() {
@@ -1115,13 +1108,13 @@ public class Unit {
     /**
      * Orders the unit to repair another unit. After issuing, the orders will become
      * {@code OrderTypes.Repair} while transitioning.
-     * 
+     *
      * <p>
      * Only Terran SCVs can be ordered to repair, and the target must be a mechanical Terran unit or
      * building.
-     * 
+     *
      * @param target
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean repair(final Unit target) {
@@ -1133,7 +1126,7 @@ public class Unit {
     /**
      * Orders this unit to burrow. After issuing, the orders will become
      * {@code OrderTypes.Burrowing} while transitioning.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean burrow() {
@@ -1145,10 +1138,10 @@ public class Unit {
     /**
      * Orders this unit to unburrow. After issuing, the orders will become
      * {@code OrderTypes.Unburrowing} while transitioning.
-     * 
+     *
      * <p>
      * This unit should be a burrowed unit.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean unburrow() {
@@ -1159,7 +1152,7 @@ public class Unit {
 
     /**
      * Orders this unit to cloak.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean cloak() {
@@ -1170,7 +1163,7 @@ public class Unit {
 
     /**
      * Orders this unit to decloak.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean decloak() {
@@ -1182,10 +1175,10 @@ public class Unit {
     /**
      * Orders this unit to siege. After issuing, the orders will become {@code OrderTypes.Sieging}
      * while transitioning.
-     * 
+     *
      * <p>
      * This unit should be a Terran Siege Tank.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean siege() {
@@ -1197,10 +1190,10 @@ public class Unit {
     /**
      * Orders this unit to unsiege. After issuing, the orders will become
      * {@code OrderTypes.Unsieging} while transitioning.
-     * 
+     *
      * <p>
      * This unit should be a Terran Siege Tank.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean unsiege() {
@@ -1211,10 +1204,10 @@ public class Unit {
 
     /**
      * Orders this unit to lift.
-     * 
+     *
      * <p>
      * This unit should be a Terran building that can be lifted.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean lift() {
@@ -1225,13 +1218,13 @@ public class Unit {
 
     /**
      * Orders this unit to land.
-     * 
+     *
      * <p>
      * This unit should be a lifted Terran building.
-     * 
+     *
      * @param position
      *            position to land the building
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean land(final Position position) {
@@ -1242,10 +1235,10 @@ public class Unit {
 
     /**
      * Orders this unit to load the target unit.
-     * 
+     *
      * @param target
      *            target to load
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean load(final Unit target) {
@@ -1256,10 +1249,10 @@ public class Unit {
 
     /**
      * Orders this unit to unload the target unit.
-     * 
+     *
      * @param target
      *            target to unload
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean unload(final Unit target) {
@@ -1270,7 +1263,7 @@ public class Unit {
 
     /**
      * Orders this unit to unload all units.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean unloadAll() {
@@ -1281,14 +1274,14 @@ public class Unit {
 
     /**
      * Orders this unit to unload all units.
-     * 
+     *
      * <p>
      * This unit should be a Terran Dropship, Protoss Shuttle, or Zerg Overlord. If this unit is a
      * Terran Bunker, the units will be unloaded right outside the bunker.
-     * 
+     *
      * @param location
      *            location to unload Units
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean unloadAll(final Position position) {
@@ -1300,10 +1293,10 @@ public class Unit {
     /**
      * Works like the right-click in the GUI (e.g. right-click on a location to order the unit to
      * move).
-     * 
+     *
      * @param position
      *            position to right-click on
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean rightClick(final Position position) {
@@ -1315,10 +1308,10 @@ public class Unit {
     /**
      * Works like the right-click in the GUI (e.g. right-click on a mineral patch to order a worker
      * to mine, right-click on an enemy to attack it).
-     * 
+     *
      * @param target
      *            target to right-click on
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean rightClick(final Unit target) {
@@ -1329,7 +1322,7 @@ public class Unit {
 
     /**
      * Orders this unit to halt construction
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean haltConstruction() {
@@ -1340,7 +1333,7 @@ public class Unit {
 
     /**
      * Orders this unit to cancel the construction in progress.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean cancelConstruction() {
@@ -1351,7 +1344,7 @@ public class Unit {
 
     /**
      * Orders this unit to cancel the addon in progress.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean cancelAddon() {
@@ -1362,10 +1355,10 @@ public class Unit {
 
     /**
      * Orders this unit to cancel training in progress.
-     * 
+     *
      * @param slot
      *            slot position to cancel
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean cancelTrain(final int slot) {
@@ -1376,7 +1369,7 @@ public class Unit {
 
     /**
      * Orders this unit to cancel the morphing in progress.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean cancelMorph() {
@@ -1387,7 +1380,7 @@ public class Unit {
 
     /**
      * Orders this unit to cancel the current research in progress.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean cancelResearch() {
@@ -1398,7 +1391,7 @@ public class Unit {
 
     /**
      * Orders this unit to cancel the current upgrade in progress.
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean cancelUpgrade() {
@@ -1409,10 +1402,10 @@ public class Unit {
 
     /**
      * Orders this unit to use tech that doesn't require a target (e.g. Stimpack).
-     * 
+     *
      * @param tech
      *            tech to use
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean useTech(final TechType tech) {
@@ -1423,13 +1416,13 @@ public class Unit {
 
     /**
      * Orders this unit to use tech that requires a location (e.g. Spider Mines).
-     * 
+     *
      * @param tech
      *            tech to use
-     * 
+     *
      * @param position
      *            position to target the tech
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean useTech(final TechType tech, final Position position) {
@@ -1440,13 +1433,13 @@ public class Unit {
 
     /**
      * Orders this unit to use tech that requires another unit (e.g. Irradiate).
-     * 
+     *
      * @param tech
      *            tech to use
-     * 
+     *
      * @param target
      *            target to use the tech on
-     * 
+     *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean useTech(final TechType tech, final Unit target) {

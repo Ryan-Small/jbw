@@ -1,38 +1,19 @@
 package com.harbinger.jbw;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * http://code.google.com/p/bwapi/wiki/Race
  */
-public class RaceType {
+public enum RaceType {
 
-    private static Map<Integer, RaceType> idToRaceType = new HashMap<>();
+    ZERG(0),
+    TERRAN(1),
+    PROTOSS(2),
+    RANDOM(3),
+    OTHER(4),
+    NONE(5),
+    UNKNOWN(6);
 
-    public static class RaceTypes {
-        public static final RaceType Zerg = new RaceType(0);
-        public static final RaceType Terran = new RaceType(1);
-        public static final RaceType Protoss = new RaceType(2);
-        // NOTE: Changes in BWAPI4 to:
-        // Unused = 3,4,5, Random = 6, None = 7, Unknown = 8
-        public static final RaceType Random = new RaceType(3);
-        public static final RaceType Other = new RaceType(4);
-        public static final RaceType None = new RaceType(5);
-        public static final RaceType Unknown = new RaceType(6);
-
-        public static RaceType getRaceType(final int id) {
-            return idToRaceType.get(id);
-        }
-
-        public static Collection<RaceType> getAllRaceTypes() {
-            return Collections.unmodifiableCollection(idToRaceType.values());
-        }
-    }
-
-    public static final int NUM_ATTRIBUTES = 6;
+    static final int NUM_ATTRIBUTES = 6;
 
     private String name;
     private final int id;
@@ -42,9 +23,17 @@ public class RaceType {
     private int transportId;
     private int supplyProviderId;
 
+    public static RaceType getRaceType(final int id) {
+        for (final RaceType type : RaceType.values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
+    }
+
     private RaceType(final int id) {
         this.id = id;
-        idToRaceType.put(id, this);
     }
 
     public void initialize(final int[] data, int index, final String name) {
@@ -59,10 +48,16 @@ public class RaceType {
         this.name = name;
     }
 
+    /**
+     * @return name for this type of race
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return unique id for this type of race
+     */
     public int getId() {
         return id;
     }

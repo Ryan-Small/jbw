@@ -1,72 +1,61 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.UnitType.UnitTypes;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Represents a StarCraft tech (research) type.
- * 
+ *
  * For a description of fields see: http://code.google.com/p/bwapi/wiki/TechType
  */
-public class TechType {
+public enum TechType {
 
-    private static Map<Integer, TechType> idToTechType = new HashMap<>();
+    STIM_PACKS(0),
+    LOCKDOWN(1),
+    EMP_SHOCKWAVE(2),
+    SPIDER_MINES(3),
+    SCANNER_SWEEP(4),
+    TANK_SIEGE_MODE(5),
+    DEFENSIVE_MATRIX(6),
+    IRRADIATE(7),
+    YAMATO_GUN(8),
+    CLOAKING_FIELD(9),
+    PERSONNEL_CLOAKING(10),
+    BURROWING(11),
+    INFESTATION(12),
+    SPAWN_BROODLINGS(13),
+    DARK_SWARM(14),
+    PLAGUE(15),
+    CONSUME(16),
+    ENSNARE(17),
+    PARASITE(18),
+    PSIONIC_STORM(19),
+    HALLUCINATION(20),
+    RECALL(21),
+    STASIS_FIELD(22),
+    ARCHON_WARP(23),
+    RESTORATION(24),
+    DISRUPTION_WEB(25),
+    UNDEFINED26(26),
+    MIND_CONTROL(27),
+    DARK_ARCHON_MELD(28),
+    FEEDBACK(29),
+    OPTICAL_FLARE(30),
+    MAELSTROM(31),
+    LURKER_ASPECT(32),
+    UNDEFINED33(33),
+    HEALING(34),
+    UNDEFINED35(35),
+    UNDEFINED36(36),
+    UNDEFINED37(37),
+    UNDEFINED38(38),
+    UNDEFINED39(39),
+    UNDEFINED40(40),
+    UNDEFINED41(41),
+    UNDEFINED42(42),
+    UNDEFINED43(43),
+    NONE(44),
+    UNKNOWN(45),
+    NUCLEAR_STRIKE(46);
 
-    public static class TechTypes {
-        public static final TechType Stim_Packs = new TechType(0);
-        public static final TechType Lockdown = new TechType(1);
-        public static final TechType EMP_Shockwave = new TechType(2);
-        public static final TechType Spider_Mines = new TechType(3);
-        public static final TechType Scanner_Sweep = new TechType(4);
-        public static final TechType Tank_Siege_Mode = new TechType(5);
-        public static final TechType Defensive_Matrix = new TechType(6);
-        public static final TechType Irradiate = new TechType(7);
-        public static final TechType Yamato_Gun = new TechType(8);
-        public static final TechType Cloaking_Field = new TechType(9);
-        public static final TechType Personnel_Cloaking = new TechType(10);
-        public static final TechType Burrowing = new TechType(11);
-        public static final TechType Infestation = new TechType(12);
-        public static final TechType Spawn_Broodlings = new TechType(13);
-        public static final TechType Dark_Swarm = new TechType(14);
-        public static final TechType Plague = new TechType(15);
-        public static final TechType Consume = new TechType(16);
-        public static final TechType Ensnare = new TechType(17);
-        public static final TechType Parasite = new TechType(18);
-        public static final TechType Psionic_Storm = new TechType(19);
-        public static final TechType Hallucination = new TechType(20);
-        public static final TechType Recall = new TechType(21);
-        public static final TechType Stasis_Field = new TechType(22);
-        public static final TechType Archon_Warp = new TechType(23);
-        public static final TechType Restoration = new TechType(24);
-        public static final TechType Disruption_Web = new TechType(25);
-        public static final TechType Undefined26 = new TechType(26);
-        public static final TechType Mind_Control = new TechType(27);
-        public static final TechType Dark_Archon_Meld = new TechType(28);
-        public static final TechType Feedback = new TechType(29);
-        public static final TechType Optical_Flare = new TechType(30);
-        public static final TechType Maelstrom = new TechType(31);
-        public static final TechType Lurker_Aspect = new TechType(32);
-        // 33 is undefined
-        public static final TechType Healing = new TechType(34);
-        // 35-43 are undefined
-        public static final TechType None = new TechType(44);
-        public static final TechType Unknown = new TechType(45);
-        public static final TechType Nuclear_Strike = new TechType(46);
-
-        public static TechType getTechType(final int id) {
-            return idToTechType.get(id);
-        }
-
-        public static Collection<TechType> getAllTechTypes() {
-            return Collections.unmodifiableCollection(idToTechType.values());
-        }
-    }
-
-    public static final int NUM_ATTRIBUTES = 10;
+    static final int NUM_ATTRIBUTES = 10;
 
     private String name;
     private final int id;
@@ -80,12 +69,20 @@ public class TechType {
     private boolean targetsUnits;
     private boolean targetsPosition;
 
-    private TechType(final int id) {
-        this.id = id;
-        idToTechType.put(id, this);
+    public static TechType getTechType(final int id) {
+        for (final TechType type : TechType.values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
     }
 
-    public void initialize(final int[] data, int index, final String name) {
+    private TechType(final int id) {
+        this.id = id;
+    }
+
+    void initialize(final int[] data, int index, final String name) {
         if (id != data[index++]) {
             throw new IllegalArgumentException();
         }
@@ -102,10 +99,16 @@ public class TechType {
         this.name = name;
     }
 
+    /**
+     * @return name for this type of tech
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return unique id for this type of tech
+     */
     public int getId() {
         return id;
     }
@@ -131,7 +134,7 @@ public class TechType {
     }
 
     public UnitType getWhatResearches() {
-        return UnitTypes.getUnitType(whatResearchesTypeId);
+        return UnitType.getUnitType(whatResearchesTypeId);
     }
 
     public int getGetWeaponId() {

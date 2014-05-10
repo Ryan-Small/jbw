@@ -1,14 +1,10 @@
 package com.harbinger.jbw;
 
 import com.harbinger.jbw.Position.Type;
-import com.harbinger.jbw.RaceType.RaceTypes;
-import com.harbinger.jbw.TechType.TechTypes;
-import com.harbinger.jbw.UpgradeType.UpgradeTypes;
-import com.harbinger.jbw.types.*;
 
 /**
  * Represents a StarCraft player.
- * 
+ *
  * For a description of fields see: http://code.google.com/p/bwapi/wiki/Player
  */
 public class Player {
@@ -59,13 +55,13 @@ public class Player {
         this.name = name;
         // Initialise technology records
         int highestIDTechType = 0;
-        for (final TechType t : TechTypes.getAllTechTypes()) {
+        for (final TechType t : TechType.values()) {
             highestIDTechType = Math.max(highestIDTechType, t.getId());
         }
         researching = new boolean[highestIDTechType + 1];
         researched = new boolean[highestIDTechType + 1];
         int highestIDUpgradeType = 0;
-        for (final UpgradeType ut : UpgradeTypes.getAllUpgradeTypes()) {
+        for (final UpgradeType ut : UpgradeType.values()) {
             highestIDUpgradeType = Math.max(highestIDUpgradeType, ut.getId());
         }
         upgrading = new boolean[highestIDUpgradeType + 1];
@@ -105,7 +101,7 @@ public class Player {
     }
 
     public RaceType getRace() {
-        return RaceTypes.getRaceType(raceId);
+        return RaceType.getRaceType(raceId);
     }
 
     // TODO Should return a PlayerType

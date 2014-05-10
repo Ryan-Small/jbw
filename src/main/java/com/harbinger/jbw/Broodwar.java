@@ -1,19 +1,6 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.BulletType.BulletTypes;
-import com.harbinger.jbw.DamageType.DamageTypes;
-import com.harbinger.jbw.ExplosionType.ExplosionTypes;
-import com.harbinger.jbw.OrderType.OrderTypes;
 import com.harbinger.jbw.Position.Positions;
-import com.harbinger.jbw.RaceType.RaceTypes;
-import com.harbinger.jbw.TechType.TechTypes;
-import com.harbinger.jbw.UnitCommandType.UnitCommandTypes;
-import com.harbinger.jbw.UnitSizeType.UnitSizeTypes;
-import com.harbinger.jbw.UnitType.UnitTypes;
-import com.harbinger.jbw.UpgradeType.UpgradeTypes;
-import com.harbinger.jbw.WeaponType.WeaponTypes;
-import com.harbinger.jbw.model.*;
-import com.harbinger.jbw.types.*;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -49,7 +36,7 @@ public class Broodwar {
 
     private final BroodwarListener listener;
 
-    private final boolean enableTerrainAnalysis;
+    // private final boolean enableTerrainAnalysis;
 
     private final HashMap<Integer, Unit> units = new HashMap<>();
     private final ArrayList<Unit> playerUnits = new ArrayList<>();
@@ -73,13 +60,9 @@ public class Broodwar {
      *
      * @param listener
      *            listener for BWAPI callback events.
-     *
-     * @param enableBWTA
-     *            {@code true} if BWTA should be enabled; {@code false} otherwise
      */
-    public Broodwar(final BroodwarListener listener, final boolean enableTerrainAnalysis) {
+    public Broodwar(final BroodwarListener listener) {
         this.listener = listener;
-        this.enableTerrainAnalysis = enableTerrainAnalysis;
     }
 
     public List<Player> getPlayers() {
@@ -160,14 +143,14 @@ public class Broodwar {
         final int[] raceTypeData = getRaceTypes();
         for (int index = 0; index < raceTypeData.length; index += RaceType.NUM_ATTRIBUTES) {
             final int id = raceTypeData[index];
-            RaceTypes.getRaceType(id).initialize(raceTypeData, index, getRaceTypeName(id));
+            RaceType.getRaceType(id).initialize(raceTypeData, index, getRaceTypeName(id));
         }
 
         // unit types
         final int[] unitTypeData = getUnitTypes();
         for (int index = 0; index < unitTypeData.length; index += UnitType.NUM_ATTRIBUTES) {
             final int id = unitTypeData[index];
-            UnitTypes.getUnitType(id).initialize(unitTypeData, index, getUnitTypeName(id),
+            UnitType.getUnitType(id).initialize(unitTypeData, index, getUnitTypeName(id),
                     getRequiredUnits(id));
         }
 
@@ -175,14 +158,14 @@ public class Broodwar {
         final int[] techTypeData = getTechTypes();
         for (int index = 0; index < techTypeData.length; index += TechType.NUM_ATTRIBUTES) {
             final int id = techTypeData[index];
-            TechTypes.getTechType(id).initialize(techTypeData, index, getTechTypeName(id));
+            TechType.getTechType(id).initialize(techTypeData, index, getTechTypeName(id));
         }
 
         // upgrade types
         final int[] upgradeTypeData = getUpgradeTypes();
         for (int index = 0; index < upgradeTypeData.length; index += UpgradeType.NUM_ATTRIBUTES) {
             final int id = upgradeTypeData[index];
-            UpgradeTypes.getUpgradeType(id).initialize(upgradeTypeData, index,
+            UpgradeType.getUpgradeType(id).initialize(upgradeTypeData, index,
                     getUpgradeTypeName(id));
         }
 
@@ -190,14 +173,14 @@ public class Broodwar {
         final int[] weaponTypeData = getWeaponTypes();
         for (int index = 0; index < weaponTypeData.length; index += WeaponType.NUM_ATTRIBUTES) {
             final int id = weaponTypeData[index];
-            WeaponTypes.getWeaponType(id).initialize(weaponTypeData, index, getWeaponTypeName(id));
+            WeaponType.getWeaponType(id).initialize(weaponTypeData, index, getWeaponTypeName(id));
         }
 
         // unit size types
         final int[] unitSizeTypeData = getUnitSizeTypes();
         for (int index = 0; index < unitSizeTypeData.length; index += UnitSizeType.NUM_ATTRIBUTES) {
             final int id = unitSizeTypeData[index];
-            UnitSizeTypes.getUnitSizeType(id).initialize(unitSizeTypeData, index,
+            UnitSizeType.getUnitSizeType(id).initialize(unitSizeTypeData, index,
                     getUnitSizeTypeName(id));
         }
 
@@ -205,30 +188,29 @@ public class Broodwar {
         final int[] bulletTypeData = getBulletTypes();
         for (int index = 0; index < bulletTypeData.length; index += BulletType.NUM_ATTRIBUTES) {
             final int id = bulletTypeData[index];
-            BulletTypes.getBulletType(id).initialize(bulletTypeData, index, getBulletTypeName(id));
+            BulletType.getBulletType(id).initialize(bulletTypeData, index, getBulletTypeName(id));
         }
 
         // damage types
         final int[] damageTypeData = getDamageTypes();
         for (int index = 0; index < damageTypeData.length; index += DamageType.NUM_ATTRIBUTES) {
             final int id = damageTypeData[index];
-            DamageTypes.getDamageType(id).initialize(damageTypeData, index, getDamageTypeName(id));
+            DamageType.getDamageType(id).initialize(damageTypeData, index, getDamageTypeName(id));
         }
 
         // explosion types
         final int[] explosionTypeData = getExplosionTypes();
         for (int index = 0; index < explosionTypeData.length; index += ExplosionType.NUM_ATTRIBUTES) {
             final int id = explosionTypeData[index];
-            ExplosionTypes.getExplosionType(id).initialize(explosionTypeData, index,
+            ExplosionType.getExplosionType(id).initialize(explosionTypeData, index,
                     getExplosionTypeName(id));
         }
 
         // unitCommand types
         final int[] unitCommandTypeData = getUnitCommandTypes();
-        for (int index = 0; index < unitCommandTypeData.length; index +=
-                UnitCommandType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < unitCommandTypeData.length; index += CommandType.NUM_ATTRIBUTES) {
             final int id = unitCommandTypeData[index];
-            UnitCommandTypes.getUnitCommandType(id).initialize(unitCommandTypeData, index,
+            CommandType.getCommandType(id).initialize(unitCommandTypeData, index,
                     getUnitCommandTypeName(id));
         }
 
@@ -236,7 +218,7 @@ public class Broodwar {
         final int[] orderTypeData = getOrderTypes();
         for (int index = 0; index < orderTypeData.length; index += OrderType.NUM_ATTRIBUTES) {
             final int id = orderTypeData[index];
-            OrderTypes.getOrderType(id).initialize(orderTypeData, index, getOrderTypeName(id));
+            OrderType.getOrderType(id).initialize(orderTypeData, index, getOrderTypeName(id));
         }
     }
 
@@ -261,9 +243,9 @@ public class Broodwar {
 
         map = new GameMap(mapName, fileName, hash, x, y, z, buildable, walkable);
 
-        if (enableTerrainAnalysis) {
-            loadMapDetails();
-        }
+        // if (enableTerrainAnalysis) {
+        loadMapDetails();
+        // }
     }
 
     private void loadMapDetails() {
@@ -573,35 +555,35 @@ public class Broodwar {
 
         final EventType event = EventType.getEventType(eventTypeId);
         switch (event) {
-            case MatchStart :
+            case MATCH_START :
                 listener.matchStart();
                 break;
 
-            case MatchEnd :
+            case MATCH_END :
                 listener.matchEnd(p1 == 1);
                 break;
 
-            case MatchFrame :
+            case MATCH_FRAME :
                 listener.matchFrame();
                 break;
 
-            case MenuFrame :
+            case MENU_FRAME :
                 // Not currently used.
                 break;
 
-            case SendText :
+            case SEND_TEXT :
                 listener.sendText(p3);
                 break;
 
-            case ReceiveText :
+            case RECEIVE_TEXT :
                 listener.receiveText(p3);
                 break;
 
-            case PlayerLeft :
+            case PLAYER_LEFT :
                 listener.playerLeft(players.get(p1));
                 break;
 
-            case NukeDetect :
+            case NUKE_DETECT :
                 if ((p1 == -1) || (p2 == -1)) {
                     listener.nukeDetect(Positions.Unknown);
                 } else {
@@ -609,51 +591,51 @@ public class Broodwar {
                 }
                 break;
 
-            case UnitDiscover :
+            case UNIT_DISCOVER :
                 listener.unitDiscover(units.get(p1));
                 break;
 
-            case UnitEvade :
+            case UNIT_EVADE :
                 listener.unitEvade(units.get(p1));
                 break;
 
-            case UnitShow :
+            case UNIT_SHOW :
                 listener.unitShow(units.get(p1));
                 break;
 
-            case UnitHide :
+            case UNIT_HIDE :
                 listener.unitHide(units.get(p1));
                 break;
 
-            case UnitCreate :
+            case UNIT_CREATE :
                 listener.unitCreate(units.get(p1));
                 break;
 
-            case UnitDestroy :
+            case UNIT_DESTROY :
                 listener.unitDestroy(units.get(p1));
                 break;
 
-            case UnitMorph :
+            case UNIT_MORPH :
                 listener.unitMorph(units.get(p1));
                 break;
 
-            case UnitRenegade :
+            case UNIT_RENEGADE :
                 listener.unitRenegade(units.get(p1));
                 break;
 
-            case SaveGame :
+            case SAVE_GAME :
                 listener.saveGame(p3);
                 break;
 
-            case UnitComplete :
+            case UNIT_COMPLETE :
                 listener.unitComplete(units.get(p1));
                 break;
 
-            case PlayerDropped :
+            case PLAYER_DROPPED :
                 listener.playerDropped(players.get(p1));
                 break;
 
-            case None :
+            case NONE :
                 // Not currently used.
                 break;
 
@@ -752,7 +734,7 @@ public class Broodwar {
     private native boolean hasCreep(final int tileX, final int tileY);
 
     public boolean hasPower(final Position position) {
-        return hasPower(position, UnitTypes.None);
+        return hasPower(position, UnitType.None);
     }
 
     public boolean hasPower(final Position position, final UnitType unitType) {
@@ -762,7 +744,7 @@ public class Broodwar {
     private native boolean hasPower(final int tileX, final int tileY, final int unitTypeId);
 
     public boolean hasPower(final Position position, final int tileWidth, final int tileHeight) {
-        return hasPower(position, tileWidth, tileHeight, UnitTypes.None);
+        return hasPower(position, tileWidth, tileHeight, UnitType.None);
     }
 
     public boolean hasPower(final Position position, final int tileWidth, final int tileHeight,
@@ -774,7 +756,7 @@ public class Broodwar {
             final int tileHeight, final int unitTypeId);
 
     public boolean hasPowerPrecise(final Position position) {
-        return hasPowerPrecise(position, UnitTypes.None);
+        return hasPowerPrecise(position, UnitType.None);
     }
 
     public boolean hasPowerPrecise(final Position position, final UnitType unitType) {

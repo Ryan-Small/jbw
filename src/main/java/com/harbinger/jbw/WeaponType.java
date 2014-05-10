@@ -1,142 +1,143 @@
 package com.harbinger.jbw;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * http://code.google.com/p/bwapi/wiki/WeaponType
  */
-public class WeaponType {
+public enum WeaponType {
+    GAUSS_RIFLE(0),
+    GAUSS_RIFLE_JIM_RAYNOR(1),
+    C_10_CANISTER_RIFLE(2),
+    C_10_CANISTER_RIFLE_SARAH_KERRIGAN(3),
+    FRAGMENTATION_GRENADE(4),
+    FRAGMENTATION_GRENADE_JIM_RAYNOR(5),
+    SPIDER_MINES(6),
+    TWIN_AUTOCANNONS(7),
+    HELLFIRE_MISSILE_PACK(8),
+    TWIN_AUTOCANNONS_ALAN_SCHEZAR(9),
+    HELLFIRE_MISSILE_PACK_ALAN_SCHEZAR(10),
+    ARCLITE_CANNON(11),
+    ARCLITE_CANNON_EDMUND_DUKE(12),
+    FUSION_CUTTER(13),
+    UNDEFINED14(14),
+    GEMINI_MISSILES(15),
+    BURST_LASERS(16),
+    GEMINI_MISSILES_TOM_KAZANSKY(17),
+    BURST_LASERS_TOM_KAZANSKY(18),
+    ATS_LASER_BATTERY(19),
+    ATA_LASER_BATTERY(20),
+    ATS_LASER_BATTERY_HERO(21),
+    ATA_LASER_BATTERY_HERO(22),
+    ATS_LASER_BATTERY_HYPERION(23),
+    ATA_LASER_BATTERY_HYPERION(24),
+    FLAME_THROWER(25),
+    FLAME_THROWER_GUI_MONTAG(26),
+    ARCLITE_SHOCK_CANNON(27),
+    ARCLITE_SHOCK_CANNON_EDMUND_DUKE(28),
+    LONGBOLT_MISSILE(29),
+    YAMATO_GUN(30),
+    NUCLEAR_STRIKE(31),
+    LOCKDOWN(32),
+    EMP_SHOCKWAVE(33),
+    IRRADIATE(34),
+    CLAWS(35),
+    CLAWS_DEVOURING_ONE(36),
+    CLAWS_INFESTED_KERRIGAN(37),
+    NEEDLE_SPINES(38),
+    NEEDLE_SPINES_HUNTER_KILLER(39),
+    KAISER_BLADES(40),
+    KAISER_BLADES_TORRASQUE(41),
+    TOXIC_SPORES(42),
+    SPINES(43),
+    UNDEFINED44(44),
+    UNDEFINED45(45),
+    ACID_SPORE(46),
+    ACID_SPORE_KUKULZA(47),
+    GLAVE_WURM(48),
+    GLAVE_WURM_KUKULZA(49),
+    UNDEFINED50(50),
+    UNDEFINED51(51),
+    SEEKER_SPORES(52),
+    SUBTERRANEAN_TENTACLE(53),
+    SUICIDE_INFESTED_TERRAN(54),
+    SUICIDE_SCOURGE(55),
+    PARASITE(56),
+    SPAWN_BROODLINGS(57),
+    ENSNARE(58),
+    DARK_SWARM(59),
+    PLAGUE(60),
+    CONSUME(61),
+    PARTICLE_BEAM(62),
+    UNDEFINED63(63),
+    PSI_BLADES(64),
+    PSI_BLADES_FENIX(65),
+    PHASE_DISRUPTOR(66),
+    PHASE_DISRUPTOR_FENIX(67),
+    UNDEFINED68(68),
+    PSI_ASSAULT(69),
+    PSIONIC_SHOCKWAVE(70),
+    PSIONIC_SHOCKWAVE_TASSADAR_ZERATUL_ARCHON(71),
+    UNDEFINED72(72),
+    DUAL_PHOTON_BLASTERS(73),
+    ANTI_MATTER_MISSILES(74),
+    DUAL_PHOTON_BLASTERS_MOJO(75),
+    ANTI_MATTER_MISSILES_MOJO(76),
+    PHASE_DISRUPTOR_CANNON(77),
+    PHASE_DISRUPTOR_CANNON_DANIMOTH(78),
+    PULSE_CANNON(79),
+    STS_PHOTON_CANNON(80),
+    STA_PHOTON_CANNON(81),
+    SCARAB(82),
+    STASIS_FIELD(83),
+    PSIONIC_STORM(84),
+    WARP_BLADES_ZERATUL(85),
+    WARP_BLADES_HERO(86),
+    UNDEFINED87(87),
+    UNDEFINED88(88),
+    UNDEFINED89(89),
+    UNDEFINED90(90),
+    UNDEFINED91(91),
+    UNDEFINED92(92),
+    UNDEFINED93(93),
+    UNDEFINED94(94),
+    UNDEFINED95(95),
+    UNDEFINED96(96),
+    UNDEFINED97(97),
+    UNDEFINED98(98),
+    UNDEFINED99(99),
+    NEUTRON_FLARE(100),
+    DISRUPTION_WEB(101),
+    RESTORATION(102),
+    HALO_ROCKETS(103),
+    CORROSIVE_ACID(104),
+    MIND_CONTROL(105),
+    FEEDBACK(106),
+    OPTICAL_FLARE(107),
+    MAELSTROM(108),
+    SUBTERRANEAN_SPINES(109),
+    UNDEFINED110(110),
+    WARP_BLADES(111),
+    C_10_CANISTER_RIFLE_SAMIR_DURAN(112),
+    C_10_CANISTER_RIFLE_INFESTED_DURAN(113),
+    DUAL_PHOTON_BLASTERS_ARTANIS(114),
+    ANTI_MATTER_MISSILES_ARTANIS(115),
+    C_10_CANISTER_RIFLE_ALEXEI_STUKOV(116),
+    UNDEFINED117(117),
+    UNDEFINED118(118),
+    UNDEFINED119(119),
+    UNDEFINED120(120),
+    UNDEFINED121(121),
+    UNDEFINED122(122),
+    UNDEFINED123(123),
+    UNDEFINED124(124),
+    UNDEFINED125(125),
+    UNDEFINED126(126),
+    UNDEFINED127(127),
+    UNDEFINED128(128),
+    UNDEFINED129(129),
+    NONE(130),
+    UNKNOWN(131);
 
-    private static Map<Integer, WeaponType> idToWeaponType = new HashMap<>();
-
-    public static class WeaponTypes {
-        public static final WeaponType Gauss_Rifle = new WeaponType(0);
-        public static final WeaponType Gauss_Rifle_Jim_Raynor = new WeaponType(1);
-        public static final WeaponType C_10_Canister_Rifle = new WeaponType(2);
-        public static final WeaponType C_10_Canister_Rifle_Sarah_Kerrigan = new WeaponType(3);
-        public static final WeaponType Fragmentation_Grenade = new WeaponType(4);
-        public static final WeaponType Fragmentation_Grenade_Jim_Raynor = new WeaponType(5);
-        public static final WeaponType Spider_Mines = new WeaponType(6);
-        public static final WeaponType Twin_Autocannons = new WeaponType(7);
-        public static final WeaponType Hellfire_Missile_Pack = new WeaponType(8);
-        public static final WeaponType Twin_Autocannons_Alan_Schezar = new WeaponType(9);
-        public static final WeaponType Hellfire_Missile_Pack_Alan_Schezar = new WeaponType(10);
-        public static final WeaponType Arclite_Cannon = new WeaponType(11);
-        public static final WeaponType Arclite_Cannon_Edmund_Duke = new WeaponType(12);
-        public static final WeaponType Fusion_Cutter = new WeaponType(13);
-        // 14 is undefined
-        public static final WeaponType Gemini_Missiles = new WeaponType(15);
-        public static final WeaponType Burst_Lasers = new WeaponType(16);
-        public static final WeaponType Gemini_Missiles_Tom_Kazansky = new WeaponType(17);
-        public static final WeaponType Burst_Lasers_Tom_Kazansky = new WeaponType(18);
-        public static final WeaponType ATS_Laser_Battery = new WeaponType(19);
-        public static final WeaponType ATA_Laser_Battery = new WeaponType(20);
-        public static final WeaponType ATS_Laser_Battery_Hero = new WeaponType(21);
-        public static final WeaponType ATA_Laser_Battery_Hero = new WeaponType(22);
-        public static final WeaponType ATS_Laser_Battery_Hyperion = new WeaponType(23);
-        public static final WeaponType ATA_Laser_Battery_Hyperion = new WeaponType(24);
-        public static final WeaponType Flame_Thrower = new WeaponType(25);
-        public static final WeaponType Flame_Thrower_Gui_Montag = new WeaponType(26);
-        public static final WeaponType Arclite_Shock_Cannon = new WeaponType(27);
-        public static final WeaponType Arclite_Shock_Cannon_Edmund_Duke = new WeaponType(28);
-        public static final WeaponType Longbolt_Missile = new WeaponType(29);
-        public static final WeaponType Yamato_Gun = new WeaponType(30);
-        public static final WeaponType Nuclear_Strike = new WeaponType(31);
-        public static final WeaponType Lockdown = new WeaponType(32);
-        public static final WeaponType EMP_Shockwave = new WeaponType(33);
-        public static final WeaponType Irradiate = new WeaponType(34);
-        public static final WeaponType Claws = new WeaponType(35);
-        public static final WeaponType Claws_Devouring_One = new WeaponType(36);
-        public static final WeaponType Claws_Infested_Kerrigan = new WeaponType(37);
-        public static final WeaponType Needle_Spines = new WeaponType(38);
-        public static final WeaponType Needle_Spines_Hunter_Killer = new WeaponType(39);
-        public static final WeaponType Kaiser_Blades = new WeaponType(40);
-        public static final WeaponType Kaiser_Blades_Torrasque = new WeaponType(41);
-        public static final WeaponType Toxic_Spores = new WeaponType(42);
-        public static final WeaponType Spines = new WeaponType(43);
-        // 44-45 are undefined
-        public static final WeaponType Acid_Spore = new WeaponType(46);
-        public static final WeaponType Acid_Spore_Kukulza = new WeaponType(47);
-        public static final WeaponType Glave_Wurm = new WeaponType(48);
-        public static final WeaponType Glave_Wurm_Kukulza = new WeaponType(49);
-        // 50-51 are undefined
-        public static final WeaponType Seeker_Spores = new WeaponType(52);
-        public static final WeaponType Subterranean_Tentacle = new WeaponType(53);
-        public static final WeaponType Suicide_Infested_Terran = new WeaponType(54);
-        public static final WeaponType Suicide_Scourge = new WeaponType(55);
-        public static final WeaponType Parasite = new WeaponType(56);
-        public static final WeaponType Spawn_Broodlings = new WeaponType(57);
-        public static final WeaponType Ensnare = new WeaponType(58);
-        public static final WeaponType Dark_Swarm = new WeaponType(59);
-        public static final WeaponType Plague = new WeaponType(60);
-        public static final WeaponType Consume = new WeaponType(61);
-        public static final WeaponType Particle_Beam = new WeaponType(62);
-        // 63 is undefined
-        public static final WeaponType Psi_Blades = new WeaponType(64);
-        public static final WeaponType Psi_Blades_Fenix = new WeaponType(65);
-        public static final WeaponType Phase_Disruptor = new WeaponType(66);
-        public static final WeaponType Phase_Disruptor_Fenix = new WeaponType(67);
-        // 68 is undefined
-        public static final WeaponType Psi_Assault = new WeaponType(69);
-        public static final WeaponType Psionic_Shockwave = new WeaponType(70);
-        public static final WeaponType Psionic_Shockwave_Tassadar_Zeratul_Archon = new WeaponType(
-                71);
-        // 72 is undefined
-        public static final WeaponType Dual_Photon_Blasters = new WeaponType(73);
-        public static final WeaponType Anti_Matter_Missiles = new WeaponType(74);
-        public static final WeaponType Dual_Photon_Blasters_Mojo = new WeaponType(75);
-        public static final WeaponType Anti_Matter_Missiles_Mojo = new WeaponType(76);
-        public static final WeaponType Phase_Disruptor_Cannon = new WeaponType(77);
-        public static final WeaponType Phase_Disruptor_Cannon_Danimoth = new WeaponType(78);
-        public static final WeaponType Pulse_Cannon = new WeaponType(79);
-        public static final WeaponType STS_Photon_Cannon = new WeaponType(80);
-        public static final WeaponType STA_Photon_Cannon = new WeaponType(81);
-        public static final WeaponType Scarab = new WeaponType(82);
-        public static final WeaponType Stasis_Field = new WeaponType(83);
-        public static final WeaponType Psionic_Storm = new WeaponType(84);
-        public static final WeaponType Warp_Blades_Zeratul = new WeaponType(85);
-        public static final WeaponType Warp_Blades_Hero = new WeaponType(86);
-        // 87-92 are undefined
-        public static final WeaponType Independant_Laser_Battery = new WeaponType(93);
-        // 94-95 are undefined
-        public static final WeaponType Twin_Autocannons_Floor_Trap = new WeaponType(96);
-        public static final WeaponType Hellfire_Missile_Pack_Wall_Trap = new WeaponType(97);
-        public static final WeaponType Flame_Thrower_Wall_Trap = new WeaponType(98);
-        public static final WeaponType Hellfire_Missile_Pack_Floor_Trap = new WeaponType(99);
-        public static final WeaponType Neutron_Flare = new WeaponType(100);
-        public static final WeaponType Disruption_Web = new WeaponType(101);
-        public static final WeaponType Restoration = new WeaponType(102);
-        public static final WeaponType Halo_Rockets = new WeaponType(103);
-        public static final WeaponType Corrosive_Acid = new WeaponType(104);
-        public static final WeaponType Mind_Control = new WeaponType(105);
-        public static final WeaponType Feedback = new WeaponType(106);
-        public static final WeaponType Optical_Flare = new WeaponType(107);
-        public static final WeaponType Maelstrom = new WeaponType(108);
-        public static final WeaponType Subterranean_Spines = new WeaponType(109);
-        // 110 is undefined
-        public static final WeaponType Warp_Blades = new WeaponType(111);
-        public static final WeaponType C_10_Canister_Rifle_Samir_Duran = new WeaponType(112);
-        public static final WeaponType C_10_Canister_Rifle_Infested_Duran = new WeaponType(113);
-        public static final WeaponType Dual_Photon_Blasters_Artanis = new WeaponType(114);
-        public static final WeaponType Anti_Matter_Missiles_Artanis = new WeaponType(115);
-        public static final WeaponType C_10_Canister_Rifle_Alexei_Stukov = new WeaponType(116);
-        // 117-129 are undefined
-        public static final WeaponType None = new WeaponType(130);
-        public static final WeaponType Unknown = new WeaponType(131);
-
-        public static WeaponType getWeaponType(final int id) {
-            return idToWeaponType.get(id);
-        }
-
-        public static Collection<WeaponType> getAllWeaponTypes() {
-            return Collections.unmodifiableCollection(idToWeaponType.values());
-        }
-    }
-
-    public static final int NUM_ATTRIBUTES = 24;
+    static final int NUM_ATTRIBUTES = 24;
 
     private String name;
     private final int id;
@@ -164,12 +165,20 @@ public class WeaponType {
     private boolean targetsOrgOrMech;
     private boolean targetsOwn;
 
-    private WeaponType(final int id) {
-        this.id = id;
-        idToWeaponType.put(id, this);
+    public static WeaponType getWeaponType(final int id) {
+        for (final WeaponType type : WeaponType.values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
     }
 
-    public void initialize(final int[] data, int index, final String name) {
+    private WeaponType(final int id) {
+        this.id = id;
+    }
+
+    void initialize(final int[] data, int index, final String name) {
         if (id != data[index++]) {
             throw new IllegalArgumentException();
         }
@@ -200,10 +209,16 @@ public class WeaponType {
         this.name = name;
     }
 
+    /**
+     * @return name for this type of weapon
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return unique id for this type of weapon
+     */
     public int getId() {
         return id;
     }
