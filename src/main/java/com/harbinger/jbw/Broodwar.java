@@ -969,6 +969,22 @@ public class Broodwar {
     /**
      * Draws text on the map for a single frame.
      *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextMap(final Position position, final String text, final BWColor color) {
+        drawTextMap(position.getPX(), position.getPY(), color.getControlCharacters() + text);
+    }
+
+    /**
+     * Draws text on the map for a single frame.
+     *
      * @param x
      *            the starting x-axis coordinate of the text to be drawn, in pixels
      *
@@ -976,9 +992,28 @@ public class Broodwar {
      *            the starting y-axis coordinate of the text to be drawn, in pixels
      *
      * @param text
-     *            the text to draw
+     *            the text to be drawn
      */
     public native void drawTextMap(final int x, final int y, final String text);
+
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param x
+     *            the starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextMap(final int x, final int y, final String text, final BWColor color) {
+        drawTextMap(x, y, color.getControlCharacters() + text);
+    }
 
     /**
      * Draws text on the screen for a single frame.
@@ -987,10 +1022,26 @@ public class Broodwar {
      *            the starting position of the text to be drawn, in pixels
      *
      * @param text
-     *            the text to draw
+     *            the text to be drawn
      */
     public void drawTextScreen(final Position position, final String text) {
         drawTextScreen(position.getPX(), position.getPY(), text);
+    }
+
+    /**
+     * Draws text on the screen for a single frame.
+     *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextScreen(final Position position, final String text, final BWColor color) {
+        drawTextScreen(position.getPX(), position.getPY(), color.getControlCharacters() + text);
     }
 
     /**
@@ -1006,6 +1057,25 @@ public class Broodwar {
      *            the text to draw
      */
     public native void drawTextScreen(final int x, final int y, final String text);
+
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param x
+     *            that starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextScreen(final int x, final int y, final String text, final BWColor color) {
+        drawTextMap(x, y, color.getControlCharacters() + text);
+    }
 
     /**
      * Draws a line on the map for a single frame.
