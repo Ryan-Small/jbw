@@ -1,8 +1,10 @@
 package com.harbinger.jbw;
 
 /**
- * Serves as the base class for an agent by providing the functionality for launching the agent on a
- * separate thread.
+ * Provides functionality for launching an agent on a separate thread.
+ *
+ * <p>
+ * Most agents can extend this class and override methods as needed.
  */
 public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
 
@@ -16,39 +18,35 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
     protected final Broodwar broodwar;
 
     /**
-     * Constructs a new agent.
+     * Constructs the agent.
      *
      * <p>
-     * The agent will still need to be {@link #start() started} in order for it to be notified of
-     * game {@link BroodwarListener events}.
+     * The agent will still need to be {@link #start() started} before a match.
      */
     public BroodwarAgent() {
         broodwar = new Broodwar(this);
     }
 
     /**
-     * Connects the agent to Broodwar on a separate thread.
+     * Starts the agent on a separate thread.
      *
      * <p>
-     * This method needs to be invoked prior to starting a Broodwar match.
+     * This method needs to be invoked prior to starting a match.
+     *
+     * <p>
+     * Each invocation will spawn a new Thread.
      *
      * @return the thread that the agent is running on
-     *
-     * @throws IllegalThreadStateException
-     *             if the thread was already started
      */
     protected Thread start() {
-        final Runnable agentRunnable = new AgentRunnable();
-        final Thread agentThread = new Thread(agentRunnable);
+        final Thread agentThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                broodwar.start();
+            }
+        });
         agentThread.start();
         return agentThread;
-    }
-
-    private class AgentRunnable implements Runnable {
-
-        @Override
-        public void run() {
-            broodwar.start();
-        }
     }
 }

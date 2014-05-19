@@ -39,14 +39,6 @@ std::map<BWTA::Region*, int> regionMap;
 jint *intBuf;
 const int bufferSize = 5000000;
 
-// utility functions
-void drawHealth(void); 
-void drawTargets(void);
-void drawIDs(void);
-bool showHealth = false;
-bool showTargets = false;
-bool showIDs = false;
-
 void reconnect(void);
 void loadTypeData(void);
 bool keyState[256];
@@ -198,11 +190,6 @@ JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_startClient(JNIEnv* env, 
 				}
 			}
 
-			// draw commands
-			if (showHealth) drawHealth();
-			if (showTargets) drawTargets();
-			if (showIDs) drawIDs();
-
 			// wait for the next frame
 			BWAPI::BWAPIClient.update();
 			if (!BWAPI::BWAPIClient.isConnected()) {
@@ -291,21 +278,6 @@ void loadTypeData(void)
 /*****************************************************************************************************************/
 // Game options
 /*****************************************************************************************************************/
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawHealth(JNIEnv* env, jobject jObj, jboolean enable)
-{
-	showHealth = enable != JNI_FALSE;
-}
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawTargets(JNIEnv* env, jobject jObj, jboolean enable)
-{
-	showTargets = enable != JNI_FALSE;
-}
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawIDs(JNIEnv* env, jobject jObj, jboolean enable)
-{
-	showIDs = enable != JNI_FALSE;
-}
 
 JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_enableUserInput(JNIEnv* env, jobject jObj)
 {
@@ -1617,175 +1589,6 @@ JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_placeCOP(JNIEnv* env,
 }
 
 /*****************************************************************************************************************/
-// Utility functions
-/*****************************************************************************************************************/
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawBox(JNIEnv* env, jobject jObj, jint left, jint top, jint right, jint bottom, jint color, jboolean fill, jboolean screenCoords)
-{
-	if (screenCoords) {
-		Broodwar->drawBoxScreen(left, top, right, bottom, BWAPI::Color(color), fill ? true : false);
-	} else {
-		Broodwar->drawBoxMap(left, top, right, bottom, BWAPI::Color(color), fill ? true : false);
-	}
-}
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawCircle(JNIEnv* env, jobject jObj, jint x, jint y, jint radius, jint color, jboolean fill, jboolean screenCoords)
-{
-	if (screenCoords) {
-		Broodwar->drawCircleScreen(x, y, radius, BWAPI::Color(color), fill ? true : false);
-	} else {
-		Broodwar->drawCircleMap(x, y, radius, BWAPI::Color(color), fill ? true : false);
-	}
-}
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawLine(JNIEnv* env, jobject jObj, jint x1, jint y1, jint x2, jint y2, jint color, jboolean screenCoords)
-{
-	if (screenCoords) {
-		Broodwar->drawLineScreen(x1, y1, x2, y2, BWAPI::Color(color));
-	} else {
-		Broodwar->drawLineMap(x1, y1, x2, y2, BWAPI::Color(color));
-	}
-}
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawDot(JNIEnv* env, jobject jObj, jint x, jint y, jint color, jboolean screenCoords)
-{
-	if (screenCoords) {
-		Broodwar->drawDotScreen(x, y, BWAPI::Color(color));	  
-	} else {
-		Broodwar->drawDotMap(x, y, BWAPI::Color(color));	  
-	}
-}
-
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawText(JNIEnv* env, jobject jObj, jint x, jint y, jstring msg, jboolean screenCoords)
-{
-	const char* text = env->GetStringUTFChars(msg, 0);
-
-	if (screenCoords) {
-		Broodwar->drawTextScreen(x, y, "%s", text);
-	} else {
-		Broodwar->drawTextMap(x, y, "%s", text);
-	}
-
-	env->ReleaseStringUTFChars(msg, text);
-}
-
-/**
-* Draws health boxes for units
-*/
-void drawHealth(void) 
-{
-	std::set<Unit*> units = Broodwar->isReplay() ? Broodwar->getAllUnits() : Broodwar->self()->getUnits();
-	for (std::set<Unit*>::iterator i = units.begin(); i != units.end(); ++i) {
-		int health = (*i)->getHitPoints();
-
-		if (health > 0) {
-			int x = (*i)->getPosition().x();
-			int y = (*i)->getPosition().y();
-			int l = (*i)->getType().dimensionLeft();
-			int t = (*i)->getType().dimensionUp();
-			int r = (*i)->getType().dimensionRight();
-			int b = (*i)->getType().dimensionDown();
-			int max = (*i)->getType().maxHitPoints();
-			int width = ((r + l) * health) / max;
-
-			if (health * 3 < max) {
-				Broodwar->drawBoxMap(x - l, y - t - 5, x - l + width, y - t, BWAPI::Colors::Red, true);
-			}
-			else if (health * 3 < 2 * max) {
-				Broodwar->drawBoxMap(x - l, y - t - 5, x - l + width, y - t, BWAPI::Colors::Yellow, true);
-			}
-			else {
-				Broodwar->drawBoxMap(x - l, y - t - 5, x - l + width, y - t, BWAPI::Colors::Green, true);
-			}
-
-			Broodwar->drawBoxMap(x - l, y - t - 5, x + r, y - t, BWAPI::Colors::White, false);
-			Broodwar->drawBoxMap(x - l, y - t, x + r, y + b, BWAPI::Colors::White, false);
-		}
-	}
-
-	units = Broodwar->enemy()->getUnits();
-	for (std::set<Unit*>::iterator i = units.begin(); i != units.end(); ++i) {
-		int health = (*i)->getHitPoints();
-
-		if (health > 0) {
-			int x = (*i)->getPosition().x();
-			int y = (*i)->getPosition().y();
-			int l = (*i)->getType().dimensionLeft();
-			int t = (*i)->getType().dimensionUp();
-			int r = (*i)->getType().dimensionRight();
-			int b = (*i)->getType().dimensionDown();
-			int max = (*i)->getType().maxHitPoints();
-			int width = ((r + l) * health) / max;
-
-			if (health * 3 < max) {
-				Broodwar->drawBoxMap(x - l, y - t - 5, x - l + width, y - t, BWAPI::Colors::Red, true);
-			}
-			else if (health * 3 < 2 * max) {
-				Broodwar->drawBoxMap(x - l, y - t - 5, x - l + width, y - t, BWAPI::Colors::Yellow, true);
-			}
-			else {
-				Broodwar->drawBoxMap(x - l, y - t - 5, x - l + width, y - t, BWAPI::Colors::Green, true);
-			}
-
-			Broodwar->drawBoxMap(x - l, y - t - 5, x + r, y - t, BWAPI::Colors::Red, false);
-			Broodwar->drawBoxMap(x - l, y - t, x + r, y + b, BWAPI::Colors::Red, false);
-			Broodwar->drawTextMap(x - l, y - t, "%s", (*i)->getType().getName().c_str());
-		}
-	}
-}
-
-/**
-* Draws the targets of each unit.
-*/
-void drawTargets(void) {
-	std::set<Unit*> units = Broodwar->isReplay() ? Broodwar->getAllUnits() : Broodwar->self()->getUnits();
-	for (std::set<Unit*>::iterator i = units.begin(); i != units.end(); ++i) {
-		Unit* target = (*i)->getTarget(); 
-		if (target != NULL) {
-			Broodwar->drawLineMap((*i)->getPosition().x(), (*i)->getPosition().y(), target->getPosition().x(), target->getPosition().y(), BWAPI::Colors::Yellow);
-		}
-
-		target = (*i)->getOrderTarget(); 
-		if (target != NULL) {
-			Broodwar->drawLineMap((*i)->getPosition().x(), (*i)->getPosition().y(), target->getPosition().x(), target->getPosition().y(), BWAPI::Colors::Yellow);
-		}
-
-		Position position = (*i)->getTargetPosition();
-		Broodwar->drawLineMap((*i)->getPosition().x(), (*i)->getPosition().y(), position.x(), position.y(), BWAPI::Colors::Yellow);
-	}	
-
-	units = Broodwar->enemy()->getUnits();
-	for (std::set<Unit*>::iterator i = units.begin(); i != units.end(); ++i) {
-		Unit* target = (*i)->getTarget(); 
-		if (target != NULL) {
-			Broodwar->drawLineMap((*i)->getPosition().x(), (*i)->getPosition().y(), target->getPosition().x(), target->getPosition().y(), BWAPI::Colors::Purple);
-		}
-
-		target = (*i)->getOrderTarget(); 
-		if (target != NULL) {
-			Broodwar->drawLineMap((*i)->getPosition().x(), (*i)->getPosition().y(), target->getPosition().x(), target->getPosition().y(), BWAPI::Colors::Purple);
-		}
-
-		Position position = (*i)->getTargetPosition(); 
-		Broodwar->drawLineMap((*i)->getPosition().x(), (*i)->getPosition().y(), position.x(), position.y(), BWAPI::Colors::Purple);
-	}	
-}
-
-/**
-* Draws the IDs of each unit.
-*/
-void drawIDs(void) {
-
-	std::set<Unit*> units = Broodwar->getAllUnits();
-	for (std::set<Unit*>::iterator i = units.begin(); i != units.end(); ++i) {
-		int x = (*i)->getPosition().x();
-		int y = (*i)->getPosition().y();
-
-		Broodwar->drawTextMap(x, y, "%i", (*i)->getID());
-	}	
-}
-
-/*****************************************************************************************************************/
 // Extended functions
 /*****************************************************************************************************************/
 
@@ -1986,4 +1789,52 @@ JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getLastError(JNIEnv *, jo
 JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getRemainingLatencyFrames(JNIEnv *, jobject){
 
 	return Broodwar->getRemainingLatencyFrames();
+}
+
+// ************************************************************************************************
+// Drawing Commands
+// ************************************************************************************************
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawTextMap(JNIEnv* env, jobject jObj, jint x, jint y, jstring msg)
+{
+	const char* text = env->GetStringUTFChars(msg, 0);
+	Broodwar->drawTextMap(x, y, "%s", text);
+	env->ReleaseStringUTFChars(msg, text);
+}
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawTextScreen(JNIEnv* env, jobject jObj, jint x, jint y, jstring msg)
+{
+	const char* text = env->GetStringUTFChars(msg, 0);
+	Broodwar->drawTextScreen(x, y, "%s", text);
+	env->ReleaseStringUTFChars(msg, text);
+}
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawLineMap(JNIEnv* env, jobject jObj, jint x1, jint y1, jint x2, jint y2, jint color)
+{
+	Broodwar->drawLineMap(x1, y1, x2, y2, BWAPI::Color(color));
+}
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawLineScreen(JNIEnv* env, jobject jObj, jint x1, jint y1, jint x2, jint y2, jint color)
+{
+	Broodwar->drawLineScreen(x1, y1, x2, y2, BWAPI::Color(color));
+}
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawRectangleMap(JNIEnv* env, jobject jObj, jint x, jint y, jint width, jint height, jint color, jboolean fill)
+{
+	Broodwar->drawBoxMap(x, y, x + width, y + height, BWAPI::Color(color), fill ? true : false);
+}
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawRectangleScreen(JNIEnv* env, jobject jObj, jint x, jint y, jint width, jint height, jint color, jboolean fill)
+{
+	Broodwar->drawBoxScreen(x, y, x + width, y + height, BWAPI::Color(color), fill ? true : false);
+}
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawEllipseMap(JNIEnv* env, jobject jObj, jint x, jint y, jint xRadius, jint yRadius, jint color, jboolean fill)
+{
+	Broodwar->drawEllipseMap(x, y, xRadius, yRadius, BWAPI::Color(color), fill ? true : false);
+}
+
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawEllipseScreen(JNIEnv* env, jobject jObj, jint x, jint y, jint xRadius, jint yRadius, jint color, jboolean fill)
+{
+	Broodwar->drawEllipseScreen(x, y, xRadius, yRadius, BWAPI::Color(color), fill ? true : false);
 }

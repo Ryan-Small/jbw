@@ -33,6 +33,8 @@ package com.harbinger.jbw;
  */
 public class Unit {
 
+    // TODO: Create a null unit
+
     public static final int NUM_ATTRIBUTES = 123;
 
     private static final double FIXED_SCALE = 100.0;

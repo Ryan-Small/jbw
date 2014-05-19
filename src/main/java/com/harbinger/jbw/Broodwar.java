@@ -8,6 +8,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.*;
 
+/**
+ * Provides access to the Broodwar game.
+ *
+ * <p>
+ *
+ */
 public class Broodwar {
 
     static {
@@ -17,8 +23,9 @@ public class Broodwar {
         } catch (final UnsatisfiedLinkError ex) {
             if (!dll.exists()) {
                 System.err.println("Native code library not found: " + dll.getAbsolutePath());
+            } else {
+                System.err.println("Native code library failed to load: " + ex.toString());
             }
-            System.err.println("Native code library failed to load: " + ex.toString());
         }
     }
 
@@ -459,7 +466,7 @@ public class Broodwar {
      * <p>
      * C++ callback function.
      */
-    private void gameUpdate() {
+    void gameUpdate() {
         // update game state
         gameFrame = getFrame();
         if (!isReplay()) {
@@ -709,6 +716,8 @@ public class Broodwar {
         return isBuildable(position.getBX(), position.getBY(), includeBuildings);
     }
 
+    // TODO: Consolidate canResearch and canUpgrade and canMake?
+
     private native boolean isBuildable(final int tileX, final int tileY,
             final boolean includeBuildings);
 
@@ -801,20 +810,46 @@ public class Broodwar {
 
     private native boolean canMake(final int unitId, final int unitTypeId);
 
+    /**
+     * Checks all the
+     *
+     * @param unit
+     * @param techType
+     * @return
+     */
     public boolean canResearch(final Unit unit, final TechType techType) {
         return canResearch(unit.getId(), techType.getId());
     }
 
     private native boolean canResearch(final int unitId, final int techTypeId);
 
+    /**
+     * Checks that the UpgradeType can be acquired.
+     *
+     * @param unitType
+     *            the UpgradeType to check
+     *
+     * @return true if the UpgradeType can be acquired; false otherwise
+     */
     public boolean canUpgrade(final UpgradeType unitType) {
         return canUpgrade(unitType.getId());
     }
 
     private native boolean canUpgrade(int upgradeTypeId);
 
-    public boolean canUpgrade(final Unit u, final UpgradeType ut) {
-        return canUpgrade(u.getId(), ut.getId());
+    /**
+     * Checks that the Unit can perform the UpgradeType.
+     *
+     * @param unit
+     *            the Unit that will be used to acquire the upgrade
+     *
+     * @param upgradeType
+     *            the UpgradeType to check
+     *
+     * @return true if the UpgradeType can be acquired through Unit; false otherwise
+     */
+    public boolean canUpgrade(final Unit unit, final UpgradeType upgradeType) {
+        return canUpgrade(unit.getId(), upgradeType.getId());
     }
 
     private native boolean canUpgrade(final int unitId, final int upgradeTypeId);
@@ -914,47 +949,438 @@ public class Broodwar {
 
     // *********************************************************************************************
     // Drawing Commands
+    //
+    // TODO: Negative width and height values cannot be used.
     // *********************************************************************************************
 
-    public native void drawHealth(final boolean enable);
-
-    public native void drawTargets(final boolean enable);
-
-    public native void drawIDs(final boolean enable);
-
-    public void drawBox(final Position p1, final Position p2, final BWColor c, final boolean fill,
-            final boolean onScreen) {
-        drawBox(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), c.getId(), fill, onScreen);
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to draw
+     */
+    public void drawTextMap(final Position position, final String text) {
+        drawTextMap(position.getPX(), position.getPY(), text);
     }
 
-    private native void drawBox(final int left, final int top, final int right, final int bottom,
-            final int color, final boolean fill, final boolean screenCoords);
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param x
+     *            the starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to draw
+     */
+    public native void drawTextMap(final int x, final int y, final String text);
 
-    public void drawCircle(final Position p, final int r, final BWColor c, final boolean fill,
-            final boolean onScreen) {
-        drawCircle(p.getPX(), p.getPY(), r, c.getId(), fill, onScreen);
+    /**
+     * Draws text on the screen for a single frame.
+     *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to draw
+     */
+    public void drawTextScreen(final Position position, final String text) {
+        drawTextScreen(position.getPX(), position.getPY(), text);
     }
 
-    private native void drawCircle(final int x, final int y, final int radius, final int color,
-            final boolean fill, final boolean onScreen);
+    /**
+     * Draws text on the screen for a single frame.
+     *
+     * @param x
+     *            the starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to draw
+     */
+    public native void drawTextScreen(final int x, final int y, final String text);
 
-    public void drawLine(final Position p1, final Position p2, final BWColor c,
-            final boolean onScreen) {
-        drawLine(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), c.getId(), onScreen);
+    /**
+     * Draws a line on the map for a single frame.
+     *
+     * @param p1
+     *            the starting position of the line to be drawn, in pixels
+     *
+     * @param p2
+     *            the ending position of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineMap(final Position p1, final Position p2, final BWColor color) {
+        drawLineMap(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), color.getId());
     }
 
-    private native void drawLine(final int x1, final int y1, final int x2, final int y2,
-            final int c, final boolean onScreen);
-
-    public void drawDot(final Position p, final BWColor c, final boolean onScreen) {
-        drawDot(p.getPX(), p.getPY(), c.getId(), onScreen);
+    /**
+     * Draws a line on the map for a single frame.
+     *
+     * @param x1
+     *            the starting x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y1
+     *            the starting y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param x2
+     *            the ending x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y2
+     *            the ending y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineMap(final int x1, final int y1, final int x2, final int y2,
+            final BWColor color) {
+        drawLineMap(x1, y1, x2, y2, color.getId());
     }
 
-    private native void drawDot(final int x, final int y, final int color, final boolean onScreen);
+    private native void drawLineMap(final int x1, final int y1, final int x2, final int y2,
+            final int c);
 
-    public void drawText(final Position position, final String msg, final boolean onScreen) {
-        drawText(position.getPX(), position.getPY(), msg, onScreen);
+    /**
+     * Draws a line on the screen for a single frame.
+     *
+     * @param p1
+     *            the starting position of the line to be drawn, in pixels
+     *
+     * @param p2
+     *            the ending position of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineScreen(final Position p1, final Position p2, final BWColor color) {
+        drawLineScreen(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), color.getId());
     }
 
-    private native void drawText(final int x, final int y, final String msg, final boolean onScreen);
+    /**
+     * Draws a line on the screen for a single frame.
+     *
+     * @param x1
+     *            the starting x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y1
+     *            the starting y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param x2
+     *            the ending x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y2
+     *            the ending y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineScreen(final int x1, final int y1, final int x2, final int y2,
+            final BWColor color) {
+        drawLineScreen(x1, y1, x2, y2, color.getId());
+    }
+
+    private native void drawLineScreen(final int x1, final int y1, final int x2, final int y2,
+            final int color);
+
+    /**
+     * Draws a rectangle on the map for a single frame.
+     *
+     * @param position
+     *            the top-left position of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleMap(final Position position, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleMap(position.getPX(), position.getPY(), width, height, color.getId(), fill);
+    }
+
+    /**
+     * Draws a rectangle on the map for a single frame.
+     *
+     * @param x
+     *            the top-left x-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param y
+     *            the top-left y-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleMap(final int x, final int y, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleMap(x, y, width, height, color.getId(), fill);
+    }
+
+    private native void drawRectangleMap(final int x, final int y, final int width,
+            final int height, final int color, final boolean fill);
+
+    /**
+     * Draws a rectangle on the screen for a single frame.
+     *
+     * @param position
+     *            the top-left position of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleScreen(final Position position, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleScreen(position.getPX(), position.getPY(), width, height, color.getId(), fill);
+    }
+
+    /**
+     * Draws a rectangle on the screen for a single frame.
+     *
+     * @param x
+     *            the top-left x-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param y
+     *            the top-left y-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleScreen(final int x, final int y, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleScreen(x, y, width, height, color.getId(), fill);
+    }
+
+    private native void drawRectangleScreen(final int x, final int y, final int width,
+            final int height, final int color, final boolean fill);
+
+    /**
+     * Draws an ellipse on the map for a single frame.
+     *
+     * @param position
+     *            the center position of the ellipse to be drawn, in pixels
+     *
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseMap(final Position position, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseMap(position.getPX(), position.getPY(), xRadius, yRadius, color.getId(), fill);
+    }
+
+    /**
+     * Draws an ellipse on the map for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseMap(final int x, final int y, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseMap(x, y, xRadius, yRadius, color.getId(), fill);
+    }
+
+    private native void drawEllipseMap(final int x, final int y, final int xRadius,
+            final int yRadius, final int color, final boolean fill);
+
+    /**
+     * Draws an ellipse on the screen for a single frame.
+     *
+     * @param position
+     *            the center position of the ellipse to be drawn, in pixels
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseScreen(final Position position, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseScreen(position.getPX(), position.getPY(), xRadius, yRadius, color.getId(), fill);
+    }
+
+    /**
+     * Draws an ellipse on the screen for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseScreen(final int x, final int y, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseScreen(x, y, xRadius, yRadius, color.getId(), fill);
+    }
+
+    private native void drawEllipseScreen(final int x, final int y, final int xRadius,
+            final int yRadius, final int color, final boolean fill);
+
+    /**
+     * Draws a circle on the map for a single frame.
+     *
+     * @param position
+     *            the center position of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleMap(final Position position, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseMap(position.getPX(), position.getPY(), radius, radius, color.getId(), fill);
+    }
+
+    /**
+     * Draws a circle on the map for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleMap(final int x, final int y, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseMap(x, y, radius, radius, color.getId(), fill);
+    }
+
+    /**
+     * Draws a circle on the screen for a single frame.
+     *
+     * @param position
+     *            the center position of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleScreen(final Position position, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseScreen(position.getPX(), position.getPY(), radius, radius, color.getId(), fill);
+    }
+
+    /**
+     * Draws a circle on the screen for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleScreen(final int x, final int y, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseScreen(x, y, radius, radius, color.getId(), fill);
+    }
 }

@@ -641,67 +641,83 @@ JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBaseLocations
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawHealth
- * Signature: (Z)V
+ * Method:    drawTextMap
+ * Signature: (IILjava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawHealth
-  (JNIEnv *, jobject, jboolean);
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawTextMap
+  (JNIEnv *, jobject, jint, jint, jstring);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawTargets
- * Signature: (Z)V
+ * Method:    drawTextScreen
+ * Signature: (IILjava/lang/String;)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawTargets
-  (JNIEnv *, jobject, jboolean);
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawTextScreen
+  (JNIEnv *, jobject, jint, jint, jstring);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawIDs
- * Signature: (Z)V
+ * Method:    drawLineMap
+ * Signature: (IIIII)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawIDs
-  (JNIEnv *, jobject, jboolean);
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawLineMap
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawBox
- * Signature: (IIIIIZZ)V
+ * Method:    drawLineScreen
+ * Signature: (IIIII)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawBox
-  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jboolean, jboolean);
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawLineScreen
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawCircle
- * Signature: (IIIIZZ)V
- */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawCircle
-  (JNIEnv *, jobject, jint, jint, jint, jint, jboolean, jboolean);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawLine
+ * Method:    drawRectangleMap
  * Signature: (IIIIIZ)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawLine
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawRectangleMap
   (JNIEnv *, jobject, jint, jint, jint, jint, jint, jboolean);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawDot
- * Signature: (IIIZ)V
+ * Method:    drawRectangleScreen
+ * Signature: (IIIIIZ)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawDot
-  (JNIEnv *, jobject, jint, jint, jint, jboolean);
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawRectangleScreen
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jboolean);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    drawText
- * Signature: (IILjava/lang/String;Z)V
+ * Method:    drawEllipseMap
+ * Signature: (IIIIIZ)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawText
-  (JNIEnv *, jobject, jint, jint, jstring, jboolean);
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawEllipseMap
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jboolean);
+
+/*
+ * Class:     com_harbinger_jbw_Broodwar
+ * Method:    drawEllipseScreen
+ * Signature: (IIIIIZ)V
+ */
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawEllipseScreen
+  (JNIEnv *, jobject, jint, jint, jint, jint, jint, jboolean);
+
+/*
+ * Class:     com_harbinger_jbw_Broodwar
+ * Method:    drawCircleMap
+ * Signature: (IIIIZ)V
+ */
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawCircleMap
+  (JNIEnv *, jobject, jint, jint, jint, jint, jboolean);
+
+/*
+ * Class:     com_harbinger_jbw_Broodwar
+ * Method:    drawCircleScreen
+ * Signature: (IIIIZ)V
+ */
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_drawCircleScreen
+  (JNIEnv *, jobject, jint, jint, jint, jint, jboolean);
 
 #ifdef __cplusplus
 }

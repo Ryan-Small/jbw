@@ -351,27 +351,26 @@ public class GameMap {
             final Position p = bl.getPosition();
 
             // draw outline of base location
-            final Position otherCorner = p.translated(new Position(4, 3, Type.BUILD));
-            bwapi.drawBox(p, otherCorner, BWColor.Blue, false, false);
+            bwapi.drawRectangleMap(p, 128, 96, BWColor.Blue, false);
 
             // if this is an island expansion, draw a yellow circle around the base location
             if (bl.isIsland()) {
-                bwapi.drawCircle(p.translated(new Position(2, 1, Type.BUILD)), 80, BWColor.Yellow,
-                        false, false);
+                bwapi.drawCircleMap(p.translated(new Position(2, 1, Type.BUILD)), 80,
+                        BWColor.Yellow, false);
             }
 
             // draw a circle at each mineral patch and a box at each vespene geyser
             for (final Unit u : bwapi.getNeutralUnits()) {
                 final UnitType ut = u.getType();
                 if (ut.isResourceContainer()) {
-                    if (ut.isMineralField()) {
-                        // Minerals
-                        bwapi.drawCircle(u.getTargetPosition(), 30, BWColor.Cyan, false, false);
-                    } else {
-                        // Geysers
-                        bwapi.drawBox(u.getTopLeft(), u.getBottomRight(), BWColor.Orange, false,
-                                false);
-                    }
+                    // if (ut.isMineralField()) {
+                    // // Minerals
+                    // bwapi.drawCircleMap(u.getTargetPosition(), 30, BWColor.Cyan, false);
+                    // } else {
+                    // // Geysers
+                    // bwapi.drawRectangleMap(u.getTopLeft(), u.getBottomRight(), BWColor.Orange,
+                    // false);
+                    // }
                 }
             }
         }
@@ -382,7 +381,7 @@ public class GameMap {
             for (int i = 0; i < polygon.length; i++) {
                 final Position point1 = polygon[i];
                 final Position point2 = polygon[(i + 1) % polygon.length];
-                bwapi.drawLine(point1, point2, BWColor.Green, false);
+                bwapi.drawLineMap(point1, point2, BWColor.Green);
             }
         }
 
@@ -390,7 +389,7 @@ public class GameMap {
         for (final ChokePoint cp : getChokePoints()) {
             final Position point1 = cp.getFirstSide();
             final Position point2 = cp.getSecondSide();
-            bwapi.drawLine(point1, point2, BWColor.Red, false);
+            bwapi.drawLineMap(point1, point2, BWColor.Red);
         }
     }
 }
