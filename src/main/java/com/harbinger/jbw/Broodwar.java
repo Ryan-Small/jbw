@@ -951,6 +951,11 @@ public class Broodwar {
     // Drawing Commands
     //
     // TODO: Negative width and height values cannot be used.
+    //
+    // TODO: Make available other colors.
+    // https://code.google.com/p/bwapi/wiki/Color
+    // https://github.com/bwapi/bwapi/blob/master/bwapi/include/BWAPI/Color.h
+    // https://github.com/bwapi/bwapi/blob/master/bwapi/BWAPILIB/Source/Color.cpp
     // *********************************************************************************************
 
     /**
@@ -1074,7 +1079,7 @@ public class Broodwar {
      *            the color of the text to be drawn
      */
     public void drawTextScreen(final int x, final int y, final String text, final BWColor color) {
-        drawTextMap(x, y, color.getControlCharacters() + text);
+        drawTextScreen(x, y, color.getControlCharacters() + text);
     }
 
     /**

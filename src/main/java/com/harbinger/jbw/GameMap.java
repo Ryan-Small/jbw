@@ -351,12 +351,12 @@ public class GameMap {
             final Position p = bl.getPosition();
 
             // draw outline of base location
-            bwapi.drawRectangleMap(p, 128, 96, BWColor.Blue, false);
+            bwapi.drawRectangleMap(p, 128, 96, BWColor.BLUE, false);
 
             // if this is an island expansion, draw a yellow circle around the base location
             if (bl.isIsland()) {
                 bwapi.drawCircleMap(p.translated(new Position(2, 1, Type.BUILD)), 80,
-                        BWColor.Yellow, false);
+                        BWColor.YELLOW, false);
             }
 
             // draw a circle at each mineral patch and a box at each vespene geyser
@@ -381,7 +381,7 @@ public class GameMap {
             for (int i = 0; i < polygon.length; i++) {
                 final Position point1 = polygon[i];
                 final Position point2 = polygon[(i + 1) % polygon.length];
-                bwapi.drawLineMap(point1, point2, BWColor.Green);
+                bwapi.drawLineMap(point1, point2, BWColor.GREEN);
             }
         }
 
@@ -389,7 +389,7 @@ public class GameMap {
         for (final ChokePoint cp : getChokePoints()) {
             final Position point1 = cp.getFirstSide();
             final Position point2 = cp.getSecondSide();
-            bwapi.drawLineMap(point1, point2, BWColor.Red);
+            bwapi.drawLineMap(point1, point2, BWColor.RED);
         }
     }
 }
