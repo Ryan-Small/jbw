@@ -1,6 +1,6 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.Position.Type;
+import com.harbinger.jbw.Position.Resolution;
 
 import java.util.Map;
 
@@ -23,10 +23,10 @@ public class BaseLocation {
     public BaseLocation(final int[] data, int index, final Map<Integer, Region> idToRegion) {
         final int x = data[index++];
         final int y = data[index++];
-        center = new Position(x, y);
+        center = new Position(x, y, Resolution.PIXEL);
         final int tx = data[index++];
         final int ty = data[index++];
-        position = new Position(tx, ty, Type.BUILD);
+        position = new Position(tx, ty, Resolution.BUILD);
         final int regionID = data[index++];
         region = idToRegion.get(regionID);
         minerals = data[index++];

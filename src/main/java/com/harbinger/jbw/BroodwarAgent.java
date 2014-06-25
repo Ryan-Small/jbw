@@ -43,7 +43,7 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
 
             @Override
             public void run() {
-                broodwar.start();
+                broodwar.connect();
             }
         });
         agentThread.start();

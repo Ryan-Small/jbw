@@ -1,6 +1,7 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.Position.Positions;
+import static com.harbinger.jbw.Position.Resolution.BUILD;
+import static com.harbinger.jbw.Position.Resolution.PIXEL;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -10,13 +11,1164 @@ import java.util.*;
 
 /**
  * Provides access to the Broodwar game.
- *
- * <p>
- *
  */
 public class Broodwar {
 
     static {
+        loadNativeLibrary();
+    }
+
+    private static final Charset CHARACTER_SET = getKoreanCharset();
+
+    private final Map<Integer, Unit> units = new HashMap<>();
+    private final List<Unit> playerUnits = new ArrayList<>();
+    private final List<Unit> alliedUnits = new ArrayList<>();
+    private final List<Unit> enemyUnits = new ArrayList<>();
+    private final List<Unit> neutralUnits = new ArrayList<>();
+
+    private final Map<Integer, Player> players = new HashMap<>();
+    private final List<Player> allies = new ArrayList<>();
+    private final List<Player> enemies = new ArrayList<>();
+
+    private final BroodwarListener listener;
+
+    private Player self;
+    private Player neutralPlayer;
+
+    private GameMap map;
+
+    /**
+     * Constructs the Broodwar with the listener to notify when game events occur.
+     *
+     * <p>
+     * A {@link #connect() connection} to the Broodwar game will still need to be established before
+     * the listener will be notified of the game events.
+     *
+     * @param listener
+     *            listener to notify of game events
+     */
+    public Broodwar(final BroodwarListener listener) {
+        this.listener = Verifier.requireNonNull(listener, "listener cannot be null");
+    }
+
+    /**
+     * Connects to the actual Broodwar game.
+     *
+     * <p>
+     * This method will block until the actual Broodwar game has been terminated.
+     *
+     * <p>
+     * Although this method can be invoked any time, the connection will only be successfully
+     * established when the game is in the Main Menu, Game Lobby, Mission Briefing, and Battle.net.
+     */
+    public void connect() {
+        nativeConnect(this);
+    }
+
+    /**
+     * Enables the user to interact with Broodwar game through the GUI, just as a player normally
+     * would when playing the game.
+     *
+     * @throws IllegalStateException
+     *             thrown if invoked at time other than the {@link BroodwarListener#matchStart()
+     *             start} of the game
+     */
+    public void enableUserInput() throws IllegalStateException {
+        if (getFrame() == 0) {
+            nativeEnableUserInput();
+        } else {
+            throw new IllegalStateException("match has already begun");
+        }
+    }
+
+    /**
+     * Enables the agent to access all game information, not just the visible units.
+     *
+     * @throws IllegalStateException
+     *             thrown if invoked at time other than the {@link BroodwarListener#matchStart()
+     *             start} of the game
+     */
+    public void enablePerfectInformation() throws IllegalStateException {
+        if (getFrame() == 0) {
+            nativeEnablePerfectInformation();
+        } else {
+            throw new IllegalStateException("match has already begun");
+        }
+    }
+
+    /**
+     * @return the number of logical frames since the match started
+     */
+    public native int getFrame();
+
+    /**
+     * @return the remaining number of frames before a unit command sent in the current frame can be
+     *         processed
+     */
+    public native int getRemainingLatencyFrames();
+
+    /**
+     * Sets that number of milliseconds to wait before executing the next frame. A Negative value
+     * will reset the game speed.
+     *
+     * <p>
+     * The default values are:
+     * <ul>
+     * <li>Fastest: 42ms/frame</li>
+     * <li>Faster: 48ms/frame</li>
+     * <li>Fast: 56ms/frame</li>
+     * <li>Normal: 67ms/frame</li>
+     * <li>Slow: 83ms/frame</li>
+     * <li>Slower: 111ms/frame</li>
+     * <li>Slowest: 167ms/frame</li>
+     * </ul>
+     *
+     * <p>
+     * Specifying a value of 0 will not guarantee that logical frames are executed as fast as
+     * possible. If that is the intention, use this in combination with {@link #setFrameSkip(int)}.
+     *
+     * <p>
+     * Changing this value will cause the execution of Use Map Settings scenario triggers to glitch.
+     * This will only happen in campaign maps and custom scenarios (non-melee).
+     *
+     * @param frameRate
+     *            the number of milliseconds to wait before executing the next frame
+     */
+    public native void setFrameDelay(final int frameRate);
+
+    /**
+     * Sets the number of graphical frames for every logical frame. A value of 0 or less will
+     * default to one.
+     *
+     * <p>
+     * This allows the game to run more logical frames per graphical frame, increasing the speed at
+     * which the game runs.
+     *
+     * @param frameSkip
+     *            the number of graphical frames per logical frame
+     */
+    public native void setFrameSkip(final int frameSkip);
+
+    /**
+     * Sets the optimization level used for processing commands. The optimization level can reduce
+     * APM and the replay size by grouping units performing the same action.
+     *
+     * <ul>
+     * <li>0 - No optimization (default)
+     * <li>1 - Optimize attack unit, morph (units only), hold position, stop, follow, gather, return
+     * cargo, repair, burrow, unburrow, cloak, decloak, siege, unsiege, right click unit, halt
+     * construction, cancel train (Carrier/Reaver only), cancel train slot (Carrier/Reaver only),
+     * cancel morph (units only), use tech, and use tech unit. Additionally perform the following
+     * transformations:
+     * <ul>
+     * <li>Attack unit becomes right click unit if the target is an enemy</li>
+     * <li>Move becomes right click position</li>
+     * <li>Gather becomes right click unit if the target contains resources</li>
+     * <li>Set rally position becomes right click position for buildings</li>
+     * <li>Set rally unit becomes right click unit for buildings</li>
+     * <li>Use tech unit for a Zerg Queen using infestation becomes right click unit when the target
+     * is a Command Center</li>
+     * </ul>
+     * <li>2 - Optimize all of the above, as well as attack unit (towers), train (buildings), morph
+     * (buildings), set rally unit, lift, unload all (bunkers only), cancel construction, cancel
+     * addon, cancel train slot, cancel morph, cancel research, and cancel upgrade. This level will
+     * flag BWAPI's commands as hacks in a replay analyzer.</li>
+     * <li>3 - Optimize all of the above, as well as attack move, set rally position, move, patrol,
+     * unload all position, right click position, and use tech position. These optimizations may
+     * yield a different movement behavior than without.</li>
+     * <li>4 - Optimize all of the above, but trim positions to be a multiple of 32 so that it may
+     * group positions that are near each other. This creates less accurate move positions. In
+     * addition, group Templars when they are ordered to merge with another Templar (includes both
+     * High and Dark).</li>
+     *
+     * @param level
+     *            the optimization level to process all future commands
+     */
+    public native void setCommandOptimizationLevel(final int level);
+
+    /**
+     * @return true if the current match is a replay; false otherwise
+     */
+    public native boolean isReplay();
+
+    /**
+     * @return the maximum number of frames in the replay
+     */
+    public native int getReplayFrameTotal();
+
+    /**
+     * @return the last error that was set
+     */
+    public ErrorCode getLastError() {
+        final int index = getLastErrorCode();
+        return ErrorCode.values()[index];
+    }
+
+    private native int getLastErrorCode();
+
+    /**
+     * Leaves the current match and goes to the after-game stats screen.
+     */
+    public native void leaveGame();
+
+    /**
+     * Sends text to other players. In single player games and replays, this will just print the
+     * text on the screen. If the game is a single player match and not a replay, then this function
+     * can be used to execute cheat codes, i.e. {@code sendText("show me the money")}.
+     *
+     * @param message
+     *            the message to send
+     */
+    public native void sendText(final String message);
+
+    /**
+     * @return the current agent or null during replays
+     */
+    public Player getAgent() {
+        return self;
+    }
+
+    /**
+     * @return the neutral Player
+     */
+    public Player getNeutralPlayer() {
+        return neutralPlayer;
+    }
+
+    /**
+     * @return the players in the match that have not left or been defeated
+     */
+    public List<Player> getPlayers() {
+        return new ArrayList<>(players.values());
+    }
+
+    /**
+     * @return the agent's allies in the match that have not left or been defeated
+     */
+    public List<Player> getAllies() {
+        return new ArrayList<>(allies);
+    }
+
+    /**
+     * @return the agent's enemies in the match that have not left or been defeated
+     */
+    public List<Player> getEnemies() {
+        return new ArrayList<>(enemies);
+    }
+
+    Player getPlayer(final int playerId) {
+        return players.get(playerId);
+    }
+
+    /**
+     * @return all accessible units
+     */
+    public List<Unit> getAllUnits() {
+        return new ArrayList<>(units.values());
+    }
+
+    /**
+     * @return all accessible units owned by the agent
+     */
+    public List<Unit> getUnits() {
+        return new ArrayList<>(playerUnits);
+    }
+
+    /**
+     * @return all accessible units owned by allies
+     */
+    public List<Unit> getAlliedUnits() {
+        return new ArrayList<>(alliedUnits);
+    }
+
+    /**
+     * @return all accessible units owned by enemies
+     */
+    public List<Unit> getEnemyUnits() {
+        return new ArrayList<>(enemyUnits);
+    }
+
+    /**
+     * @return all accessible units owned by the neutral player
+     */
+    public List<Unit> getNeutralUnits() {
+        return new ArrayList<>(neutralUnits);
+    }
+
+    /**
+     * Convenience method for retrieving all units owned by a specific player.
+     *
+     * @param player
+     *            the Player whose Units to return
+     *
+     * @return all accessible units owned by the player
+     */
+    public List<Unit> getUnits(final Player player) {
+        final List<Unit> playerUnits = new ArrayList<>();
+        for (final Unit unit : units.values()) {
+            if (unit.getPlayer() == player) {
+                playerUnits.add(unit);
+            }
+        }
+        return playerUnits;
+    }
+
+    Unit getUnit(final int unitId) {
+        return units.get(unitId);
+    }
+
+    /**
+     * @return the map that the current match is using
+     */
+    public GameMap getMap() {
+        return map;
+    }
+
+    /**
+     * Indicates if the specified build position is visible.
+     *
+     * @param position
+     *            the position to check
+     *
+     * @return true if the build tile is visible; false otherwise
+     */
+    public boolean isVisible(final Position position) {
+        return isVisible(position.getX(BUILD), position.getY(BUILD));
+    }
+
+    private native boolean isVisible(final int tileX, final int tileY);
+
+    /**
+     * Indicates if the specified location has been explored (i.e. was visible at some point during
+     * the match).
+     *
+     * @param position
+     *            the position to check
+     *
+     * @return true if the position has been explored; false otherwise
+     */
+    public boolean isExplored(final Position position) {
+        return isExplored(position.getX(BUILD), position.getY(BUILD));
+    }
+
+    private native boolean isExplored(final int tileX, final int tileY);
+
+    /**
+     * Indicates if the specified build tile is buildable. Note that this just uses the static map
+     * data.
+     *
+     * @param position
+     *            the position to check
+     *
+     * @param includeBuildings
+     *            true if the check if consider visible builds as being prohibitive; false otherwise
+     *
+     * @return true if the position is buildable; false otherwise
+     */
+    public boolean isBuildable(final Position position, final boolean includeBuildings) {
+        // TODO: Consider units in this check.
+        return isBuildable(position.getX(BUILD), position.getY(BUILD), includeBuildings);
+    }
+
+    private native boolean isBuildable(final int tileX, final int tileY,
+            final boolean includeBuildings);
+
+    /**
+     * Indicates if a UnitType can be built at the position.
+     *
+     * @param position
+     *            the top-left tile to build on
+     *
+     * @param unitType
+     *            the UnitType that will be build
+     *
+     * @param checkExplored
+     *            true if the check will include verifying that the area has been explored first;
+     *            false otherwise
+     *
+     * @return true if the UnitType can be built at the position; false otherwise
+     */
+    public boolean canBuildHere(final Position position, final UnitType unitType,
+            final boolean checkExplored) {
+        return canBuildHere(position.getX(BUILD), position.getY(BUILD), unitType.getId(),
+                checkExplored);
+    }
+
+    private native boolean canBuildHere(final int tileX, final int tileY, final int unitTypeId,
+            final boolean checkExplored);
+
+    /**
+     * Indicates if a UnitType can be built at the position.
+     *
+     * @param unit
+     *            the unit that will do the building
+     *
+     * @param position
+     *            the top-left tile to build on
+     *
+     * @param unitType
+     *            the UnitType that will be built
+     *
+     * @param checkExplored
+     *            true if the check will include verifying that the area has been explored first;
+     *            false otherwise
+     *
+     * @return true if the UnitType can be built at the position and by the unit; false otherwise
+     */
+    public boolean canBuildHere(final Unit unit, final Position position, final UnitType unitType,
+            final boolean checkExplored) {
+        return canBuildHere(unit.getId(), position.getX(BUILD), position.getY(BUILD),
+                unitType.getId(), checkExplored);
+    }
+
+    private native boolean canBuildHere(final int unitId, final int tileX, final int tileY,
+            final int unitTypeId, boolean checkExplored);
+
+    /**
+     * Indicates if the position has creep on it.
+     *
+     * @param position
+     *            the build position to check for creep
+     *
+     * @return true if the build position has creep on it; false otherwise
+     */
+    public boolean hasCreep(final Position position) {
+        return hasCreep(position.getX(BUILD), position.getY(BUILD));
+    }
+
+    private native boolean hasCreep(final int tileX, final int tileY);
+
+    /**
+     * Indicates if the position is powered by an owned Protoss Pylon.
+     *
+     * @param position
+     *            the build position to check for power
+     *
+     * @return true if the position has power; false otherwise
+     */
+    public boolean hasPower(final Position position) {
+        return hasPower(position, UnitType.None);
+    }
+
+    /**
+     * Indicates if the unitType will be powered by an owned Protoss Pylon if placed at the given
+     * build position.
+     *
+     * @param position
+     *            the build position to check for power
+     *
+     * @param unitType
+     *            the UnitType to check
+     *
+     * @return true if the UnitType will have power at the position; false otherwise
+     */
+    public boolean hasPower(final Position position, final UnitType unitType) {
+        return hasPower(position.getX(BUILD), position.getY(BUILD), unitType.getId());
+    }
+
+    private native boolean hasPower(final int tileX, final int tileY, final int unitTypeId);
+
+    /**
+     * Indicates if the pixel position is powered by an owned Protoss Pylon.
+     *
+     * @param position
+     *            the pixel position to check for power
+     *
+     * @return true if the position has power; false otherwise
+     */
+    public boolean hasPowerPrecise(final Position position) {
+        return hasPowerPrecise(position.getX(PIXEL), position.getY(PIXEL), UnitType.None.getId());
+    }
+
+    private native boolean hasPowerPrecise(final int x, final int y, final int unitTypeId);
+
+    /**
+     * Indicates if there is a path between two positions.
+     *
+     * <p>
+     * This only checks if the start position is connected to the end position. It does not check if
+     * all units can actually travel from the start to the end.
+     *
+     * @param start
+     *            the starting position
+     *
+     * @param end
+     *            the ending position
+     *
+     * @return true if there is a path between the two positions; false otherwise
+     */
+    public boolean hasPath(final Position start, final Position end) {
+        return hasPath(start.getX(PIXEL), start.getY(PIXEL), end.getX(PIXEL), end.getY(PIXEL));
+    }
+
+    private native boolean hasPath(final int fromX, final int fromY, final int toX, final int toY);
+
+    /**
+     * Indicates if there is a path between the two units.
+     *
+     * @param unit1
+     *            the initial unit
+     *
+     * @param unit2
+     *            the target unit
+     *
+     * @return true if the two units have a path between them; false otherwise
+     */
+    public boolean hasPath(final Unit unit1, final Unit unit2) {
+        return hasPath(unit1.getId(), unit2.getId());
+    }
+
+    private native boolean hasPath(final int unitID, final int targetID);
+
+    /**
+     * Indicates if there is path between a Unit and a Position.
+     *
+     * @param unit
+     *            the initial unit
+     *
+     * @param position
+     *            the target position
+     *
+     * @return true if the Unit has a path to the target position; false otherwise
+     */
+    public boolean hasPath(final Unit unit, final Position position) {
+        return hasPath(unit.getId(), position.getX(PIXEL), position.getY(PIXEL));
+    }
+
+    private native boolean hasPath(final int unitID, final int toX, final int toY);
+
+    /**
+     * Indicates if all the requirements have been met to allow researching of a technology.
+     *
+     * <p>
+     * The requirements include resources, technology tree, availability, and required Units.
+     *
+     * @param techType
+     *            the techType to check
+     *
+     * @return true if the TechType can be researched; false otherwise
+     */
+    public boolean canResearch(final TechType techType) {
+        return canResearch(techType.getId());
+    }
+
+    private native boolean canResearch(final int techTypeId);
+
+    /**
+     * Indicates if all the requirements have been met to allow the researching of a technology.
+     *
+     * <p>
+     * The requirements include resources, technology tree, availability, and required Units.
+     *
+     * @param unit
+     *            the Unit that will be doing the researching
+     *
+     * @param techType
+     *            the TechType to check
+     *
+     * @return true if the TechType can be researched; false otherwise
+     */
+    public boolean canResearch(final Unit unit, final TechType techType) {
+        return canResearch(unit.getId(), techType.getId());
+    }
+
+    private native boolean canResearch(final int unitId, final int techTypeId);
+
+    /**
+     * Indicates if all the requirements have been met to allow the making of a UnitType.
+     *
+     * <p>
+     * The requirements include resources, technology tree, availability, required Units, and
+     * supply.
+     *
+     * @param unitType
+     *            the UnitType to check
+     *
+     * @return true if the UnitType can be made; false otherwise
+     */
+    public boolean canMake(final UnitType unitType) {
+        return canMake(unitType.getId());
+    }
+
+    private native boolean canMake(final int unitTypeId);
+
+    /**
+     * Indicates if all the requirements have been met to allow the making of a UnitType.
+     *
+     * <p>
+     * The requirements include resources, technology tree, availability, required Units, and
+     * supply.
+     *
+     * @param unit
+     *            the Unit that will be doing the making
+     *
+     * @param unitType
+     *            the UnitType to check
+     *
+     * @return true if the UnitType can be made, false otherwise
+     */
+    public boolean canMake(final Unit unit, final UnitType unitType) {
+        return canMake(unitType.getId(), unitType.getId());
+    }
+
+    private native boolean canMake(final int unitId, final int unitTypeId);
+
+    /**
+     * Checks that the UpgradeType can be acquired.
+     *
+     * @param unitType
+     *            the UpgradeType to check
+     *
+     * @return true if the UpgradeType can be acquired; false otherwise
+     */
+    public boolean canUpgrade(final UpgradeType unitType) {
+        return canUpgrade(unitType.getId());
+    }
+
+    private native boolean canUpgrade(int upgradeTypeId);
+
+    /**
+     * Checks that the Unit can perform the UpgradeType.
+     *
+     * @param unit
+     *            the Unit that will be used to acquire the upgrade
+     *
+     * @param upgradeType
+     *            the UpgradeType to check
+     *
+     * @return true if the UpgradeType can be acquired through Unit; false otherwise
+     */
+    public boolean canUpgrade(final Unit unit, final UpgradeType upgradeType) {
+        return canUpgrade(unit.getId(), upgradeType.getId());
+    }
+
+    private native boolean canUpgrade(final int unitId, final int upgradeTypeId);
+
+    // *********************************************************************************************
+    // Drawing Commands
+    //
+    // TODO: Negative width and height values cannot be used.
+    // TODO: Make available other colors.
+    //
+    // https://code.google.com/p/bwapi/wiki/Color
+    // https://github.com/bwapi/bwapi/blob/master/bwapi/include/BWAPI/Color.h
+    // https://github.com/bwapi/bwapi/blob/master/bwapi/BWAPILIB/Source/Color.cpp
+    // *********************************************************************************************
+
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to draw
+     */
+    public void drawTextMap(final Position position, final String text) {
+        drawTextMap(position.getX(PIXEL), position.getY(PIXEL), text);
+    }
+
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextMap(final Position position, final String text, final BWColor color) {
+        drawTextMap(position.getX(PIXEL), position.getY(PIXEL), color.getControlCharacters() + text);
+    }
+
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param x
+     *            the starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     */
+    public native void drawTextMap(final int x, final int y, final String text);
+
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param x
+     *            the starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextMap(final int x, final int y, final String text, final BWColor color) {
+        drawTextMap(x, y, color.getControlCharacters() + text);
+    }
+
+    /**
+     * Draws text on the screen for a single frame.
+     *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     */
+    public void drawTextScreen(final Position position, final String text) {
+        drawTextScreen(position.getX(PIXEL), position.getY(PIXEL), text);
+    }
+
+    /**
+     * Draws text on the screen for a single frame.
+     *
+     * @param position
+     *            the starting position of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextScreen(final Position position, final String text, final BWColor color) {
+        drawTextScreen(position.getX(PIXEL), position.getY(PIXEL), color.getControlCharacters()
+                + text);
+    }
+
+    /**
+     * Draws text on the screen for a single frame.
+     *
+     * @param x
+     *            the starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to draw
+     */
+    public native void drawTextScreen(final int x, final int y, final String text);
+
+    /**
+     * Draws text on the map for a single frame.
+     *
+     * @param x
+     *            that starting x-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param y
+     *            the starting y-axis coordinate of the text to be drawn, in pixels
+     *
+     * @param text
+     *            the text to be drawn
+     *
+     * @param color
+     *            the color of the text to be drawn
+     */
+    public void drawTextScreen(final int x, final int y, final String text, final BWColor color) {
+        drawTextScreen(x, y, color.getControlCharacters() + text);
+    }
+
+    /**
+     * Draws a line on the map for a single frame.
+     *
+     * @param p1
+     *            the starting position of the line to be drawn, in pixels
+     *
+     * @param p2
+     *            the ending position of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineMap(final Position p1, final Position p2, final BWColor color) {
+        drawLineMap(p1.getX(PIXEL), p1.getY(PIXEL), p2.getX(PIXEL), p2.getY(PIXEL), color.getId());
+    }
+
+    /**
+     * Draws a line on the map for a single frame.
+     *
+     * @param x1
+     *            the starting x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y1
+     *            the starting y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param x2
+     *            the ending x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y2
+     *            the ending y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineMap(final int x1, final int y1, final int x2, final int y2,
+            final BWColor color) {
+        drawLineMap(x1, y1, x2, y2, color.getId());
+    }
+
+    private native void drawLineMap(final int x1, final int y1, final int x2, final int y2,
+            final int c);
+
+    /**
+     * Draws a line on the screen for a single frame.
+     *
+     * @param p1
+     *            the starting position of the line to be drawn, in pixels
+     *
+     * @param p2
+     *            the ending position of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineScreen(final Position p1, final Position p2, final BWColor color) {
+        drawLineScreen(p1.getX(PIXEL), p1.getY(PIXEL), p2.getX(PIXEL), p2.getY(PIXEL),
+                color.getId());
+    }
+
+    /**
+     * Draws a line on the screen for a single frame.
+     *
+     * @param x1
+     *            the starting x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y1
+     *            the starting y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param x2
+     *            the ending x-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param y2
+     *            the ending y-axis coordinate of the line to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the line to be drawn
+     */
+    public void drawLineScreen(final int x1, final int y1, final int x2, final int y2,
+            final BWColor color) {
+        drawLineScreen(x1, y1, x2, y2, color.getId());
+    }
+
+    private native void drawLineScreen(final int x1, final int y1, final int x2, final int y2,
+            final int color);
+
+    /**
+     * Draws a rectangle on the map for a single frame.
+     *
+     * @param position
+     *            the top-left position of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleMap(final Position position, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleMap(position.getX(PIXEL), position.getY(PIXEL), width, height, color.getId(),
+                fill);
+    }
+
+    /**
+     * Draws a rectangle on the map for a single frame.
+     *
+     * @param x
+     *            the top-left x-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param y
+     *            the top-left y-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleMap(final int x, final int y, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleMap(x, y, width, height, color.getId(), fill);
+    }
+
+    private native void drawRectangleMap(final int x, final int y, final int width,
+            final int height, final int color, final boolean fill);
+
+    /**
+     * Draws a rectangle on the screen for a single frame.
+     *
+     * @param position
+     *            the top-left position of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleScreen(final Position position, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleScreen(position.getX(PIXEL), position.getY(PIXEL), width, height,
+                color.getId(), fill);
+    }
+
+    /**
+     * Draws a rectangle on the screen for a single frame.
+     *
+     * @param x
+     *            the top-left x-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param y
+     *            the top-left y-axis coordinate of the rectangle to be drawn, in pixels
+     *
+     * @param width
+     *            the width of the rectangle to be drawn, in pixels
+     *
+     * @param height
+     *            the height of the rectangle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the rectangle to be drawn
+     *
+     * @param fill
+     *            true if the rectangle should be filled; false otherwise
+     */
+    public void drawRectangleScreen(final int x, final int y, final int width, final int height,
+            final BWColor color, final boolean fill) {
+        drawRectangleScreen(x, y, width, height, color.getId(), fill);
+    }
+
+    private native void drawRectangleScreen(final int x, final int y, final int width,
+            final int height, final int color, final boolean fill);
+
+    /**
+     * Draws an ellipse on the map for a single frame.
+     *
+     * @param position
+     *            the center position of the ellipse to be drawn, in pixels
+     *
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseMap(final Position position, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseMap(position.getX(PIXEL), position.getY(PIXEL), xRadius, yRadius, color.getId(),
+                fill);
+    }
+
+    /**
+     * Draws an ellipse on the map for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseMap(final int x, final int y, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseMap(x, y, xRadius, yRadius, color.getId(), fill);
+    }
+
+    private native void drawEllipseMap(final int x, final int y, final int xRadius,
+            final int yRadius, final int color, final boolean fill);
+
+    /**
+     * Draws an ellipse on the screen for a single frame.
+     *
+     * @param position
+     *            the center position of the ellipse to be drawn, in pixels
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseScreen(final Position position, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseScreen(position.getX(PIXEL), position.getY(PIXEL), xRadius, yRadius,
+                color.getId(), fill);
+    }
+
+    /**
+     * Draws an ellipse on the screen for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the ellipse to be drawn, in pixels
+     *
+     * @param xRadius
+     *            the x-radius of the ellipse, in pixels
+     *
+     * @param yRadius
+     *            the y-radius of the ellipse, in pixels
+     *
+     * @param color
+     *            the color of the ellipse to be drawn
+     *
+     * @param fill
+     *            true if the ellipse should be filled; false otherwise
+     */
+    public void drawEllipseScreen(final int x, final int y, final int xRadius, final int yRadius,
+            final BWColor color, final boolean fill) {
+        drawEllipseScreen(x, y, xRadius, yRadius, color.getId(), fill);
+    }
+
+    private native void drawEllipseScreen(final int x, final int y, final int xRadius,
+            final int yRadius, final int color, final boolean fill);
+
+    /**
+     * Draws a circle on the map for a single frame.
+     *
+     * @param position
+     *            the center position of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleMap(final Position position, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseMap(position.getX(PIXEL), position.getY(PIXEL), radius, radius, color.getId(),
+                fill);
+    }
+
+    /**
+     * Draws a circle on the map for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleMap(final int x, final int y, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseMap(x, y, radius, radius, color.getId(), fill);
+    }
+
+    /**
+     * Draws a circle on the screen for a single frame.
+     *
+     * @param position
+     *            the center position of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleScreen(final Position position, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseScreen(position.getX(PIXEL), position.getY(PIXEL), radius, radius,
+                color.getId(), fill);
+    }
+
+    /**
+     * Draws a circle on the screen for a single frame.
+     *
+     * @param x
+     *            the center x-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param y
+     *            the center y-axis coordinate of the circle to be drawn, in pixels
+     *
+     * @param radius
+     *            the radius of the circle to be drawn, in pixels
+     *
+     * @param color
+     *            the color of the circle to be drawn
+     *
+     * @param fill
+     *            true if the circle should be filled; false otherwise
+     */
+    public void drawCircleScreen(final int x, final int y, final int radius, final BWColor color,
+            final boolean fill) {
+        drawEllipseScreen(x, y, radius, radius, color.getId(), fill);
+    }
+
+    // *********************************************************************************************
+    // Static Methods
+    // *********************************************************************************************
+
+    private static void loadNativeLibrary() {
         final File dll = new File("src/main/resources/", "client-bridge-x86.dll");
         try {
             System.load(dll.getAbsolutePath());
@@ -29,121 +1181,29 @@ public class Broodwar {
         }
     }
 
-    /** The character set to use when decoding Strings. */
-    private static final Charset CHARACTER_SET = getCharset();
-
-    private static Charset getCharset() {
+    private static Charset getKoreanCharset() {
         try {
             return Charset.forName("Cp949");
-        } catch (final UnsupportedCharsetException e) {
+        } catch (final UnsupportedCharsetException ex) {
             System.err.println("Korean character set not available.");
             return StandardCharsets.ISO_8859_1;
         }
     }
 
-    private final BroodwarListener listener;
-
-    // private final boolean enableTerrainAnalysis;
-
-    private final HashMap<Integer, Unit> units = new HashMap<>();
-    private final ArrayList<Unit> playerUnits = new ArrayList<>();
-    private final ArrayList<Unit> alliedUnits = new ArrayList<>();
-    private final ArrayList<Unit> enemyUnits = new ArrayList<>();
-    private final ArrayList<Unit> neutralUnits = new ArrayList<>();
-
-    private final HashMap<Integer, Player> players = new HashMap<>();
-    private final ArrayList<Player> allies = new ArrayList<>();
-    private final ArrayList<Player> enemies = new ArrayList<>();
-
-    private Player self;
-    private Player neutralPlayer;
-
-    private GameMap map;
-    private int gameFrame = 0;
+    // *********************************************************************************************
+    // Callback Commands
+    // *********************************************************************************************
 
     /**
-     * Instantiates a BWAPI instance, but does not connect to the bridge. To connect, the start
-     * method must be invoked.
+     * Notifies the client and event listener that a connection has been formed to the bridge.
      *
-     * @param listener
-     *            listener for BWAPI callback events.
+     * <p>
+     * C++ callback function.
      */
-    public Broodwar(final BroodwarListener listener) {
-        this.listener = listener;
+    void connected() {
+        loadTypeData();
+        listener.connected();
     }
-
-    public List<Player> getPlayers() {
-        return Collections.unmodifiableList(new ArrayList<>(players.values()));
-    }
-
-    public List<Player> getAllies() {
-        return Collections.unmodifiableList(allies);
-    }
-
-    public List<Player> getEnemies() {
-        return Collections.unmodifiableList(enemies);
-    }
-
-    public Player getMyself() {
-        return self;
-    }
-
-    public Player getNeutralPlayer() {
-        return neutralPlayer;
-    }
-
-    public Player getPlayer(final int playerId) {
-        return players.get(playerId);
-    }
-
-    public List<Unit> getUnits() {
-        return Collections.unmodifiableList(new ArrayList<>(units.values()));
-    }
-
-    public List<Unit> getAlliedUnits() {
-        return Collections.unmodifiableList(alliedUnits);
-    }
-
-    public List<Unit> getEnemyUnits() {
-        return Collections.unmodifiableList(enemyUnits);
-    }
-
-    public List<Unit> getMyUnits() {
-        return Collections.unmodifiableList(playerUnits);
-    }
-
-    public List<Unit> getNeutralUnits() {
-        return Collections.unmodifiableList(neutralUnits);
-    }
-
-    public Unit getUnit(final int unitId) {
-        return units.get(unitId);
-    }
-
-    public List<Unit> getUnits(final Player player) {
-        final List<Unit> playerUnits = new ArrayList<>();
-        for (final Unit unit : units.values()) {
-            if (unit.getPlayer() == player) {
-                playerUnits.add(unit);
-            }
-        }
-        return playerUnits;
-    }
-
-    public int getFrameCount() {
-        return gameFrame;
-    }
-
-    public List<Unit> getUnitsOnTile(final int x, final int y) {
-        // Most tiles will have 0 units on tile.
-        final List<Unit> units = new ArrayList<>(0);
-        for (final int id : getUnitIdsOnTile(x, y)) {
-            units.add(getUnit(id));
-        }
-        return units;
-    }
-
-    private native int[] getUnitIdsOnTile(final int tx, final int ty);
 
     private void loadTypeData() {
         // race types
@@ -230,12 +1290,68 @@ public class Broodwar {
     }
 
     /**
-     * Returns the map currently being used.
+     * Notifies the client that a game has started. This method is always called before
+     * {@code BWAPIEventListener.matchStart()}, and is meant as a way of notifying the client to
+     * initialize state.
      *
-     * @return the map currently being used
+     * <p>
+     * The listener is not notified of this invocation.
+     *
+     * <p>
+     * C++ callback function.
      */
-    public GameMap getMap() {
-        return map;
+    void gameStarted() {
+        self = null;
+        allies.clear();
+        enemies.clear();
+        players.clear();
+
+        final int[] playerData = getPlayersData();
+        for (int index = 0; index < playerData.length; index += Player.NUM_ATTRIBUTES) {
+            final String name = new String(getPlayerName(playerData[index]), CHARACTER_SET);
+            final Player player = new Player(playerData, index, name);
+
+            players.put(player.getId(), player);
+
+            if (player.isSelf()) {
+                self = player;
+            } else if (player.isAlly()) {
+                allies.add(player);
+            } else if (player.isEnemy()) {
+                enemies.add(player);
+            } else if (player.isNeutral()) {
+                neutralPlayer = player;
+            }
+        }
+
+        // get unit data
+        units.clear();
+        playerUnits.clear();
+        alliedUnits.clear();
+        enemyUnits.clear();
+        neutralUnits.clear();
+        final int[] unitData = getAllUnitsData();
+
+        for (int index = 0; index < unitData.length; index += Unit.NUM_ATTRIBUTES) {
+            final int id = unitData[index];
+            final Unit unit = new Unit(id, this);
+            unit.update(unitData, index);
+
+            units.put(id, unit);
+            if ((self != null) && (unit.getPlayer() == self)) {
+                playerUnits.add(unit);
+
+            } else if (allies.contains(unit.getPlayer())) {
+                alliedUnits.add(unit);
+
+            } else if (enemies.contains(unit.getPlayer())) {
+                enemyUnits.add(unit);
+
+            } else {
+                neutralUnits.add(unit);
+            }
+        }
+        loadMapData();
     }
 
     private void loadMapData() {
@@ -356,106 +1472,6 @@ public class Broodwar {
     }
 
     /**
-     * Utility function for printing to the java console from C++.
-     *
-     * <p>
-     * C++ callback function.
-     */
-    void javaPrint(final String msg) {
-        // TODO: Allow agent to decide how best to print the message.
-        System.out.println("Bridge: " + msg);
-    }
-
-    /**
-     * Connects the client to BWAPI.
-     *
-     * <p>
-     * This method will block until Broodwar has been closed.
-     */
-    public void start() {
-        startClient(this);
-    }
-
-    private native void startClient(final Broodwar broodwar);
-
-    /**
-     * Notifies the client and event listener that a connection has been formed to the bridge.
-     *
-     * <p>
-     * C++ callback function.
-     */
-    void connected() {
-        loadTypeData();
-        listener.connected();
-    }
-
-    /**
-     * Notifies the client that a game has started. This method is always called before
-     * {@code BWAPIEventListener.matchStart()}, and is meant as a way of notifying the client to
-     * initialize state.
-     *
-     * <p>
-     * The listener is not notified of this invocation.
-     *
-     * <p>
-     * C++ callback function.
-     */
-    void gameStarted() {
-        self = null;
-        allies.clear();
-        enemies.clear();
-        players.clear();
-
-        final int[] playerData = getPlayersData();
-        for (int index = 0; index < playerData.length; index += Player.NUM_ATTRIBUTES) {
-            final String name = new String(getPlayerName(playerData[index]), CHARACTER_SET);
-            final Player player = new Player(playerData, index, name);
-
-            players.put(player.getId(), player);
-
-            if (player.isSelf()) {
-                self = player;
-            } else if (player.isAlly()) {
-                allies.add(player);
-            } else if (player.isEnemy()) {
-                enemies.add(player);
-            } else if (player.isNeutral()) {
-                neutralPlayer = player;
-            }
-        }
-
-        // get unit data
-        units.clear();
-        playerUnits.clear();
-        alliedUnits.clear();
-        enemyUnits.clear();
-        neutralUnits.clear();
-        final int[] unitData = getAllUnitsData();
-
-        for (int index = 0; index < unitData.length; index += Unit.NUM_ATTRIBUTES) {
-            final int id = unitData[index];
-            final Unit unit = new Unit(id, this);
-            unit.update(unitData, index);
-
-            units.put(id, unit);
-            if ((self != null) && (unit.getPlayer() == self)) {
-                playerUnits.add(unit);
-
-            } else if (allies.contains(unit.getPlayer())) {
-                alliedUnits.add(unit);
-
-            } else if (enemies.contains(unit.getPlayer())) {
-                enemyUnits.add(unit);
-
-            } else {
-                neutralUnits.add(unit);
-            }
-        }
-        gameFrame = getFrame();
-        loadMapData();
-    }
-
-    /**
      * Notifies the client that game data has been updated. This method is always called before
      * {@code BWAPIEventListener.matchFrame()}, and is meant as a way of notifying the client to
      * update the game state.
@@ -468,7 +1484,6 @@ public class Broodwar {
      */
     void gameUpdate() {
         // update game state
-        gameFrame = getFrame();
         if (!isReplay()) {
             self.update(getPlayerUpdate(self.getId()));
             self.updateResearch(getResearchStatus(self.getId()), getUpgradeStatus(self.getId()));
@@ -592,9 +1607,9 @@ public class Broodwar {
 
             case NUKE_DETECT :
                 if ((p1 == -1) || (p2 == -1)) {
-                    listener.nukeDetect(Positions.Unknown);
+                    listener.nukeDetect(Position.UNKNOWN);
                 } else {
-                    listener.nukeDetect(new Position(p1, p2));
+                    listener.nukeDetect(new Position(p1, p2, PIXEL));
                 }
                 break;
 
@@ -664,195 +1679,22 @@ public class Broodwar {
         listener.keyPressed(keyCode);
     }
 
-    public native int getFrame();
-
-    public native int getRemainingLatencyFrames();
-
-    public native int getReplayFrameTotal();
-
-    public native boolean isReplay();
-
-    public native int getLastError();
-
-    public native void leaveGame();
-
-    public native void enableUserInput();
-
-    public native void enablePerfectInformation();
-
-    public native void setGameSpeed(final int speed);
-
-    public native void setFrameSkip(final int frameSkip);
-
-    public native void setCommandOptimizationLevel(final int level);
-
-    public native void sendText(final String message);
-
-    private native int[] getLoadedUnits(final int unitId);
-
-    private native int[] getInterceptors(final int unitId);
-
-    private native int[] getLarva(final int unitId);
-
-    public boolean isVisible(final Position position) {
-        return isVisible(position.getBX(), position.getBY());
-    }
-
-    private native boolean isVisible(final int tileX, final int tileY);
-
-    public boolean isVisibleToPlayer(final Unit unit, final Player player) {
-        return isVisibleToPlayer(unit.getId(), player.getId());
-    }
-
-    private native boolean isVisibleToPlayer(final int unitId, final int playerId);
-
-    public boolean isExplored(final Position position) {
-        return isExplored(position.getBX(), position.getBY());
-    }
-
-    private native boolean isExplored(final int tileX, final int tileY);
-
-    public boolean isBuildable(final Position position, final boolean includeBuildings) {
-        return isBuildable(position.getBX(), position.getBY(), includeBuildings);
-    }
-
-    // TODO: Consolidate canResearch and canUpgrade and canMake?
-
-    private native boolean isBuildable(final int tileX, final int tileY,
-            final boolean includeBuildings);
-
-    public boolean canBuildHere(final Position p, final UnitType ut, final boolean checkExplored) {
-        return canBuildHere(p.getBX(), p.getBY(), ut.getId(), checkExplored);
-    }
-
-    private native boolean canBuildHere(final int tileX, final int tileY, final int unitTypeId,
-            final boolean checkExplored);
-
-    public boolean canBuildHere(final Unit u, final Position p, final UnitType ut,
-            final boolean checkExplored) {
-        return canBuildHere(u.getId(), p.getBX(), p.getBY(), ut.getId(), checkExplored);
-    }
-
-    private native boolean canBuildHere(final int unitId, final int tileX, final int tileY,
-            final int unitTypeId, boolean checkExplored);
-
-    public boolean hasCreep(final Position position) {
-        return hasCreep(position.getBX(), position.getBY());
-    }
-
-    private native boolean hasCreep(final int tileX, final int tileY);
-
-    public boolean hasPower(final Position position) {
-        return hasPower(position, UnitType.None);
-    }
-
-    public boolean hasPower(final Position position, final UnitType unitType) {
-        return hasPower(position.getBX(), position.getBY(), unitType.getId());
-    }
-
-    private native boolean hasPower(final int tileX, final int tileY, final int unitTypeId);
-
-    public boolean hasPower(final Position position, final int tileWidth, final int tileHeight) {
-        return hasPower(position, tileWidth, tileHeight, UnitType.None);
-    }
-
-    public boolean hasPower(final Position position, final int tileWidth, final int tileHeight,
-            final UnitType unitType) {
-        return hasPower(position.getBX(), position.getBY(), tileWidth, tileHeight, unitType.getId());
-    }
-
-    private native boolean hasPower(final int tileX, final int tileY, final int tileWidth,
-            final int tileHeight, final int unitTypeId);
-
-    public boolean hasPowerPrecise(final Position position) {
-        return hasPowerPrecise(position, UnitType.None);
-    }
-
-    public boolean hasPowerPrecise(final Position position, final UnitType unitType) {
-        return hasPowerPrecise(position.getPX(), position.getPY(), unitType.getId());
-    }
-
-    private native boolean hasPowerPrecise(final int x, final int y, final int unitTypeId);
-
-    public boolean hasPath(final Position from, final Position to) {
-        return hasPath(from.getPX(), from.getPY(), to.getPX(), to.getPY());
-    }
-
-    private native boolean hasPath(final int fromX, final int fromY, final int toX, final int toY);
-
-    public boolean hasPath(final Unit u, final Unit target) {
-        return hasPath(u.getId(), target.getId());
-    }
-
-    private native boolean hasPath(final int unitID, final int targetID);
-
-    public boolean hasPath(final Unit u, final Position to) {
-        return hasPath(u.getId(), to.getPX(), to.getPY());
-    }
-
-    private native boolean hasPath(final int unitID, final int toX, final int toY);
-
-    public boolean canResearch(final TechType techType) {
-        return canResearch(techType.getId());
-    }
-
-    private native boolean canResearch(final int techTypeId);
-
-    public boolean canMake(final UnitType unitType) {
-        return canMake(unitType.getId());
-    }
-
-    private native boolean canMake(final int unitTypeId);
-
-    public boolean canMake(final UnitType unitType1, final UnitType unitType2) {
-        return canMake(unitType1.getId(), unitType2.getId());
-    }
-
-    private native boolean canMake(final int unitId, final int unitTypeId);
-
     /**
-     * Checks all the
+     * Utility function for printing to the java console from C++.
      *
-     * @param unit
-     * @param techType
-     * @return
+     * <p>
+     * C++ callback function.
      */
-    public boolean canResearch(final Unit unit, final TechType techType) {
-        return canResearch(unit.getId(), techType.getId());
+    void javaPrint(final String msg) {
+        // TODO: Allow agent to decide how best to print the message.
+        System.out.println("Bridge: " + msg);
     }
 
-    private native boolean canResearch(final int unitId, final int techTypeId);
+    private native void nativeConnect(final Broodwar broodwar);
 
-    /**
-     * Checks that the UpgradeType can be acquired.
-     *
-     * @param unitType
-     *            the UpgradeType to check
-     *
-     * @return true if the UpgradeType can be acquired; false otherwise
-     */
-    public boolean canUpgrade(final UpgradeType unitType) {
-        return canUpgrade(unitType.getId());
-    }
+    private native void nativeEnableUserInput();
 
-    private native boolean canUpgrade(int upgradeTypeId);
-
-    /**
-     * Checks that the Unit can perform the UpgradeType.
-     *
-     * @param unit
-     *            the Unit that will be used to acquire the upgrade
-     *
-     * @param upgradeType
-     *            the UpgradeType to check
-     *
-     * @return true if the UpgradeType can be acquired through Unit; false otherwise
-     */
-    public boolean canUpgrade(final Unit unit, final UpgradeType upgradeType) {
-        return canUpgrade(unit.getId(), upgradeType.getId());
-    }
-
-    private native boolean canUpgrade(final int unitId, final int upgradeTypeId);
+    private native void nativeEnablePerfectInformation();
 
     // *********************************************************************************************
     // Data Commands
@@ -919,6 +1761,7 @@ public class Broodwar {
     // *********************************************************************************************
     // Map Commands
     // *********************************************************************************************
+
     private native void analyzeTerrain();
 
     private native byte[] getMapName();
@@ -946,516 +1789,4 @@ public class Broodwar {
     private native int[] getPolygon(final int regionId);
 
     private native int[] getBaseLocations();
-
-    // *********************************************************************************************
-    // Drawing Commands
-    //
-    // TODO: Negative width and height values cannot be used.
-    //
-    // TODO: Make available other colors.
-    // https://code.google.com/p/bwapi/wiki/Color
-    // https://github.com/bwapi/bwapi/blob/master/bwapi/include/BWAPI/Color.h
-    // https://github.com/bwapi/bwapi/blob/master/bwapi/BWAPILIB/Source/Color.cpp
-    // *********************************************************************************************
-
-    /**
-     * Draws text on the map for a single frame.
-     *
-     * @param position
-     *            the starting position of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to draw
-     */
-    public void drawTextMap(final Position position, final String text) {
-        drawTextMap(position.getPX(), position.getPY(), text);
-    }
-
-    /**
-     * Draws text on the map for a single frame.
-     *
-     * @param position
-     *            the starting position of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to be drawn
-     *
-     * @param color
-     *            the color of the text to be drawn
-     */
-    public void drawTextMap(final Position position, final String text, final BWColor color) {
-        drawTextMap(position.getPX(), position.getPY(), color.getControlCharacters() + text);
-    }
-
-    /**
-     * Draws text on the map for a single frame.
-     *
-     * @param x
-     *            the starting x-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param y
-     *            the starting y-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to be drawn
-     */
-    public native void drawTextMap(final int x, final int y, final String text);
-
-    /**
-     * Draws text on the map for a single frame.
-     *
-     * @param x
-     *            the starting x-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param y
-     *            the starting y-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to be drawn
-     *
-     * @param color
-     *            the color of the text to be drawn
-     */
-    public void drawTextMap(final int x, final int y, final String text, final BWColor color) {
-        drawTextMap(x, y, color.getControlCharacters() + text);
-    }
-
-    /**
-     * Draws text on the screen for a single frame.
-     *
-     * @param position
-     *            the starting position of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to be drawn
-     */
-    public void drawTextScreen(final Position position, final String text) {
-        drawTextScreen(position.getPX(), position.getPY(), text);
-    }
-
-    /**
-     * Draws text on the screen for a single frame.
-     *
-     * @param position
-     *            the starting position of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to be drawn
-     *
-     * @param color
-     *            the color of the text to be drawn
-     */
-    public void drawTextScreen(final Position position, final String text, final BWColor color) {
-        drawTextScreen(position.getPX(), position.getPY(), color.getControlCharacters() + text);
-    }
-
-    /**
-     * Draws text on the screen for a single frame.
-     *
-     * @param x
-     *            the starting x-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param y
-     *            the starting y-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to draw
-     */
-    public native void drawTextScreen(final int x, final int y, final String text);
-
-    /**
-     * Draws text on the map for a single frame.
-     *
-     * @param x
-     *            that starting x-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param y
-     *            the starting y-axis coordinate of the text to be drawn, in pixels
-     *
-     * @param text
-     *            the text to be drawn
-     *
-     * @param color
-     *            the color of the text to be drawn
-     */
-    public void drawTextScreen(final int x, final int y, final String text, final BWColor color) {
-        drawTextScreen(x, y, color.getControlCharacters() + text);
-    }
-
-    /**
-     * Draws a line on the map for a single frame.
-     *
-     * @param p1
-     *            the starting position of the line to be drawn, in pixels
-     *
-     * @param p2
-     *            the ending position of the line to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the line to be drawn
-     */
-    public void drawLineMap(final Position p1, final Position p2, final BWColor color) {
-        drawLineMap(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), color.getId());
-    }
-
-    /**
-     * Draws a line on the map for a single frame.
-     *
-     * @param x1
-     *            the starting x-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param y1
-     *            the starting y-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param x2
-     *            the ending x-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param y2
-     *            the ending y-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the line to be drawn
-     */
-    public void drawLineMap(final int x1, final int y1, final int x2, final int y2,
-            final BWColor color) {
-        drawLineMap(x1, y1, x2, y2, color.getId());
-    }
-
-    private native void drawLineMap(final int x1, final int y1, final int x2, final int y2,
-            final int c);
-
-    /**
-     * Draws a line on the screen for a single frame.
-     *
-     * @param p1
-     *            the starting position of the line to be drawn, in pixels
-     *
-     * @param p2
-     *            the ending position of the line to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the line to be drawn
-     */
-    public void drawLineScreen(final Position p1, final Position p2, final BWColor color) {
-        drawLineScreen(p1.getPX(), p1.getPY(), p2.getPX(), p2.getPY(), color.getId());
-    }
-
-    /**
-     * Draws a line on the screen for a single frame.
-     *
-     * @param x1
-     *            the starting x-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param y1
-     *            the starting y-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param x2
-     *            the ending x-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param y2
-     *            the ending y-axis coordinate of the line to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the line to be drawn
-     */
-    public void drawLineScreen(final int x1, final int y1, final int x2, final int y2,
-            final BWColor color) {
-        drawLineScreen(x1, y1, x2, y2, color.getId());
-    }
-
-    private native void drawLineScreen(final int x1, final int y1, final int x2, final int y2,
-            final int color);
-
-    /**
-     * Draws a rectangle on the map for a single frame.
-     *
-     * @param position
-     *            the top-left position of the rectangle to be drawn, in pixels
-     *
-     * @param width
-     *            the width of the rectangle to be drawn, in pixels
-     *
-     * @param height
-     *            the height of the rectangle to be drawn, in pixels
-     *
-     * @param color
-     *            the color rectangle to be drawn
-     *
-     * @param fill
-     *            true if the rectangle should be filled; false otherwise
-     */
-    public void drawRectangleMap(final Position position, final int width, final int height,
-            final BWColor color, final boolean fill) {
-        drawRectangleMap(position.getPX(), position.getPY(), width, height, color.getId(), fill);
-    }
-
-    /**
-     * Draws a rectangle on the map for a single frame.
-     *
-     * @param x
-     *            the top-left x-axis coordinate of the rectangle to be drawn, in pixels
-     *
-     * @param y
-     *            the top-left y-axis coordinate of the rectangle to be drawn, in pixels
-     *
-     * @param width
-     *            the width of the rectangle to be drawn, in pixels
-     *
-     * @param height
-     *            the height of the rectangle to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the rectangle to be drawn
-     *
-     * @param fill
-     *            true if the rectangle should be filled; false otherwise
-     */
-    public void drawRectangleMap(final int x, final int y, final int width, final int height,
-            final BWColor color, final boolean fill) {
-        drawRectangleMap(x, y, width, height, color.getId(), fill);
-    }
-
-    private native void drawRectangleMap(final int x, final int y, final int width,
-            final int height, final int color, final boolean fill);
-
-    /**
-     * Draws a rectangle on the screen for a single frame.
-     *
-     * @param position
-     *            the top-left position of the rectangle to be drawn, in pixels
-     *
-     * @param width
-     *            the width of the rectangle to be drawn, in pixels
-     *
-     * @param height
-     *            the height of the rectangle to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the rectangle to be drawn
-     *
-     * @param fill
-     *            true if the rectangle should be filled; false otherwise
-     */
-    public void drawRectangleScreen(final Position position, final int width, final int height,
-            final BWColor color, final boolean fill) {
-        drawRectangleScreen(position.getPX(), position.getPY(), width, height, color.getId(), fill);
-    }
-
-    /**
-     * Draws a rectangle on the screen for a single frame.
-     *
-     * @param x
-     *            the top-left x-axis coordinate of the rectangle to be drawn, in pixels
-     *
-     * @param y
-     *            the top-left y-axis coordinate of the rectangle to be drawn, in pixels
-     *
-     * @param width
-     *            the width of the rectangle to be drawn, in pixels
-     *
-     * @param height
-     *            the height of the rectangle to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the rectangle to be drawn
-     *
-     * @param fill
-     *            true if the rectangle should be filled; false otherwise
-     */
-    public void drawRectangleScreen(final int x, final int y, final int width, final int height,
-            final BWColor color, final boolean fill) {
-        drawRectangleScreen(x, y, width, height, color.getId(), fill);
-    }
-
-    private native void drawRectangleScreen(final int x, final int y, final int width,
-            final int height, final int color, final boolean fill);
-
-    /**
-     * Draws an ellipse on the map for a single frame.
-     *
-     * @param position
-     *            the center position of the ellipse to be drawn, in pixels
-     *
-     * @param xRadius
-     *            the x-radius of the ellipse, in pixels
-     *
-     * @param yRadius
-     *            the y-radius of the ellipse, in pixels
-     *
-     * @param color
-     *            the color of the ellipse to be drawn
-     *
-     * @param fill
-     *            true if the ellipse should be filled; false otherwise
-     */
-    public void drawEllipseMap(final Position position, final int xRadius, final int yRadius,
-            final BWColor color, final boolean fill) {
-        drawEllipseMap(position.getPX(), position.getPY(), xRadius, yRadius, color.getId(), fill);
-    }
-
-    /**
-     * Draws an ellipse on the map for a single frame.
-     *
-     * @param x
-     *            the center x-axis coordinate of the ellipse to be drawn, in pixels
-     *
-     * @param y
-     *            the center y-axis coordinate of the ellipse to be drawn, in pixels
-     *
-     * @param xRadius
-     *            the x-radius of the ellipse, in pixels
-     *
-     * @param yRadius
-     *            the y-radius of the ellipse, in pixels
-     *
-     * @param color
-     *            the color of the ellipse to be drawn
-     *
-     * @param fill
-     *            true if the ellipse should be filled; false otherwise
-     */
-    public void drawEllipseMap(final int x, final int y, final int xRadius, final int yRadius,
-            final BWColor color, final boolean fill) {
-        drawEllipseMap(x, y, xRadius, yRadius, color.getId(), fill);
-    }
-
-    private native void drawEllipseMap(final int x, final int y, final int xRadius,
-            final int yRadius, final int color, final boolean fill);
-
-    /**
-     * Draws an ellipse on the screen for a single frame.
-     *
-     * @param position
-     *            the center position of the ellipse to be drawn, in pixels
-     * @param xRadius
-     *            the x-radius of the ellipse, in pixels
-     *
-     * @param yRadius
-     *            the y-radius of the ellipse to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the ellipse to be drawn
-     *
-     * @param fill
-     *            true if the ellipse should be filled; false otherwise
-     */
-    public void drawEllipseScreen(final Position position, final int xRadius, final int yRadius,
-            final BWColor color, final boolean fill) {
-        drawEllipseScreen(position.getPX(), position.getPY(), xRadius, yRadius, color.getId(), fill);
-    }
-
-    /**
-     * Draws an ellipse on the screen for a single frame.
-     *
-     * @param x
-     *            the center x-axis coordinate of the ellipse to be drawn, in pixels
-     *
-     * @param y
-     *            the center y-axis coordinate of the ellipse to be drawn, in pixels
-     *
-     * @param xRadius
-     *            the x-radius of the ellipse, in pixels
-     *
-     * @param yRadius
-     *            the y-radius of the ellipse, in pixels
-     *
-     * @param color
-     *            the color of the ellipse to be drawn
-     *
-     * @param fill
-     *            true if the ellipse should be filled; false otherwise
-     */
-    public void drawEllipseScreen(final int x, final int y, final int xRadius, final int yRadius,
-            final BWColor color, final boolean fill) {
-        drawEllipseScreen(x, y, xRadius, yRadius, color.getId(), fill);
-    }
-
-    private native void drawEllipseScreen(final int x, final int y, final int xRadius,
-            final int yRadius, final int color, final boolean fill);
-
-    /**
-     * Draws a circle on the map for a single frame.
-     *
-     * @param position
-     *            the center position of the circle to be drawn, in pixels
-     *
-     * @param radius
-     *            the radius of the circle to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the circle to be drawn
-     *
-     * @param fill
-     *            true if the circle should be filled; false otherwise
-     */
-    public void drawCircleMap(final Position position, final int radius, final BWColor color,
-            final boolean fill) {
-        drawEllipseMap(position.getPX(), position.getPY(), radius, radius, color.getId(), fill);
-    }
-
-    /**
-     * Draws a circle on the map for a single frame.
-     *
-     * @param x
-     *            the center x-axis coordinate of the circle to be drawn, in pixels
-     *
-     * @param y
-     *            the center y-axis coordinate of the circle to be drawn, in pixels
-     *
-     * @param radius
-     *            the radius of the circle to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the circle to be drawn
-     *
-     * @param fill
-     *            true if the circle should be filled; false otherwise
-     */
-    public void drawCircleMap(final int x, final int y, final int radius, final BWColor color,
-            final boolean fill) {
-        drawEllipseMap(x, y, radius, radius, color.getId(), fill);
-    }
-
-    /**
-     * Draws a circle on the screen for a single frame.
-     *
-     * @param position
-     *            the center position of the circle to be drawn, in pixels
-     *
-     * @param radius
-     *            the radius of the circle to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the circle to be drawn
-     *
-     * @param fill
-     *            true if the circle should be filled; false otherwise
-     */
-    public void drawCircleScreen(final Position position, final int radius, final BWColor color,
-            final boolean fill) {
-        drawEllipseScreen(position.getPX(), position.getPY(), radius, radius, color.getId(), fill);
-    }
-
-    /**
-     * Draws a circle on the screen for a single frame.
-     *
-     * @param x
-     *            the center x-axis coordinate of the circle to be drawn, in pixels
-     *
-     * @param y
-     *            the center y-axis coordinate of the circle to be drawn, in pixels
-     *
-     * @param radius
-     *            the radius of the circle to be drawn, in pixels
-     *
-     * @param color
-     *            the color of the circle to be drawn
-     *
-     * @param fill
-     *            true if the circle should be filled; false otherwise
-     */
-    public void drawCircleScreen(final int x, final int y, final int radius, final BWColor color,
-            final boolean fill) {
-        drawEllipseScreen(x, y, radius, radius, color.getId(), fill);
-    }
 }

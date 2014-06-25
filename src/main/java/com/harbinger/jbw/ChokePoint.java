@@ -1,5 +1,7 @@
 package com.harbinger.jbw;
 
+import com.harbinger.jbw.Position.Resolution;
+
 import java.util.Map;
 
 /**
@@ -22,16 +24,16 @@ public class ChokePoint {
     public ChokePoint(final int[] data, int index, final Map<Integer, Region> idToRegion) {
         final int centerX = data[index++];
         final int centerY = data[index++];
-        center = new Position(centerX, centerY);
+        center = new Position(centerX, centerY, Resolution.PIXEL);
         radius = data[index++] / fixedScale;
         firstRegionId = data[index++];
         secondRegionId = data[index++];
         final int firstSideX = data[index++];
         final int firstSideY = data[index++];
-        firstSide = new Position(firstSideX, firstSideY);
+        firstSide = new Position(firstSideX, firstSideY, Resolution.PIXEL);
         final int secondSideX = data[index++];
         final int secondSideY = data[index++];
-        secondSide = new Position(secondSideX, secondSideY);
+        secondSide = new Position(secondSideX, secondSideY, Resolution.PIXEL);
         firstRegion = idToRegion.get(firstRegionId);
         secondRegion = idToRegion.get(secondRegionId);
     }

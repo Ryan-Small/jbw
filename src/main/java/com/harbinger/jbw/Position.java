@@ -1,15 +1,18 @@
 package com.harbinger.jbw;
 
-/** Generalised representation of a position for JNIBWAPI. Immutable. */
+import static com.harbinger.jbw.Position.Resolution.BUILD;
+import static com.harbinger.jbw.Position.Resolution.PIXEL;
+
+/**
+ * Represents a location in (x, y) coordinate space on the map.
+ */
 public class Position {
 
-    public static class Positions {
-        public static final Position Invalid = new Position(1000, 1000, Type.BUILD);
-        public static final Position None = new Position(1000, 1001, Type.BUILD);
-        public static final Position Unknown = new Position(1000, 1002, Type.BUILD);
-    }
+    public static final Position NONE = new Position(1000, 1000, BUILD);
+    public static final Position UNKNOWN = new Position(1000, 1001, BUILD);
+    public static final Position INVALID = new Position(1000, 1002, BUILD);
 
-    public static enum Type {
+    public static enum Resolution {
         PIXEL(1),
         WALK(8),
         BUILD(32);
@@ -17,8 +20,8 @@ public class Position {
         /** Length in pixels */
         public final int scale;
 
-        private Type(final int size) {
-            scale = size;
+        private Resolution(final int scale) {
+            this.scale = scale;
         }
     }
 
@@ -26,146 +29,133 @@ public class Position {
     private final int y;
 
     /**
-     * Creates a new Position representing the given x and y as Pixel, Walk Tile, or Build Tile
-     * coordinates (depending on the Type given).
+     * Constructs and initializes the position to represent the x and y coordinate.
+     *
+     * @param x
+     *            the x-coordinate
+     *
+     * @param y
+     *            the y-coordinate
+     *
+     * @param resolution
+     *            the resolution that is being used for the specified x and y coordinates
      */
-    public Position(final int x, final int y, final Type type) {
-        this.x = x * type.scale;
-        this.y = y * type.scale;
-    }
-
-    /** Creates a new Position representing the given x and y as Pixel coordinates. */
-    public Position(final int x, final int y) {
-        this(x, y, Type.PIXEL);
-    }
-
-    /** Returns the x-coordinate, in pixels */
-    public int getPX() {
-        return x / Type.PIXEL.scale;
-    }
-
-    /** Returns the y-coordinate, in pixels */
-    public int getPY() {
-        return y / Type.PIXEL.scale;
-    }
-
-    /** Returns the x-coordinate, in walk tiles */
-    public int getWX() {
-        return x / Type.WALK.scale;
-    }
-
-    /** Returns the y-coordinate, in walk tiles */
-    public int getWY() {
-        return y / Type.WALK.scale;
-    }
-
-    /** Returns the x-coordinate, in build tiles */
-    public int getBX() {
-        return x / Type.BUILD.scale;
-    }
-
-    /** Returns the y-coordinate, in build tiles */
-    public int getBY() {
-        return y / Type.BUILD.scale;
+    public Position(final int x, final int y, final Resolution resolution) {
+        this.x = x * resolution.scale;
+        this.y = y * resolution.scale;
     }
 
     /**
-     * Returns the distance to the target position in Pixel coordinates.
-     * 
-     * @see #getApproxPDistance(Position)
+     * @param resolution
+     *            the resolution to use when returning the x-coordinate
+     *
+     * @return the x-coordinate at the specified resolution
      */
-    public double getPDistance(final Position target) {
+    public int getX(final Resolution resolution) {
+        return x / resolution.scale;
+    }
+
+    /**
+     * @param resolution
+     *            the resolution to use when returning the y-coordinate
+     *
+     * @return the y-coordinate at the specified resolution
+     */
+    public int getY(final Resolution resolution) {
+        return y / resolution.scale;
+    }
+
+    /**
+     * Returns the distance to the target position in pixels.
+     *
+     * @param target
+     *            the target position
+     *
+     * @param resolution
+     *            the resolution to use when returning the distance
+     *
+     * @return the distance to the target position at the specified resolution
+     */
+    public double getDistance(final Position target, final Resolution resolution) {
         final int dx = x - target.x;
         final int dy = y - target.y;
-        return Math.sqrt((dx * dx) + (dy * dy));
-    }
-
-    public double getWDistance(final Position target) {
-        return getPDistance(target) / Type.WALK.scale;
-    }
-
-    public double getBDistance(final Position target) {
-        return getPDistance(target) / Type.BUILD.scale;
+        return Math.sqrt((dx * dx) + (dy * dy)) / resolution.scale;
     }
 
     /**
-     * Get an approximate distance to the target position in Pixel coordinates.
-     * 
-     * Uses Starcraft's approximated distance function, which is reasonably accurate yet avoids a
-     * sqrt operation and saves some CPU cycles.
-     * 
-     * @see #getPDistance(Position)
-     **/
-    public int getApproxPDistance(final Position target) {
-        int min = Math.abs(x - target.x);
-        int max = Math.abs(y - target.y);
-        if (max < min) {
-            final int temp = max;
-            max = min;
-            min = temp;
-        }
+     * Calculates the approximate distance to a target position.
+     *
+     * <p>
+     * Uses Starcraft's approximated distance function, which is reasonably accurate yet avoids the
+     * square root operation and saves some CPU cycles.
+     *
+     * @param target
+     *            the target position
+     *
+     * @param resolution
+     *            the resolution to use when returning the approximate distance
+     *
+     * @return the approximate distance between to the target position at the specified resolution
+     */
+    public int getApproxDistance(final Position target, final Resolution resolution) {
+        final int dx = Math.abs(x - target.x);
+        final int dy = Math.abs(y - target.y);
+
+        final int min = Math.min(dx, dy);
+        final int max = Math.max(dx, dy);
 
         if (min < (max >> 2)) {
             return max;
         }
 
         final int minCalc = (3 * min) >> 3;
-        return (((minCalc >> 5) + minCalc + max) - (max >> 4) - (max >> 6));
-    }
-
-    public int getApproxWDistance(final Position target) {
-        return getApproxPDistance(target) / Type.WALK.scale;
-    }
-
-    public int getApproxBDistance(final Position target) {
-        return getApproxPDistance(target) / Type.BUILD.scale;
+        return (((minCalc >> 5) + minCalc + max) - (max >> 4) - (max >> 6)) / resolution.scale;
     }
 
     /**
-     * Returns true if the position is on the map. Note: if map parameter is null, this function
-     * will check validity against the largest (256x256) map size.
+     * Returns a new Position that represents the effect of moving this position by delta (treated
+     * as a vector from the origin).
+     *
+     * @param x
+     *            the x delta in pixels
+     *
+     * @param y
+     *            the y delta in pixels
+     *
+     * @return the new translated position
      */
+    public Position translated(final int x, final int y) {
+        return translated(new Position(x, y, PIXEL));
+    }
+
+    /**
+     * Returns a new Position that represents the effect of moving this position by delta (treated
+     * as a vector from the origin).
+     *
+     * @param delta
+     *            the delta to be applied
+     *
+     * @return the new translated position
+     */
+    public Position translated(final Position delta) {
+        return new Position(x + delta.x, y + delta.y, PIXEL);
+    }
+
     public boolean isValid(final GameMap map) {
         if ((x < 0) || (y < 0)) {
             return false;
         }
+
         if (map == null) {
-            return (getBX() < 256) && (getBY() < 256);
+            return (getX(BUILD) < 256) && (getY(BUILD) < 256);
         } else {
-            return (x < map.getSize().getPX()) && (y < map.getSize().getPY());
+            return (x < map.getSize().getX(PIXEL)) && (y < map.getSize().getY(PIXEL));
         }
     }
 
     /**
-     * Returns a <b>new</b> Position in the closest valid map position. Worked out at Build Tile
-     * resolution, like in BWAPI. Note: if map parameter is null, this function will check validity
-     * against the largest (256x256) map size.
+     * @return the hash code for this position
      */
-    public Position makeValid(final GameMap map) {
-        if (isValid(map)) {
-            return this;
-        }
-        //
-        int newBtX = Math.max(getBX(), 0);
-        int newBtY = Math.max(getBY(), 0);
-        if (map == null) {
-            newBtX = Math.min(newBtX, 256 - 1);
-            newBtY = Math.min(newBtY, 256 - 1);
-        } else {
-            newBtX = Math.min(newBtX, map.getSize().getBX() - 1);
-            newBtY = Math.min(newBtY, map.getSize().getBY() - 1);
-        }
-        return new Position(newBtX, newBtY, Type.BUILD);
-    }
-
-    /**
-     * Returns a <b>new</b> Position that represents the effect of moving this position by delta
-     * (treated as a vector from the origin)
-     */
-    public Position translated(final Position delta) {
-        return new Position(x + delta.x, y + delta.y);
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -175,7 +165,15 @@ public class Position {
         return result;
     }
 
-    /** Positions are the same as long as they have the same Pixel coordinates. */
+    /**
+     * Indicates whether or not two positions are equal.
+     *
+     * @param obj
+     *            the object to be compared
+     *
+     * @return true if the object to be compared is an instance of Position and points to the same
+     *         location, at the pixel resolution resolution, as this position; false otherwise
+     */
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
@@ -197,6 +195,9 @@ public class Position {
         return true;
     }
 
+    /**
+     * @return the String representation of this position
+     */
     @Override
     public String toString() {
         return getClass().getName() + "[x=" + x + ",y=" + y + "]";

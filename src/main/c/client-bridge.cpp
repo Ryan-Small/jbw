@@ -50,7 +50,7 @@ double fixedScale = 100.0;
 /**
 * Entry point from Java
 */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_startClient(JNIEnv* env, jobject jObj, jobject classRef)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_nativeConnect(JNIEnv* env, jobject jObj, jobject classRef)
 {
 	// get the java callback functions
 	jEnv = env;
@@ -279,17 +279,17 @@ void loadTypeData(void)
 // Game options
 /*****************************************************************************************************************/
 
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_enableUserInput(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_nativeEnableUserInput(JNIEnv* env, jobject jObj)
 {
 	Broodwar->enableFlag(Flag::UserInput);
 }
 
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_enablePerfectInformation(JNIEnv* env, jobject jObj)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_nativeEnablePerfectInformation(JNIEnv* env, jobject jObj)
 {
 	Broodwar->enableFlag(Flag::CompleteMapInformation);
 }
 
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setGameSpeed(JNIEnv* env, jobject jObj, jint speed)
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setFrameDelay(JNIEnv* env, jobject jObj, jint speed)
 {
 	Broodwar->setLocalSpeed(speed);
 }
@@ -1782,7 +1782,7 @@ JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setCommandOptimizationLev
 	Broodwar->setCommandOptimizationLevel(level);
 }
 
-JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getLastError(JNIEnv *, jobject){
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getLastErrorCode(JNIEnv *, jobject){
 	return Broodwar->getLastError().getID();
 }
 

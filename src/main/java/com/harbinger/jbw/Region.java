@@ -1,10 +1,12 @@
 package com.harbinger.jbw;
 
+import com.harbinger.jbw.Position.Resolution;
+
 import java.util.*;
 
 /**
  * Represents a region in a StarCraft map.
- * 
+ *
  * For a description of fields see: http://code.google.com/p/bwta/wiki/Region
  */
 public class Region {
@@ -22,10 +24,10 @@ public class Region {
         id = data[index++];
         final int centerX = data[index++];
         final int centerY = data[index++];
-        center = new Position(centerX, centerY);
+        center = new Position(centerX, centerY, Resolution.PIXEL);
         polygon = new Position[coordinates.length / 2];
         for (int i = 0; i < coordinates.length; i += 2) {
-            polygon[i / 2] = new Position(coordinates[i], coordinates[i + 1]);
+            polygon[i / 2] = new Position(coordinates[i], coordinates[i + 1], Resolution.PIXEL);
         }
     }
 

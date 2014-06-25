@@ -1,10 +1,8 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.Position.Positions;
-
 /**
  * Serves as a callback interface for {@link Broodwar}. The implementing class is registered during
- * construction of {@code Broodwar}. Once {@link Broodwar#start() started}, the implementing class
+ * construction of {@code Broodwar}. Once {@link Broodwar#connect() started}, the implementing class
  * will be notified of events.
  *
  * <p>
@@ -116,7 +114,7 @@ public interface BroodwarListener {
 
     /**
      * Invoked when a nuke has been launched. If the location is not visible, the provided location
-     * will be {@link Positions#Unknown unknown}.
+     * will be {@link Positions#UNKNOWN unknown}.
      *
      * @param position
      *            the position the nuke is targeted for

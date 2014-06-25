@@ -1,6 +1,6 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.Position.Type;
+import com.harbinger.jbw.Position.Resolution;
 
 /**
  * Represents a StarCraft player.
@@ -114,7 +114,7 @@ public class Player {
      * Positions.Invalid / Positions.None / Positions.Unknown.
      */
     public Position getStartLocation() {
-        return new Position(startLocationX, startLocationY, Type.BUILD);
+        return new Position(startLocationX, startLocationY, Resolution.BUILD);
     }
 
     public boolean isSelf() {

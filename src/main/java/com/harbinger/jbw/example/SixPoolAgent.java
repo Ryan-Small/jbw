@@ -25,7 +25,7 @@ public class SixPoolAgent extends BroodwarAgent {
      */
     @Override
     public void matchStart() {
-        broodwar.setGameSpeed(0);
+        broodwar.setFrameDelay(0);
         broodwar.enableUserInput();
         broodwar.enablePerfectInformation();
     }
@@ -37,8 +37,8 @@ public class SixPoolAgent extends BroodwarAgent {
     public void matchFrame() {
 
         // TODO: Why are supply numbers being doubled?
-        final int supplyUsed = broodwar.getMyself().getSupplyUsed() / 2;
-        final int supplyTotal = broodwar.getMyself().getSupplyTotal() / 2;
+        final int supplyUsed = broodwar.getAgent().getSupplyUsed() / 2;
+        final int supplyTotal = broodwar.getAgent().getSupplyTotal() / 2;
 
         // build units
         if (supplyUsed >= supplyTotal) {
@@ -62,7 +62,7 @@ public class SixPoolAgent extends BroodwarAgent {
         }
 
         // handle idle units
-        for (final Unit unit : broodwar.getMyUnits()) {
+        for (final Unit unit : broodwar.getUnits()) {
             if (unit.isIdle() && (unit.getType() == UnitType.Zerg_Drone)) {
                 for (final Unit minerals : broodwar.getNeutralUnits()) {
                     if ((minerals.getType() == UnitType.Resource_Mineral_Field)) {
@@ -82,7 +82,7 @@ public class SixPoolAgent extends BroodwarAgent {
     }
 
     private Unit getUnit(final UnitType unitType) {
-        for (final Unit unit : broodwar.getMyUnits()) {
+        for (final Unit unit : broodwar.getUnits()) {
             if (unit.getType() == unitType) {
                 return unit;
             }

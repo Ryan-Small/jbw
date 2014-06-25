@@ -1,5 +1,7 @@
 package com.harbinger.jbw;
 
+import com.harbinger.jbw.Position.Resolution;
+
 /**
  * This class is used to get information about individual units as well as issue order to units.
  * Each unit in the game has a unique Unit object, and Unit objects are not deleted until the end of
@@ -342,7 +344,8 @@ public class Unit {
                 yDist = 0;
             }
         }
-        return new Position(0, 0).getPDistance(new Position(xDist, yDist));
+        return new Position(0, 0, Resolution.PIXEL).getDistance(new Position(xDist, yDist,
+                Resolution.PIXEL), Resolution.PIXEL);
     }
 
     /** Returns the distance from the edge of the current unit to the target position. */
@@ -350,29 +353,30 @@ public class Unit {
         if (!isExists()) {
             return Integer.MAX_VALUE;
         }
-        int xDist = getLeft() - (target.getPX() + 1);
+        int xDist = getLeft() - (target.getX(Resolution.PIXEL) + 1);
         if (xDist < 0) {
-            xDist = target.getPX() - (getRight() + 1);
+            xDist = target.getX(Resolution.PIXEL) - (getRight() + 1);
             if (xDist < 0) {
                 xDist = 0;
             }
         }
-        int yDist = getTop() - (target.getPY() + 1);
+        int yDist = getTop() - (target.getY(Resolution.PIXEL) + 1);
         if (yDist < 0) {
-            yDist = target.getPY() - (getBottom() + 1);
+            yDist = target.getY(Resolution.PIXEL) - (getBottom() + 1);
             if (yDist < 0) {
                 yDist = 0;
             }
         }
-        return new Position(0, 0).getPDistance(new Position(xDist, yDist));
+        return new Position(0, 0, Resolution.PIXEL).getDistance(new Position(xDist, yDist,
+                Resolution.PIXEL), Resolution.PIXEL);
     }
 
     public Position getTopLeft() {
-        return new Position(getLeft(), getTop());
+        return new Position(getLeft(), getTop(), Resolution.PIXEL);
     }
 
     public Position getBottomRight() {
-        return new Position(getRight(), getBottom());
+        return new Position(getRight(), getBottom(), Resolution.PIXEL);
     }
 
     public int getLeft() {
@@ -461,7 +465,7 @@ public class Unit {
     }
 
     public Position getInitialPosition() {
-        return new Position(initialX, initialY);
+        return new Position(initialX, initialY, Resolution.PIXEL);
     }
 
     public int getInitialHitPoints() {
@@ -590,7 +594,7 @@ public class Unit {
     }
 
     public Position getTargetPosition() {
-        return new Position(targetX, targetY);
+        return new Position(targetX, targetY, Resolution.PIXEL);
     }
 
     public OrderType getOrder() {
@@ -606,7 +610,7 @@ public class Unit {
     }
 
     public Position getRallyPosition() {
-        return new Position(rallyX, rallyY);
+        return new Position(rallyX, rallyY, Resolution.PIXEL);
     }
 
     public Unit getRallyUnit() {
@@ -865,7 +869,7 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean attack(final Position position) {
-        return attack(getId(), position.getPX(), position.getPY());
+        return attack(getId(), position.getX(Resolution.PIXEL), position.getY(Resolution.PIXEL));
     }
 
     private native boolean attack(final int unitId, final int x, final int y);
@@ -897,7 +901,8 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean build(final UnitType building, final Position position) {
-        return build(getId(), building.getId(), position.getBX(), position.getBY());
+        return build(getId(), building.getId(), position.getX(Resolution.BUILD),
+                position.getY(Resolution.BUILD));
     }
 
     private native boolean build(final int builderId, final int buildingId, final int tx,
@@ -987,7 +992,8 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean setRallyPoint(final Position position) {
-        return setRallyPoint(getId(), position.getPX(), position.getPY());
+        return setRallyPoint(getId(), position.getX(Resolution.PIXEL),
+                position.getY(Resolution.PIXEL));
     }
 
     private native boolean setRallyPoint(final int unitId, final int x, final int y);
@@ -1016,7 +1022,7 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean move(final Position position) {
-        return move(getId(), position.getPX(), position.getPY());
+        return move(getId(), position.getX(Resolution.PIXEL), position.getY(Resolution.PIXEL));
     }
 
     private native boolean move(final int unitId, final int x, final int y);
@@ -1031,7 +1037,7 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean patrol(final Position position) {
-        return patrol(getId(), position.getPX(), position.getPY());
+        return patrol(getId(), position.getX(Resolution.PIXEL), position.getY(Resolution.PIXEL));
     }
 
     private native boolean patrol(final int unitId, final int x, final int y);
@@ -1230,7 +1236,7 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean land(final Position position) {
-        return land(getId(), position.getBX(), position.getBY());
+        return land(getId(), position.getX(Resolution.BUILD), position.getY(Resolution.BUILD));
     }
 
     private native boolean land(final int unitId, final int x, final int y);
@@ -1287,7 +1293,7 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean unloadAll(final Position position) {
-        return unloadAll(getId(), position.getPX(), position.getPY());
+        return unloadAll(getId(), position.getX(Resolution.PIXEL), position.getY(Resolution.PIXEL));
     }
 
     private native boolean unloadAll(final int unitId, final int x, final int y);
@@ -1302,7 +1308,7 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean rightClick(final Position position) {
-        return rightClick(getId(), position.getPX(), position.getPY());
+        return rightClick(getId(), position.getX(Resolution.PIXEL), position.getY(Resolution.PIXEL));
     }
 
     private native boolean rightClick(final int unitId, final int x, final int y);
@@ -1428,7 +1434,8 @@ public class Unit {
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
     public boolean useTech(final TechType tech, final Position position) {
-        return useTech(getId(), tech.getId(), position.getPX(), position.getPY());
+        return useTech(getId(), tech.getId(), position.getX(Resolution.PIXEL),
+                position.getY(Resolution.PIXEL));
     }
 
     private native boolean useTech(final int unitId, final int techId, final int x, final int y);
@@ -1451,7 +1458,7 @@ public class Unit {
     private native boolean useTech(final int unitId, final int typeId, final int targetId);
 
     public boolean placeCop(final Position position) {
-        return placeCop(getId(), position.getBX(), position.getBY());
+        return placeCop(getId(), position.getX(Resolution.BUILD), position.getY(Resolution.BUILD));
     }
 
     private native boolean placeCop(final int unitId, final int x, final int y);

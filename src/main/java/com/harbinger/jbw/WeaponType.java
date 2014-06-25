@@ -165,7 +165,7 @@ public enum WeaponType {
     private boolean targetsOrgOrMech;
     private boolean targetsOwn;
 
-    public static WeaponType getWeaponType(final int id) {
+    static WeaponType getWeaponType(final int id) {
         for (final WeaponType type : WeaponType.values()) {
             if (type.getId() == id) {
                 return type;

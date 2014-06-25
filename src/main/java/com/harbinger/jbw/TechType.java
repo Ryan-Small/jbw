@@ -1,5 +1,6 @@
 package com.harbinger.jbw;
 
+
 /**
  * Represents a StarCraft tech (research) type.
  *

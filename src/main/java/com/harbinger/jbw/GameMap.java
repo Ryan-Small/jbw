@@ -1,6 +1,6 @@
 package com.harbinger.jbw;
 
-import com.harbinger.jbw.Position.Type;
+import com.harbinger.jbw.Position.Resolution;
 
 import java.awt.Point;
 import java.util.*;
@@ -31,7 +31,7 @@ public class GameMap {
 
     public GameMap(final String name, final String fileName, final String hash, final int width,
             final int height, final int[] heightMap, final int[] buildable, final int[] walkable) {
-        size = new Position(width, height, Type.BUILD);
+        size = new Position(width, height, Resolution.BUILD);
         this.name = name;
         this.fileName = fileName;
         this.hash = hash;
@@ -50,10 +50,10 @@ public class GameMap {
         // Fill lowResWalkable for A* search
         lowResWalkable = new boolean[width * height];
         Arrays.fill(lowResWalkable, true);
-        for (int wx = 0; wx < size.getWX(); wx++) {
-            for (int wy = 0; wy < size.getWY(); wy++) {
+        for (int wx = 0; wx < size.getX(Resolution.WALK); wx++) {
+            for (int wy = 0; wy < size.getY(Resolution.WALK); wy++) {
                 lowResWalkable[(wx / 4) + (width * (wy / 4))] &=
-                        isWalkable(new Position(wx, wy, Type.WALK));
+                        isWalkable(new Position(wx, wy, Resolution.WALK));
             }
         }
     }
@@ -116,25 +116,25 @@ public class GameMap {
     /** @deprecated Width in build tiles (32px). Use {@link #getSize()} instead. */
     @Deprecated
     public int getWidth() {
-        return size.getBX();
+        return size.getX(Resolution.BUILD);
     }
 
     /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
     @Deprecated
     public int getHeight() {
-        return size.getBY();
+        return size.getY(Resolution.BUILD);
     }
 
     /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
     @Deprecated
     public int getWalkWidth() {
-        return size.getWX();
+        return size.getX(Resolution.WALK);
     }
 
     /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
     @Deprecated
     public int getWalkHeight() {
-        return size.getWY();
+        return size.getY(Resolution.WALK);
     }
 
     /** The name of the current map */
@@ -153,7 +153,7 @@ public class GameMap {
 
     /** Converts a position to a 1-dimensional build tile array index for this map */
     private int getBuildTileArrayIndex(final Position p) {
-        return p.getBX() + (size.getBX() * p.getBY());
+        return p.getX(Resolution.BUILD) + (size.getX(Resolution.BUILD) * p.getY(Resolution.BUILD));
     }
 
     public int getGroundHeight(final Position p) {
@@ -183,7 +183,8 @@ public class GameMap {
 
     public boolean isWalkable(final Position p) {
         if (p.isValid(this)) {
-            return walkable[p.getWX() + (size.getWX() * p.getWY())];
+            return walkable[p.getX(Resolution.WALK)
+                    + (size.getX(Resolution.WALK) * p.getY(Resolution.WALK))];
         } else {
             return false;
         }
@@ -237,7 +238,8 @@ public class GameMap {
         if (!isConnected(start, end)) {
             return -1;
         }
-        return aStarSearchDistance(start.getBX(), start.getBY(), end.getBX(), end.getBY());
+        return aStarSearchDistance(start.getX(Resolution.BUILD), start.getY(Resolution.BUILD),
+                end.getX(Resolution.BUILD), end.getY(Resolution.BUILD));
     }
 
     /**
@@ -280,17 +282,17 @@ public class GameMap {
             closedTiles.add(p);
             // Explore the neighbours of p
             final int minx = Math.max(p.x - 1, 0);
-            final int maxx = Math.min(p.x + 1, size.getBX() - 1);
+            final int maxx = Math.min(p.x + 1, size.getX(Resolution.BUILD) - 1);
             final int miny = Math.max(p.y - 1, 0);
-            final int maxy = Math.min(p.y + 1, size.getBY() - 1);
+            final int maxy = Math.min(p.y + 1, size.getY(Resolution.BUILD) - 1);
             for (int x = minx; x <= maxx; x++) {
                 for (int y = miny; y <= maxy; y++) {
-                    if (!isLowResWalkable(new Position(x, y, Type.BUILD))) {
+                    if (!isLowResWalkable(new Position(x, y, Resolution.BUILD))) {
                         continue;
                     }
                     if ((p.x != x) && (p.y != y)
-                            && !isLowResWalkable(new Position(p.x, y, Type.BUILD))
-                            && !isLowResWalkable(new Position(x, p.y, Type.BUILD))) {
+                            && !isLowResWalkable(new Position(p.x, y, Resolution.BUILD))
+                            && !isLowResWalkable(new Position(x, p.y, Resolution.BUILD))) {
                         continue; // Not diagonally accessible
                     }
                     final Point t = new Point(x, y);
@@ -355,7 +357,7 @@ public class GameMap {
 
             // if this is an island expansion, draw a yellow circle around the base location
             if (bl.isIsland()) {
-                bwapi.drawCircleMap(p.translated(new Position(2, 1, Type.BUILD)), 80,
+                bwapi.drawCircleMap(p.translated(new Position(2, 1, Resolution.BUILD)), 80,
                         BWColor.YELLOW, false);
             }
 
