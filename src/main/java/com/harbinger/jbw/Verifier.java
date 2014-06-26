@@ -16,12 +16,12 @@ public class Verifier {
      * </pre>
      *
      * @param object
-     *            the Object to check for nullity.
+     *            the Object to check for nullity
      *
-     * @return the {@code object}
+     * @return the object
      *
      * @throws IllegalArgumentException
-     *             Thrown if {@code object} is {@code null}.
+     *             thrown if the object is null
      */
     public static <T> T requireNonNull(final T object) {
         if (object == null) {
@@ -46,10 +46,10 @@ public class Verifier {
      * @param message
      *            the message to use if the exception is thrown
      *
-     * @return the {@code object}
+     * @return the object
      *
      * @throws IllegalArgumentException
-     *             Thrown if {@code object} is {@code null}.
+     *             thrown if the object is null
      */
     public static <T> T requireNonNull(final T object, final String message) {
         if (object == null) {
