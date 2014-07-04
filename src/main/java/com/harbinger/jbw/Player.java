@@ -1,6 +1,9 @@
 package com.harbinger.jbw;
 
 import com.harbinger.jbw.Position.Resolution;
+import com.harbinger.jbw.Type.Race;
+import com.harbinger.jbw.Type.Tech;
+import com.harbinger.jbw.Type.Upgrade;
 
 /**
  * Represents a StarCraft player.
@@ -40,7 +43,7 @@ public class Player {
     private final boolean[] upgrading;
     private final int[] upgradeLevel;
 
-    public Player(final int[] data, int index, final String name) {
+    Player(final int[] data, int index, final String name) {
         id = data[index++];
         raceId = data[index++];
         typeId = data[index++];
@@ -55,20 +58,20 @@ public class Player {
         this.name = name;
         // Initialise technology records
         int highestIDTechType = 0;
-        for (final TechType t : TechType.values()) {
+        for (final Tech t : Tech.values()) {
             highestIDTechType = Math.max(highestIDTechType, t.getId());
         }
         researching = new boolean[highestIDTechType + 1];
         researched = new boolean[highestIDTechType + 1];
         int highestIDUpgradeType = 0;
-        for (final UpgradeType ut : UpgradeType.values()) {
+        for (final Upgrade ut : Upgrade.values()) {
             highestIDUpgradeType = Math.max(highestIDUpgradeType, ut.getId());
         }
         upgrading = new boolean[highestIDUpgradeType + 1];
         upgradeLevel = new int[highestIDUpgradeType + 1];
     }
 
-    public void update(final int[] data) {
+    void update(final int[] data) {
         int index = 0;
         minerals = data[index++];
         gas = data[index++];
@@ -82,7 +85,7 @@ public class Player {
         razingScore = data[index++];
     }
 
-    public void updateResearch(final int[] techData, final int[] upgradeData) {
+    void updateResearch(final int[] techData, final int[] upgradeData) {
         for (int i = 0; i < techData.length; i += 3) {
             final int techTypeID = techData[i];
             researched[techTypeID] = (techData[i + 1] == 1);
@@ -96,16 +99,16 @@ public class Player {
         }
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
-    public RaceType getRace() {
-        return RaceType.getRaceType(raceId);
+    public Race getRace() {
+        return Race.getRaceType(raceId);
     }
 
     // TODO Should return a PlayerType
-    public int getTypeId() {
+    int getTypeId() {
         return typeId;
     }
 
@@ -185,27 +188,33 @@ public class Player {
         return razingScore;
     }
 
-    public boolean isResearched(final TechType tech) {
+    public boolean isResearched(final Tech tech) {
         return researched[tech.getId()];
     }
 
-    public boolean isResearching(final TechType tech) {
+    public boolean isResearching(final Tech tech) {
         return researching[tech.getId()];
     }
 
-    public int getUpgradeLevel(final UpgradeType upgrade) {
+    public int getUpgradeLevel(final Upgrade upgrade) {
         return upgradeLevel[upgrade.getId()];
     }
 
-    public boolean isUpgrading(final UpgradeType upgrade) {
+    public boolean isUpgrading(final Upgrade upgrade) {
         return upgrading[upgrade.getId()];
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return id;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {

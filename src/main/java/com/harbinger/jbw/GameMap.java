@@ -1,6 +1,7 @@
 package com.harbinger.jbw;
 
 import com.harbinger.jbw.Position.Resolution;
+import com.harbinger.jbw.Type.UnitType;
 
 import java.awt.Point;
 import java.util.*;
@@ -184,7 +185,7 @@ public class GameMap {
     public boolean isWalkable(final Position p) {
         if (p.isValid(this)) {
             return walkable[p.getX(Resolution.WALK)
-                    + (size.getX(Resolution.WALK) * p.getY(Resolution.WALK))];
+                            + (size.getX(Resolution.WALK) * p.getY(Resolution.WALK))];
         } else {
             return false;
         }

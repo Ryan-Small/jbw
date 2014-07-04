@@ -5,7 +5,7 @@ import static com.harbinger.jbw.Position.Resolution.PIXEL;
 public class ColorAcceptanceTestAgent extends BroodwarAgent {
 
     public static void main(final String[] args) {
-        new ColorAcceptanceTestAgent().start();
+        new ColorAcceptanceTestAgent().launchWithBroodwar();
     }
 
     private BWColor getColor() {
@@ -44,5 +44,9 @@ public class ColorAcceptanceTestAgent extends BroodwarAgent {
         broodwar.drawEllipseMap(50, 130, 10, 5, color, true);
         broodwar.drawEllipseScreen(new Position(80, 130, PIXEL), 10, 5, color, false);
         broodwar.drawEllipseScreen(110, 130, 10, 5, color, true);
+
+        if (broodwar.getFrame() == 100) {
+            terminateBroodwar();
+        }
     }
 }

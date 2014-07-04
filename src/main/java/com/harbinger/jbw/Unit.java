@@ -1,6 +1,11 @@
 package com.harbinger.jbw;
 
 import com.harbinger.jbw.Position.Resolution;
+import com.harbinger.jbw.Type.Command;
+import com.harbinger.jbw.Type.Order;
+import com.harbinger.jbw.Type.Tech;
+import com.harbinger.jbw.Type.UnitType;
+import com.harbinger.jbw.Type.Upgrade;
 
 /**
  * This class is used to get information about individual units as well as issue order to units.
@@ -452,8 +457,8 @@ public class Unit {
         return lastCommandFrame;
     }
 
-    public CommandType getLastCommand() {
-        return CommandType.getCommandType(lastCommandId);
+    public Command getLastCommand() {
+        return Command.getCommandType(lastCommandId);
     }
 
     public Player getLastAttackingPlayer() {
@@ -561,12 +566,12 @@ public class Unit {
         return trainingQueueSize;
     }
 
-    public TechType getTech() {
-        return TechType.getTechType(researchingTechId);
+    public Tech getTech() {
+        return Tech.getTechType(researchingTechId);
     }
 
-    public UpgradeType getUpgrade() {
-        return UpgradeType.getUpgradeType(upgradingUpgradeId);
+    public Upgrade getUpgrade() {
+        return Upgrade.getUpgradeType(upgradingUpgradeId);
     }
 
     public int getRemainingBuildTimer() {
@@ -597,16 +602,16 @@ public class Unit {
         return new Position(targetX, targetY, Resolution.PIXEL);
     }
 
-    public OrderType getOrder() {
-        return OrderType.getOrderType(orderId);
+    public Order getOrder() {
+        return Order.getOrderType(orderId);
     }
 
     public Unit getOrderTarget() {
         return broodwar.getUnit(orderTargetId);
     }
 
-    public OrderType getSecondaryOrder() {
-        return OrderType.getOrderType(secondaryOrderId);
+    public Order getSecondaryOrder() {
+        return Order.getOrderType(secondaryOrderId);
     }
 
     public Position getRallyPosition() {
@@ -963,7 +968,7 @@ public class Unit {
      *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean research(final TechType tech) {
+    public boolean research(final Tech tech) {
         return research(getId(), tech.getId());
     }
 
@@ -977,7 +982,7 @@ public class Unit {
      *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean upgrade(final UpgradeType upgrade) {
+    public boolean upgrade(final Upgrade upgrade) {
         return upgrade(getId(), upgrade.getId());
     }
 
@@ -1416,7 +1421,7 @@ public class Unit {
      *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean useTech(final TechType tech) {
+    public boolean useTech(final Tech tech) {
         return useTech(getId(), tech.getId());
     }
 
@@ -1433,7 +1438,7 @@ public class Unit {
      *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean useTech(final TechType tech, final Position position) {
+    public boolean useTech(final Tech tech, final Position position) {
         return useTech(getId(), tech.getId(), position.getX(Resolution.PIXEL),
                 position.getY(Resolution.PIXEL));
     }
@@ -1451,7 +1456,7 @@ public class Unit {
      *
      * @return {@code true} if the command can be completed; {@code false} otherwise
      */
-    public boolean useTech(final TechType tech, final Unit target) {
+    public boolean useTech(final Tech tech, final Unit target) {
         return useTech(getId(), tech.getId(), target.getId());
     }
 

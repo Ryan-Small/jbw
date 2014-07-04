@@ -2,8 +2,8 @@ package com.harbinger.jbw.example;
 
 import com.harbinger.jbw.BroodwarAgent;
 import com.harbinger.jbw.Position;
+import com.harbinger.jbw.Type.UnitType;
 import com.harbinger.jbw.Unit;
-import com.harbinger.jbw.UnitType;
 
 /**
  * Serves as an example agent to introduce JavaBroodwar to new developers.
@@ -17,7 +17,7 @@ import com.harbinger.jbw.UnitType;
 public class SixPoolAgent extends BroodwarAgent {
 
     public static void main(final String[] args) {
-        new SixPoolAgent().start();
+        new SixPoolAgent().launchWithBroodwar();
     }
 
     /**

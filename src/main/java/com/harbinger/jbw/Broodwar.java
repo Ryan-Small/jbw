@@ -3,6 +3,18 @@ package com.harbinger.jbw;
 import static com.harbinger.jbw.Position.Resolution.BUILD;
 import static com.harbinger.jbw.Position.Resolution.PIXEL;
 
+import com.harbinger.jbw.Type.Bullet;
+import com.harbinger.jbw.Type.Command;
+import com.harbinger.jbw.Type.Damage;
+import com.harbinger.jbw.Type.Explosion;
+import com.harbinger.jbw.Type.Order;
+import com.harbinger.jbw.Type.Race;
+import com.harbinger.jbw.Type.Tech;
+import com.harbinger.jbw.Type.UnitSize;
+import com.harbinger.jbw.Type.UnitType;
+import com.harbinger.jbw.Type.Upgrade;
+import com.harbinger.jbw.Type.Weapon;
+
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -48,7 +60,7 @@ public class Broodwar {
      *            listener to notify of game events
      */
     public Broodwar(final BroodwarListener listener) {
-        this.listener = Verifier.requireNonNull(listener, "listener cannot be null");
+        this.listener = Argument.requireNonNull(listener, "listener cannot be null");
     }
 
     /**
@@ -548,7 +560,7 @@ public class Broodwar {
      *
      * @return true if the TechType can be researched; false otherwise
      */
-    public boolean canResearch(final TechType techType) {
+    public boolean canResearch(final Tech techType) {
         return canResearch(techType.getId());
     }
 
@@ -568,7 +580,7 @@ public class Broodwar {
      *
      * @return true if the TechType can be researched; false otherwise
      */
-    public boolean canResearch(final Unit unit, final TechType techType) {
+    public boolean canResearch(final Unit unit, final Tech techType) {
         return canResearch(unit.getId(), techType.getId());
     }
 
@@ -621,7 +633,7 @@ public class Broodwar {
      *
      * @return true if the UpgradeType can be acquired; false otherwise
      */
-    public boolean canUpgrade(final UpgradeType unitType) {
+    public boolean canUpgrade(final Upgrade unitType) {
         return canUpgrade(unitType.getId());
     }
 
@@ -638,7 +650,7 @@ public class Broodwar {
      *
      * @return true if the UpgradeType can be acquired through Unit; false otherwise
      */
-    public boolean canUpgrade(final Unit unit, final UpgradeType upgradeType) {
+    public boolean canUpgrade(final Unit unit, final Upgrade upgradeType) {
         return canUpgrade(unit.getId(), upgradeType.getId());
     }
 
@@ -1208,9 +1220,9 @@ public class Broodwar {
     private void loadTypeData() {
         // race types
         final int[] raceTypeData = getRaceTypes();
-        for (int index = 0; index < raceTypeData.length; index += RaceType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < raceTypeData.length; index += Race.NUM_ATTRIBUTES) {
             final int id = raceTypeData[index];
-            RaceType.getRaceType(id).initialize(raceTypeData, index, getRaceTypeName(id));
+            Race.getRaceType(id).initialize(raceTypeData, index, getRaceTypeName(id));
         }
 
         // unit types
@@ -1223,69 +1235,69 @@ public class Broodwar {
 
         // tech types
         final int[] techTypeData = getTechTypes();
-        for (int index = 0; index < techTypeData.length; index += TechType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < techTypeData.length; index += Tech.NUM_ATTRIBUTES) {
             final int id = techTypeData[index];
-            TechType.getTechType(id).initialize(techTypeData, index, getTechTypeName(id));
+            Tech.getTechType(id).initialize(techTypeData, index, getTechTypeName(id));
         }
 
         // upgrade types
         final int[] upgradeTypeData = getUpgradeTypes();
-        for (int index = 0; index < upgradeTypeData.length; index += UpgradeType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < upgradeTypeData.length; index += Upgrade.NUM_ATTRIBUTES) {
             final int id = upgradeTypeData[index];
-            UpgradeType.getUpgradeType(id).initialize(upgradeTypeData, index,
+            Upgrade.getUpgradeType(id).initialize(upgradeTypeData, index,
                     getUpgradeTypeName(id));
         }
 
         // weapon types
         final int[] weaponTypeData = getWeaponTypes();
-        for (int index = 0; index < weaponTypeData.length; index += WeaponType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < weaponTypeData.length; index += Weapon.NUM_ATTRIBUTES) {
             final int id = weaponTypeData[index];
-            WeaponType.getWeaponType(id).initialize(weaponTypeData, index, getWeaponTypeName(id));
+            Weapon.getWeaponType(id).initialize(weaponTypeData, index, getWeaponTypeName(id));
         }
 
         // unit size types
         final int[] unitSizeTypeData = getUnitSizeTypes();
-        for (int index = 0; index < unitSizeTypeData.length; index += UnitSizeType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < unitSizeTypeData.length; index += UnitSize.NUM_ATTRIBUTES) {
             final int id = unitSizeTypeData[index];
-            UnitSizeType.getUnitSizeType(id).initialize(unitSizeTypeData, index,
+            UnitSize.getUnitSizeType(id).initialize(unitSizeTypeData, index,
                     getUnitSizeTypeName(id));
         }
 
         // bullet types
         final int[] bulletTypeData = getBulletTypes();
-        for (int index = 0; index < bulletTypeData.length; index += BulletType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < bulletTypeData.length; index += Bullet.NUM_ATTRIBUTES) {
             final int id = bulletTypeData[index];
-            BulletType.getBulletType(id).initialize(bulletTypeData, index, getBulletTypeName(id));
+            Bullet.getBulletType(id).initialize(bulletTypeData, index, getBulletTypeName(id));
         }
 
         // damage types
         final int[] damageTypeData = getDamageTypes();
-        for (int index = 0; index < damageTypeData.length; index += DamageType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < damageTypeData.length; index += Damage.NUM_ATTRIBUTES) {
             final int id = damageTypeData[index];
-            DamageType.getDamageType(id).initialize(damageTypeData, index, getDamageTypeName(id));
+            Damage.getDamageType(id).initialize(damageTypeData, index, getDamageTypeName(id));
         }
 
         // explosion types
         final int[] explosionTypeData = getExplosionTypes();
-        for (int index = 0; index < explosionTypeData.length; index += ExplosionType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < explosionTypeData.length; index += Explosion.NUM_ATTRIBUTES) {
             final int id = explosionTypeData[index];
-            ExplosionType.getExplosionType(id).initialize(explosionTypeData, index,
+            Explosion.getExplosionType(id).initialize(explosionTypeData, index,
                     getExplosionTypeName(id));
         }
 
         // unitCommand types
         final int[] unitCommandTypeData = getUnitCommandTypes();
-        for (int index = 0; index < unitCommandTypeData.length; index += CommandType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < unitCommandTypeData.length; index += Command.NUM_ATTRIBUTES) {
             final int id = unitCommandTypeData[index];
-            CommandType.getCommandType(id).initialize(unitCommandTypeData, index,
+            Command.getCommandType(id).initialize(unitCommandTypeData, index,
                     getUnitCommandTypeName(id));
         }
 
         // order types
         final int[] orderTypeData = getOrderTypes();
-        for (int index = 0; index < orderTypeData.length; index += OrderType.NUM_ATTRIBUTES) {
+        for (int index = 0; index < orderTypeData.length; index += Order.NUM_ATTRIBUTES) {
             final int id = orderTypeData[index];
-            OrderType.getOrderType(id).initialize(orderTypeData, index, getOrderTypeName(id));
+            Order.getOrderType(id).initialize(orderTypeData, index, getOrderTypeName(id));
         }
     }
 
@@ -1663,6 +1675,33 @@ public class Broodwar {
 
             default :
                 break;
+        }
+    }
+
+    private enum EventType {
+        MATCH_START,
+        MATCH_END,
+        MATCH_FRAME,
+        MENU_FRAME,
+        SEND_TEXT,
+        RECEIVE_TEXT,
+        PLAYER_LEFT,
+        NUKE_DETECT,
+        UNIT_DISCOVER,
+        UNIT_EVADE,
+        UNIT_SHOW,
+        UNIT_HIDE,
+        UNIT_CREATE,
+        UNIT_DESTROY,
+        UNIT_MORPH,
+        UNIT_RENEGADE,
+        SAVE_GAME,
+        UNIT_COMPLETE,
+        PLAYER_DROPPED,
+        NONE;
+
+        public static EventType getEventType(final int id) {
+            return EventType.values()[id];
         }
     }
 

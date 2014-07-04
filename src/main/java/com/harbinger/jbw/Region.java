@@ -5,13 +5,12 @@ import com.harbinger.jbw.Position.Resolution;
 import java.util.*;
 
 /**
- * Represents a region in a StarCraft map.
- *
- * For a description of fields see: http://code.google.com/p/bwta/wiki/Region
+ * Represents a region of the map with a polygon boundary, and is connected to other regions via
+ * {@link ChokePoint}.
  */
 public class Region {
 
-    public static final int NUM_ATTRIBUTES = 3;
+    static final int NUM_ATTRIBUTES = 3;
 
     private final int id;
     private final Position center;
@@ -20,7 +19,7 @@ public class Region {
     private final Set<ChokePoint> chokePoints = new HashSet<>();
     private Set<Region> allConnectedRegions = null;
 
-    public Region(final int[] data, int index, final int[] coordinates) {
+    Region(final int[] data, int index, final int[] coordinates) {
         id = data[index++];
         final int centerX = data[index++];
         final int centerY = data[index++];
@@ -31,35 +30,47 @@ public class Region {
         }
     }
 
-    public int getId() {
+    int getId() {
         return id;
     }
 
+    void addChokePoint(final ChokePoint chokePoint) {
+        chokePoints.add(chokePoint);
+    }
+
+    void addConnectedRegion(final Region other) {
+        connectedRegions.add(other);
+    }
+
+    /**
+     * @return the center of this region
+     */
     public Position getCenter() {
         return center;
     }
 
+    /**
+     * @return the polygon border of this region
+     */
     public Position[] getPolygon() {
         return Arrays.copyOf(polygon, polygon.length);
     }
 
-    protected void addChokePoint(final ChokePoint chokePoint) {
-        chokePoints.add(chokePoint);
-    }
-
+    /**
+     * @return the ChokePoints adjacent to this region
+     */
     public Set<ChokePoint> getChokePoints() {
         return Collections.unmodifiableSet(chokePoints);
     }
 
-    protected void addConnectedRegion(final Region other) {
-        connectedRegions.add(other);
-    }
-
+    /**
+     * @return the Regions connected to this region
+     */
     public Set<Region> getConnectedRegions() {
         return Collections.unmodifiableSet(connectedRegions);
     }
 
-    /** Get all transitively connected regions for a given region */
+    // Get all transitively connected regions for a given region
     public Set<Region> getAllConnectedRegions() {
         // Evaluate on first call
         if (allConnectedRegions == null) {

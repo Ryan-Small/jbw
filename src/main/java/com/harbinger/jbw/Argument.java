@@ -1,13 +1,13 @@
 package com.harbinger.jbw;
 
 /**
- * Helper class for argument verification.
+ * Convenience class for verifying arguments.
  */
-public class Verifier {
+public class Argument {
 
     /**
-     * Verifies that the {@code object} is not {@code null}. This method is designed primarily for
-     * doing parameter validation in methods and constructors, as demonstrated below:
+     * Verifies that the object is not null. This method is designed primarily for doing parameter
+     * validation in methods and constructors, as demonstrated below:
      *
      * <pre>
      * public Foo(final Bar bar) {
@@ -31,8 +31,8 @@ public class Verifier {
     }
 
     /**
-     * Verifies that the {@code object} is not {@code null}. This method is designed primarily for
-     * doing parameter validation in methods and constructors, as demonstrated below:
+     * Verifies that the object is not null. This method is designed primarily for doing parameter
+     * validation in methods and constructors, as demonstrated below:
      *
      * <pre>
      * public Foo(final Bar bar) {
