@@ -2,6 +2,15 @@ package com.harbinger.jbw;
 
 import static com.harbinger.jbw.Position.Resolution.PIXEL;
 
+/**
+ * Verifies that text and shapes can be drawn. This test is not automated; it launches Broodwar and
+ * the an agent that will invoke the drawing methods. A user will need to verify that they are in
+ * face drawing properly.
+ *
+ * <p>
+ * Some of the drawing methods will drawn directly on the screen, others on the map in the top-left
+ * corner. The text and shapes will cycle through all of the available colors.
+ */
 public class ColorAcceptanceTestAgent extends BroodwarAgent {
 
     public static void main(final String[] args) {
@@ -44,9 +53,5 @@ public class ColorAcceptanceTestAgent extends BroodwarAgent {
         broodwar.drawEllipseMap(50, 130, 10, 5, color, true);
         broodwar.drawEllipseScreen(new Position(80, 130, PIXEL), 10, 5, color, false);
         broodwar.drawEllipseScreen(110, 130, 10, 5, color, true);
-
-        if (broodwar.getFrame() == 100) {
-            terminateBroodwar();
-        }
     }
 }
