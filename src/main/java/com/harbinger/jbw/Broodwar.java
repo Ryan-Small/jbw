@@ -60,7 +60,10 @@ public class Broodwar {
      *            listener to notify of game events
      */
     public Broodwar(final BroodwarListener listener) {
-        this.listener = Argument.requireNonNull(listener, "listener cannot be null");
+        if (listener == null) {
+            throw new IllegalArgumentException("listener cannot be null");
+        }
+        this.listener = listener;
     }
 
     /**
@@ -1244,8 +1247,7 @@ public class Broodwar {
         final int[] upgradeTypeData = getUpgradeTypes();
         for (int index = 0; index < upgradeTypeData.length; index += Upgrade.NUM_ATTRIBUTES) {
             final int id = upgradeTypeData[index];
-            Upgrade.getUpgradeType(id).initialize(upgradeTypeData, index,
-                    getUpgradeTypeName(id));
+            Upgrade.getUpgradeType(id).initialize(upgradeTypeData, index, getUpgradeTypeName(id));
         }
 
         // weapon types
