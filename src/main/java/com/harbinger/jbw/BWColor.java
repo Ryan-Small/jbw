@@ -1,5 +1,8 @@
 package com.harbinger.jbw;
 
+/**
+ * Colors that are part of the Broodwar color palette.
+ */
 public enum BWColor {
 
     /** the default color for Player 1 */
@@ -32,7 +35,10 @@ public enum BWColor {
     /** the default color for Player 12 (neutral) */
     CYAN(128, "\u001F"),
 
+    /** the color black */
     BLACK(0, "\u0005"),
+
+    /** the color grey */
     GREY(74, "\u0016");
 
     private int id;
