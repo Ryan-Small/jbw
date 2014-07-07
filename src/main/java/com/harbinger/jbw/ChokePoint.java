@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public class ChokePoint {
 
-    public static final int NUM_ATTRIBUTES = 9;
-    public static final double fixedScale = 100.0;
+    static final int NUM_ATTRIBUTES = 9;
+    private static final double SCALE = 100.0;
 
     private final Position center;
     private final double radius;
@@ -21,11 +21,11 @@ public class ChokePoint {
     private final Region firstRegion;
     private final Region secondRegion;
 
-    public ChokePoint(final int[] data, int index, final Map<Integer, Region> idToRegion) {
+    ChokePoint(final int[] data, int index, final Map<Integer, Region> idToRegion) {
         final int centerX = data[index++];
         final int centerY = data[index++];
         center = new Position(centerX, centerY, Resolution.PIXEL);
-        radius = data[index++] / fixedScale;
+        radius = data[index++] / SCALE;
         firstRegionId = data[index++];
         secondRegionId = data[index++];
         final int firstSideX = data[index++];
