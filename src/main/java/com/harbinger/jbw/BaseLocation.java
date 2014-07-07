@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class BaseLocation {
 
-    public static final int NUM_ATTRIBUTES = 10;
+    static final int NUM_ATTRIBUTES = 10;
 
     private final Position center;
     private final Position position;
