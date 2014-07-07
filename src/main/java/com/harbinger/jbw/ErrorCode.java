@@ -9,9 +9,8 @@ public enum ErrorCode {
 
     /**
      * Indicates that there was an attempt to order a unit or request information about a unit that
-     * does not exist.
+     * does not, or no longer, exists.
      */
-    // TODO: What if the unit did exist and was killed?
     UNIT_DOES_NOT_EXIST,
 
     /**
