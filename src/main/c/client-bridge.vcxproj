@@ -204,7 +204,7 @@ del $(OutDir)\$(ProjectName)-$(PlatformShortName).exp</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="com_harbinger_jbw_Broodwar.h" />
-    <ClInclude Include="com_harbinger_jbw_model_Unit.h" />
+    <ClInclude Include="com_harbinger_jbw_Unit.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
