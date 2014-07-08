@@ -204,13 +204,15 @@ public class Position {
         return new Position(x + delta.x, y + delta.y, PIXEL);
     }
 
+    /**
+     * @param map
+     *            the GameMap to verify Position against
+     * 
+     * @return true if the Position is on the GameMap; false otherwise
+     */
     public boolean isValid(final GameMap map) {
         if ((x < 0) || (y < 0)) {
             return false;
-        }
-
-        if (map == null) {
-            return (getX(BUILD) < 256) && (getY(BUILD) < 256);
         } else {
             return (x < map.getSize().getX(PIXEL)) && (y < map.getSize().getY(PIXEL));
         }
