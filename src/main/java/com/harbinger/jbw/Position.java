@@ -12,6 +12,9 @@ public class Position {
     public static final Position UNKNOWN = new Position(1000, 1001, BUILD);
     public static final Position INVALID = new Position(1000, 1002, BUILD);
 
+    /**
+     * Indicates the different resolutions a position can have.
+     */
     public static enum Resolution {
         PIXEL(1),
         WALK(8),
@@ -63,6 +66,66 @@ public class Position {
      */
     public int getY(final Resolution resolution) {
         return y / resolution.scale;
+    }
+
+    /**
+     * Convenience method for getting the x-coordinate at the {@code PIXEL} resolution. Equivalent
+     * to {@code getX(Resolution.PIXEL);}.
+     *
+     * @return the x-coordinate at the {@code PIXEL} resolution
+     */
+    public int getPX() {
+        return getX(Resolution.PIXEL);
+    }
+
+    /**
+     * Convenience method for getting the y-coordinate at the {@code PIXEL} resolution. Equivalent
+     * to {@code getY(Resolution.PIXEL);}.
+     *
+     * @return the y-coordinate at the {@code PIXEL} resolution
+     */
+    public int getPY() {
+        return getY(Resolution.PIXEL);
+    }
+
+    /**
+     * Convenience method for getting the x-coordinate at the {@code WALK} resolution. Equivalent to
+     * {@code getX(Resolution.WALK)}.
+     *
+     * @return the x-coordinate at the {@code WALK} resolution
+     */
+    public int getWX() {
+        return getX(Resolution.WALK);
+    }
+
+    /**
+     * Convenience method for getting the y-coordinate at the {@code WALK} resolution. Equivalent to
+     * {@code getY(Resolution.WALK)}.
+     *
+     * @return the y-coordinate at the {@code WALK} resolution
+     */
+    public int getWY() {
+        return getY(Resolution.WALK);
+    }
+
+    /**
+     * Convenience method for getting the x-coordinate at the {@code BUILD} resolution. Equivalent
+     * to {@code getX(Resolution.BUILD)}.
+     *
+     * @return the x-coordinate at the {@code BUILD} resolution
+     */
+    public int getBX() {
+        return getX(Resolution.BUILD);
+    }
+
+    /**
+     * Convenience method for getting the y-coordinate at the {@code BUILD} resolution. Equivalent
+     * to {@code getY(Resolution.BUILD)}.
+     *
+     * @return the y-coordinate at the {@code BUILD} resolution
+     */
+    public int getBY() {
+        return getY(Resolution.BUILD);
     }
 
     /**
