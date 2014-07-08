@@ -351,7 +351,7 @@ public class GameMap {
     public void drawTerrainData(final Broodwar bwapi) {
         // iterate through all the base locations and draw their outlines
         for (final BaseLocation bl : bwapi.getMap().getBaseLocations()) {
-            final Position p = bl.getPosition();
+            final Position p = bl.getCenter();
 
             // draw outline of base location
             bwapi.drawRectangleMap(p, 128, 96, BWColor.BLUE, false);
