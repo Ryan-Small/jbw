@@ -37,27 +37,36 @@ public class BaseLocation {
     }
 
     /**
-     * @return the center of the base
+     * @return the top-left (build) Position where a Hatchery, Nexus, or Command Center should be
+     *         built
+     */
+    public Position getPosition() {
+        return position;
+    }
+
+    /**
+     * @return the center Position of where a Hatchery, Nexus, or Command Center should be built
      */
     public Position getCenter() {
         return center;
     }
 
-    /** The Position of the top left of the BaseLocation */
-    public Position getPosition() {
-        return position;
-    }
-
+    /**
+     * @return the Region this base is located in
+     */
     public Region getRegion() {
         return region;
     }
 
+    /**
+     * @return the amount of minerals originally available
+     */
     public int getMinerals() {
         return minerals;
     }
 
     /**
-     * @return
+     * @return the amount of gas originally available
      */
     public int getGas() {
         return gas;
