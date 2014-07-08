@@ -59,14 +59,14 @@ public class BaseLocation {
     }
 
     /**
-     * @return the amount of minerals originally available
+     * @return the amount of minerals originally available at the start of the match
      */
     public int getMinerals() {
         return minerals;
     }
 
     /**
-     * @return the amount of gas originally available
+     * @return the amount of gas originally available at the start of the match
      */
     public int getGas() {
         return gas;
