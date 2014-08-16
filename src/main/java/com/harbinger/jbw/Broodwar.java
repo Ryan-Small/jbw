@@ -629,7 +629,10 @@ public class Broodwar {
     private native boolean canMake(final int unitId, final int unitTypeId);
 
     /**
-     * Checks that the UpgradeType can be acquired.
+     * Indicates if all the requirements have been met to allow the upgrading of an Update.
+     *
+     * <p>
+     * The requirements include resources, technology tree, and availability.
      *
      * @param unitType
      *            the UpgradeType to check
@@ -643,7 +646,11 @@ public class Broodwar {
     private native boolean canUpgrade(int upgradeTypeId);
 
     /**
-     * Checks that the Unit can perform the UpgradeType.
+     * Indicates if all the requirements have been met to allow a specific Unit to perform an
+     * Upgrade.
+     *
+     * <p>
+     * The requirements include resources, technology tree, and availability.
      *
      * @param unit
      *            the Unit that will be used to acquire the upgrade
@@ -1371,18 +1378,14 @@ public class Broodwar {
     private void loadMapData() {
         final String mapName = new String(getMapName(), CHARACTER_SET);
         final String fileName = getMapFileName();
-        final String hash = getMapHash();
         final int x = getMapWidth();
         final int y = getMapHeight();
         final int[] z = getMapDepth();
         final int[] buildable = getBuildableData();
         final int[] walkable = getWalkableData();
 
-        map = new GameMap(mapName, fileName, hash, x, y, z, buildable, walkable);
-
-        // if (enableTerrainAnalysis) {
+        map = new GameMap(mapName, fileName, x, y, z, buildable, walkable);
         loadMapDetails();
-        // }
     }
 
     private void loadMapDetails() {
@@ -1393,10 +1396,6 @@ public class Broodwar {
             try {
                 final FileReader fr = new FileReader(mapDataCacheFile);
                 final BufferedReader br = new BufferedReader(fr);
-
-                final int[] regionMap = readMapData(br);
-                final int[] regions = readMapData(br);
-                final int[] chokePoints = readMapData(br);
                 final int[] bases = readMapData(br);
 
                 int[] data = null;
@@ -1409,7 +1408,7 @@ public class Broodwar {
 
                 br.close();
 
-                map.initialize(regionMap, regions, polygons, chokePoints, bases);
+                map.setBaseLocations(bases);
                 return;
 
             } catch (final IOException ex) {
@@ -1419,15 +1418,7 @@ public class Broodwar {
         }
 
         analyzeTerrain();
-        final int[] regionMap = getRegionMap();
-        final int[] regions = getRegions();
-        final int[] chokePoints = getChokePoints();
         final int[] bases = getBaseLocations();
-        final HashMap<Integer, int[]> polygons = new HashMap<>();
-        for (int i = 0; i < regions.length; i += Region.NUM_ATTRIBUTES) {
-            final int id = regions[i];
-            polygons.put(id, getPolygon(id));
-        }
 
         try {
             if (!mapDataCacheFile.getParentFile().exists()) {
@@ -1436,18 +1427,10 @@ public class Broodwar {
             final FileWriter fw = new FileWriter(mapDataCacheFile);
             final BufferedWriter bw = new BufferedWriter(fw);
 
-            writeMapData(bw, regionMap);
-            writeMapData(bw, regions);
-            writeMapData(bw, chokePoints);
             writeMapData(bw, bases);
-            for (final int id : polygons.keySet()) {
-                bw.write("" + id + ",");
-                writeMapData(bw, polygons.get(id));
-            }
-
             bw.close();
 
-            map.initialize(regionMap, regions, polygons, chokePoints, bases);
+            map.setBaseLocations(bases);
 
         } catch (final Exception ex) {
             System.err.println("Map data could not be cached.");
@@ -1809,25 +1792,15 @@ public class Broodwar {
 
     private native String getMapFileName();
 
-    private native String getMapHash();
-
     private native int getMapWidth();
 
     private native int getMapHeight();
 
     private native int[] getMapDepth();
 
-    private native int[] getRegionMap();
-
     private native int[] getWalkableData();
 
     private native int[] getBuildableData();
-
-    private native int[] getChokePoints();
-
-    private native int[] getRegions();
-
-    private native int[] getPolygon(final int regionId);
 
     private native int[] getBaseLocations();
 }

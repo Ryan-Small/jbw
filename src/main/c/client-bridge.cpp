@@ -987,11 +987,6 @@ JNIEXPORT jbyteArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapName(JNIEnv* 
 	return jbArray;
 }
 
-JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getMapHash(JNIEnv* env, jobject jObj)
-{
-	return env->NewStringUTF(Broodwar->mapHash().c_str());
-}
-
 JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapDepth(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
@@ -1077,62 +1072,6 @@ JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_analyzeTerrain(JNIEnv* en
 	}
 }
 
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getChokePoints(JNIEnv* env, jobject jObj)
-{
-	int index = 0;
-
-	std::set<BWTA::Chokepoint*> chokepoints = BWTA::getChokepoints();
-	for (std::set<BWTA::Chokepoint*>::iterator i = chokepoints.begin(); i != chokepoints.end(); ++i) {
-		intBuf[index++] = (*i)->getCenter().x();
-		intBuf[index++] = (*i)->getCenter().y();
-		intBuf[index++] = static_cast<int>((*i)->getWidth() * fixedScale);
-		intBuf[index++] = regionMap[(*i)->getRegions().first];
-		intBuf[index++] = regionMap[(*i)->getRegions().second];
-		intBuf[index++] = (*i)->getSides().first.x();
-		intBuf[index++] = (*i)->getSides().first.y();
-		intBuf[index++] = (*i)->getSides().second.x();
-		intBuf[index++] = (*i)->getSides().second.y();
-	}
-
-	jintArray result = env->NewIntArray(index);
-	env->SetIntArrayRegion(result, 0, index, intBuf);
-	return result;
-}
-
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRegions(JNIEnv* env, jobject jObj)
-{
-	int index = 0;
-
-	std::set<BWTA::Region*> regions = BWTA::getRegions();
-	for (std::set<BWTA::Region*>::iterator i = regions.begin(); i != regions.end(); ++i) {
-		intBuf[index++] = regionMap[(*i)];
-		intBuf[index++] = (*i)->getCenter().x();
-		intBuf[index++] = (*i)->getCenter().y();
-	}
-
-	jintArray result = env->NewIntArray(index);
-	env->SetIntArrayRegion(result, 0, index, intBuf);
-	return result;
-} 
-
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getPolygon(JNIEnv* env, jobject jObj, jint regionID)
-{
-	int index = 0;
-	std::set<BWTA::Region*> regions = BWTA::getRegions();
-	for (std::set<BWTA::Region*>::iterator i = regions.begin(); i != regions.end(); ++i) {
-		if (regionID == regionMap[(*i)]) {
-			for (unsigned int j = 0; j < (*i)->getPolygon().size(); ++j) {
-				intBuf[index++] = (*i)->getPolygon()[j].x();
-				intBuf[index++] = (*i)->getPolygon()[j].y();
-			}
-		}
-	}
-
-	jintArray result = env->NewIntArray(index);
-	env->SetIntArrayRegion(result, 0, index, intBuf);
-	return result;
-}
-
 JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBaseLocations(JNIEnv* env, jobject jObj)
 {
 	int index = 0;
@@ -1143,7 +1082,6 @@ JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBaseLocations(JNI
 		intBuf[index++] = (*i)->getPosition().y();
 		intBuf[index++] = (*i)->getTilePosition().x();
 		intBuf[index++] = (*i)->getTilePosition().y();
-		intBuf[index++] = regionMap[(*i)->getRegion()];
 		intBuf[index++] = (*i)->minerals();
 		intBuf[index++] = (*i)->gas();
 		intBuf[index++] = (*i)->isIsland() ? 1 : 0;
