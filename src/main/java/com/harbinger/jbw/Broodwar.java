@@ -629,7 +629,10 @@ public class Broodwar {
     private native boolean canMake(final int unitId, final int unitTypeId);
 
     /**
-     * Checks that the UpgradeType can be acquired.
+     * Indicates if all the requirements have been met to allow the upgrading of an Update.
+     *
+     * <p>
+     * The requirements include resources, technology tree, and availability.
      *
      * @param unitType
      *            the UpgradeType to check
@@ -643,7 +646,11 @@ public class Broodwar {
     private native boolean canUpgrade(int upgradeTypeId);
 
     /**
-     * Checks that the Unit can perform the UpgradeType.
+     * Indicates if all the requirements have been met to allow a specific Unit to perform an
+     * Upgrade.
+     *
+     * <p>
+     * The requirements include resources, technology tree, and availability.
      *
      * @param unit
      *            the Unit that will be used to acquire the upgrade
@@ -1371,14 +1378,13 @@ public class Broodwar {
     private void loadMapData() {
         final String mapName = new String(getMapName(), CHARACTER_SET);
         final String fileName = getMapFileName();
-        final String hash = getMapHash();
         final int x = getMapWidth();
         final int y = getMapHeight();
         final int[] z = getMapDepth();
         final int[] buildable = getBuildableData();
         final int[] walkable = getWalkableData();
 
-        map = new GameMap(mapName, fileName, hash, x, y, z, buildable, walkable);
+        map = new GameMap(mapName, fileName, x, y, z, buildable, walkable);
         loadMapDetails();
     }
 
@@ -1402,7 +1408,7 @@ public class Broodwar {
 
                 br.close();
 
-                map.initialize(bases);
+                map.setBaseLocations(bases);
                 return;
 
             } catch (final IOException ex) {
@@ -1424,7 +1430,7 @@ public class Broodwar {
             writeMapData(bw, bases);
             bw.close();
 
-            map.initialize(bases);
+            map.setBaseLocations(bases);
 
         } catch (final Exception ex) {
             System.err.println("Map data could not be cached.");
@@ -1785,8 +1791,6 @@ public class Broodwar {
     private native byte[] getMapName();
 
     private native String getMapFileName();
-
-    private native String getMapHash();
 
     private native int getMapWidth();
 

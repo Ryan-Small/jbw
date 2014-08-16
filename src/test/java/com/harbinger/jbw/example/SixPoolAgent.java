@@ -28,6 +28,8 @@ public class SixPoolAgent extends BroodwarAgent {
         broodwar.setFrameDelay(0);
         broodwar.enableUserInput();
         broodwar.enablePerfectInformation();
+        System.out.println(broodwar.getMap().getName());
+        System.out.println(broodwar.getMap().getFileName());
     }
 
     /**
@@ -35,7 +37,6 @@ public class SixPoolAgent extends BroodwarAgent {
      */
     @Override
     public void matchFrame() {
-
         // TODO: Why are supply numbers being doubled?
         final int supplyUsed = broodwar.getAgent().getSupplyUsed() / 2;
         final int supplyTotal = broodwar.getAgent().getSupplyTotal() / 2;

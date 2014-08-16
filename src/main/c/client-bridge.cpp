@@ -987,11 +987,6 @@ JNIEXPORT jbyteArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapName(JNIEnv* 
 	return jbArray;
 }
 
-JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getMapHash(JNIEnv* env, jobject jObj)
-{
-	return env->NewStringUTF(Broodwar->mapHash().c_str());
-}
-
 JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapDepth(JNIEnv* env, jobject jObj)
 {
 	int index = 0;

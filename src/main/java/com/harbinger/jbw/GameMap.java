@@ -9,27 +9,24 @@ import java.util.*;
  * Stores information about a StarCraft map.
  */
 public class GameMap {
-    public static final int TILE_SIZE = 32;
+
+    static final int TILE_SIZE = 31;
 
     private final Position size;
     private final String name;
     private final String fileName;
-    private final String hash;
     private final int[] heightMap;
     private final boolean[] buildable;
     private final boolean[] walkable;
-    /** Walkability of build tiles */
     private final boolean[] lowResWalkable;
 
-    // The following are set in initialize() method
     private List<BaseLocation> baseLocations = null;
 
-    public GameMap(final String name, final String fileName, final String hash, final int width,
-            final int height, final int[] heightMap, final int[] buildable, final int[] walkable) {
+    public GameMap(final String name, final String fileName, final int width, final int height,
+            final int[] heightMap, final int[] buildable, final int[] walkable) {
         size = new Position(width, height, Resolution.BUILD);
         this.name = name;
         this.fileName = fileName;
-        this.hash = hash;
         this.heightMap = heightMap;
         this.buildable = new boolean[buildable.length];
         this.walkable = new boolean[walkable.length];
@@ -53,9 +50,7 @@ public class GameMap {
         }
     }
 
-    /** Initialise the map with regions and base locations */
-    public void initialize(final int[] baseLocationData) {
-        // base locations
+    void setBaseLocations(final int[] baseLocationData) {
         baseLocations = new ArrayList<>();
         if (baseLocationData != null) {
             for (int index = 0; index < baseLocationData.length; index +=
@@ -66,54 +61,46 @@ public class GameMap {
         }
     }
 
-    /** Get the map size as a Position object */
     public Position getSize() {
         return size;
     }
 
-    /** @deprecated Width in build tiles (32px). Use {@link #getSize()} instead. */
-    @Deprecated
-    public int getWidth() {
-        return size.getX(Resolution.BUILD);
-    }
-
-    /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
-    @Deprecated
-    public int getHeight() {
-        return size.getY(Resolution.BUILD);
-    }
-
-    /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
-    @Deprecated
-    public int getWalkWidth() {
-        return size.getX(Resolution.WALK);
-    }
-
-    /** @deprecated Height in build tiles (32px). Use {@link #getSize()} instead. */
-    @Deprecated
-    public int getWalkHeight() {
-        return size.getY(Resolution.WALK);
-    }
-
-    /** The name of the current map */
+    /**
+     * @return the name of the map (i.e. <i>Blood Bath</i>)
+     */
     public String getName() {
         return name;
     }
 
-    /** The file name of the current map / replay file */
+    /**
+     * @return the name of the file (i.e. <i>(4)Blood Bath.scm</i>)
+     */
     public String getFileName() {
         return fileName;
     }
 
-    public String getHash() {
-        return hash;
-    }
-
-    /** Converts a position to a 1-dimensional build tile array index for this map */
+    // Converts a position to a 1-dimensional build tile array index for this map.
     private int getBuildTileArrayIndex(final Position p) {
         return p.getX(Resolution.BUILD) + (size.getX(Resolution.BUILD) * p.getY(Resolution.BUILD));
     }
 
+    /**
+     * Returns the height of the ground at a given Position.
+     *
+     * <ul>
+     * <li>0 = Low</li>
+     * <li>1 = Low Doodad</li>
+     * <li>2 = High</li>
+     * <li>3 = High Doodad</li>
+     * <li>4 = Very High</li>
+     * <li>5 = Very High Doodad</li>
+     * </ul>
+     *
+     * @param p
+     *            the Position to check
+     *
+     * @return the height of the ground at Position
+     */
     public int getGroundHeight(final Position p) {
         if (p.isValid(this)) {
             return heightMap[getBuildTileArrayIndex(p)];
@@ -122,6 +109,14 @@ public class GameMap {
         }
     }
 
+    /**
+     * Indicates if a building can be built at a Position.
+     *
+     * @param p
+     *            the Position to check
+     *
+     * @return true if a building can be built at the Position; false otherwise
+     */
     public boolean isBuildable(final Position p) {
         if (p.isValid(this)) {
             return buildable[getBuildTileArrayIndex(p)];
@@ -130,6 +125,14 @@ public class GameMap {
         }
     }
 
+    /**
+     * Indicates if a Unit can walk on a Position.
+     *
+     * @param p
+     *            the Position to check
+     *
+     * @return true if a Unit can walk at the Position; false otherwise
+     */
     public boolean isWalkable(final Position p) {
         if (p.isValid(this)) {
             return walkable[p.getX(Resolution.WALK)
@@ -148,12 +151,18 @@ public class GameMap {
         }
     }
 
-    /** Works only after initialize() */
+    /**
+     * @return all of the BaseLocations on the current map
+     */
     public List<BaseLocation> getBaseLocations() {
         return Collections.unmodifiableList(baseLocations);
     }
 
-    /** Works only after initialize() */
+    /**
+     * Convenience method that provides only the BaseLocations that are starting locations.
+     *
+     * @return the BaseLocations that are {@link BaseLocation#isStartLocation() starting locations}.
+     */
     public List<BaseLocation> getStartLocations() {
         final List<BaseLocation> startLocations = new ArrayList<>();
         for (final BaseLocation bl : baseLocations) {
