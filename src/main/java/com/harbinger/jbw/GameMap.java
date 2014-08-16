@@ -1,7 +1,6 @@
 package com.harbinger.jbw;
 
 import com.harbinger.jbw.Position.Resolution;
-import com.harbinger.jbw.Type.UnitType;
 
 import java.awt.Point;
 import java.util.*;
@@ -23,12 +22,7 @@ public class GameMap {
     private final boolean[] lowResWalkable;
 
     // The following are set in initialize() method
-    /** Region ID for each build tile */
-    private int[] regionMap = null;
-    private List<Region> regions = null;
-    private List<ChokePoint> chokePoints = null;
     private List<BaseLocation> baseLocations = null;
-    private HashMap<Integer, Region> idToRegion = null;
 
     public GameMap(final String name, final String fileName, final String hash, final int width,
             final int height, final int[] heightMap, final int[] buildable, final int[] walkable) {
@@ -60,52 +54,15 @@ public class GameMap {
     }
 
     /** Initialise the map with regions and base locations */
-    public void initialize(final int[] regionMapData, final int[] regionData,
-            final HashMap<Integer, int[]> regionPolygons, final int[] chokePointData,
-            final int[] baseLocationData) {
-        // regionMap
-        regionMap = regionMapData;
-
-        // regions
-        regions = new ArrayList<>();
-        if (regionData != null) {
-            for (int index = 0; index < regionData.length; index += Region.NUM_ATTRIBUTES) {
-                final int[] coordinates = regionPolygons.get(regionData[index]);
-                final Region region = new Region(regionData, index, coordinates);
-                regions.add(region);
-            }
-        }
-        idToRegion = new HashMap<>();
-        for (final Region region : regions) {
-            idToRegion.put(region.getId(), region);
-        }
-
-        // choke points
-        chokePoints = new ArrayList<>();
-        if (chokePointData != null) {
-            for (int index = 0; index < chokePointData.length; index += ChokePoint.NUM_ATTRIBUTES) {
-                final ChokePoint chokePoint = new ChokePoint(chokePointData, index, idToRegion);
-                chokePoints.add(chokePoint);
-            }
-        }
-
+    public void initialize(final int[] baseLocationData) {
         // base locations
         baseLocations = new ArrayList<>();
         if (baseLocationData != null) {
             for (int index = 0; index < baseLocationData.length; index +=
                     BaseLocation.NUM_ATTRIBUTES) {
-                final BaseLocation baseLocation =
-                        new BaseLocation(baseLocationData, index, idToRegion);
+                final BaseLocation baseLocation = new BaseLocation(baseLocationData, index);
                 baseLocations.add(baseLocation);
             }
-        }
-
-        // connect the region graph
-        for (final ChokePoint chokePoint : chokePoints) {
-            chokePoint.getFirstRegion().addChokePoint(chokePoint);
-            chokePoint.getFirstRegion().addConnectedRegion(chokePoint.getSecondRegion());
-            chokePoint.getSecondRegion().addChokePoint(chokePoint);
-            chokePoint.getSecondRegion().addConnectedRegion(chokePoint.getFirstRegion());
         }
     }
 
@@ -165,15 +122,6 @@ public class GameMap {
         }
     }
 
-    /** Works only after initialize(). Returns null if the specified position is invalid. */
-    public Region getRegion(final Position p) {
-        if (p.isValid(this)) {
-            return idToRegion.get(regionMap[getBuildTileArrayIndex(p)]);
-        } else {
-            return null;
-        }
-    }
-
     public boolean isBuildable(final Position p) {
         if (p.isValid(this)) {
             return buildable[getBuildTileArrayIndex(p)];
@@ -201,21 +149,6 @@ public class GameMap {
     }
 
     /** Works only after initialize() */
-    public List<Region> getRegions() {
-        return Collections.unmodifiableList(regions);
-    }
-
-    /** Works only after initialize() */
-    public Region getRegion(final int regionID) {
-        return idToRegion.get(regionID);
-    }
-
-    /** Works only after initialize() */
-    public List<ChokePoint> getChokePoints() {
-        return Collections.unmodifiableList(chokePoints);
-    }
-
-    /** Works only after initialize() */
     public List<BaseLocation> getBaseLocations() {
         return Collections.unmodifiableList(baseLocations);
     }
@@ -236,25 +169,8 @@ public class GameMap {
      * reachable. Works only after initialize(). Ported from BWTA.
      */
     public double getGroundDistance(final Position start, final Position end) {
-        if (!isConnected(start, end)) {
-            return -1;
-        }
         return aStarSearchDistance(start.getX(Resolution.BUILD), start.getY(Resolution.BUILD),
                 end.getX(Resolution.BUILD), end.getY(Resolution.BUILD));
-    }
-
-    /**
-     * Based on map connectedness only. Ignores buildings. Works only after initialize(). Ported
-     * from BWTA.
-     */
-    public boolean isConnected(final Position start, final Position end) {
-        if (getRegion(start) == null) {
-            return false;
-        }
-        if (getRegion(end) == null) {
-            return false;
-        }
-        return getRegion(start).getAllConnectedRegions().contains(getRegion(end));
     }
 
     /**
@@ -341,58 +257,6 @@ public class GameMap {
         @Override
         public int compareTo(final AStarTile o) {
             return Integer.compare(distPlusCost, o.distPlusCost);
-        }
-    }
-
-    /**
-     * Debugging method to check terrain has been analysed properly. Taken from BWAPI's
-     * ExampleAIClient
-     */
-    public void drawTerrainData(final Broodwar bwapi) {
-        // iterate through all the base locations and draw their outlines
-        for (final BaseLocation bl : bwapi.getMap().getBaseLocations()) {
-            final Position p = bl.getCenter();
-
-            // draw outline of base location
-            bwapi.drawRectangleMap(p, 128, 96, BWColor.BLUE, false);
-
-            // if this is an island expansion, draw a yellow circle around the base location
-            if (bl.isIsland()) {
-                bwapi.drawCircleMap(p.translated(new Position(2, 1, Resolution.BUILD)), 80,
-                        BWColor.YELLOW, false);
-            }
-
-            // draw a circle at each mineral patch and a box at each vespene geyser
-            for (final Unit u : bwapi.getNeutralUnits()) {
-                final UnitType ut = u.getType();
-                if (ut.isResourceContainer()) {
-                    // if (ut.isMineralField()) {
-                    // // Minerals
-                    // bwapi.drawCircleMap(u.getTargetPosition(), 30, BWColor.Cyan, false);
-                    // } else {
-                    // // Geysers
-                    // bwapi.drawRectangleMap(u.getTopLeft(), u.getBottomRight(), BWColor.Orange,
-                    // false);
-                    // }
-                }
-            }
-        }
-
-        // Iterate through all the regions and draw the polygon outline of it in green.
-        for (final Region r : getRegions()) {
-            final Position[] polygon = r.getPolygon();
-            for (int i = 0; i < polygon.length; i++) {
-                final Position point1 = polygon[i];
-                final Position point2 = polygon[(i + 1) % polygon.length];
-                bwapi.drawLineMap(point1, point2, BWColor.GREEN);
-            }
-        }
-
-        // Visualise the chokepoints with red lines
-        for (final ChokePoint cp : getChokePoints()) {
-            final Position point1 = cp.getFirstSide();
-            final Position point2 = cp.getSecondSide();
-            bwapi.drawLineMap(point1, point2, BWColor.RED);
         }
     }
 }

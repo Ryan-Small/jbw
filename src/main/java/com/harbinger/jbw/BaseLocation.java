@@ -2,8 +2,6 @@ package com.harbinger.jbw;
 
 import com.harbinger.jbw.Position.Resolution;
 
-import java.util.Map;
-
 /**
  * Represents a location on the map where it makes sense to place a base (e.g. near resources).
  */
@@ -13,22 +11,23 @@ public class BaseLocation {
 
     private final Position center;
     private final Position position;
-    private final Region region;
     private final int minerals;
     private final int gas;
     private final boolean island;
     private final boolean mineralOnly;
     private final boolean startLocation;
 
-    BaseLocation(final int[] data, int index, final Map<Integer, Region> idToRegion) {
+    BaseLocation(final int[] data, int index) {
         final int x = data[index++];
         final int y = data[index++];
         center = new Position(x, y, Resolution.PIXEL);
         final int tx = data[index++];
         final int ty = data[index++];
         position = new Position(tx, ty, Resolution.BUILD);
-        final int regionID = data[index++];
-        region = idToRegion.get(regionID);
+
+        // TODO: The following index represents the region
+        index++;
+
         minerals = data[index++];
         gas = data[index++];
         island = (data[index++] == 1);
@@ -49,13 +48,6 @@ public class BaseLocation {
      */
     public Position getCenter() {
         return center;
-    }
-
-    /**
-     * @return the Region this base is located in
-     */
-    public Region getRegion() {
-        return region;
     }
 
     /**

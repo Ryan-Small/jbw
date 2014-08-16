@@ -9,10 +9,26 @@ extern "C" {
 #endif
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    setGameSpeed
+ * Method:    getFrame
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getFrame
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_harbinger_jbw_Broodwar
+ * Method:    getRemainingLatencyFrames
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getRemainingLatencyFrames
+  (JNIEnv *, jobject);
+
+/*
+ * Class:     com_harbinger_jbw_Broodwar
+ * Method:    setFrameDelay
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setGameSpeed
+JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setFrameDelay
   (JNIEnv *, jobject, jint);
 
 /*
@@ -33,10 +49,10 @@ JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_setCommandOptimizationLev
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    getRemainingLatencyFrames
- * Signature: ()I
+ * Method:    isReplay
+ * Signature: ()Z
  */
-JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getRemainingLatencyFrames
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isReplay
   (JNIEnv *, jobject);
 
 /*
@@ -49,26 +65,10 @@ JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getReplayFrameTotal
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    getFrame
+ * Method:    getLastErrorCode
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getFrame
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    isReplay
- * Signature: ()Z
- */
-JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isReplay
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    getLastError
- * Signature: ()I
- */
-JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getLastError
+JNIEXPORT jint JNICALL Java_com_harbinger_jbw_Broodwar_getLastErrorCode
   (JNIEnv *, jobject);
 
 /*
@@ -89,50 +89,10 @@ JNIEXPORT void JNICALL Java_com_harbinger_jbw_Broodwar_sendText
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    getUnitIdsOnTile
- * Signature: (II)[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getUnitIdsOnTile
-  (JNIEnv *, jobject, jint, jint);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    getLoadedUnits
- * Signature: (I)[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getLoadedUnits
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    getInterceptors
- * Signature: (I)[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getInterceptors
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    getLarva
- * Signature: (I)[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getLarva
-  (JNIEnv *, jobject, jint);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
  * Method:    isVisible
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isVisible
-  (JNIEnv *, jobject, jint, jint);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    isVisibleToPlayer
- * Signature: (II)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_isVisibleToPlayer
   (JNIEnv *, jobject, jint, jint);
 
 /*
@@ -180,16 +140,8 @@ JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasCreep
  * Method:    hasPower
  * Signature: (III)Z
  */
-JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPower__III
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPower
   (JNIEnv *, jobject, jint, jint, jint);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    hasPower
- * Signature: (IIIII)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_hasPower__IIIII
-  (JNIEnv *, jobject, jint, jint, jint, jint, jint);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
@@ -233,6 +185,14 @@ JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canResearch__I
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
+ * Method:    canResearch
+ * Signature: (II)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canResearch__II
+  (JNIEnv *, jobject, jint, jint);
+
+/*
+ * Class:     com_harbinger_jbw_Broodwar
  * Method:    canMake
  * Signature: (I)Z
  */
@@ -245,14 +205,6 @@ JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canMake__I
  * Signature: (II)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canMake__II
-  (JNIEnv *, jobject, jint, jint);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    canResearch
- * Signature: (II)Z
- */
-JNIEXPORT jboolean JNICALL Java_com_harbinger_jbw_Broodwar_canResearch__II
   (JNIEnv *, jobject, jint, jint);
 
 /*
@@ -649,14 +601,6 @@ JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapDepth
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    getRegionMap
- * Signature: ()[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRegionMap
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
  * Method:    getWalkableData
  * Signature: ()[I
  */
@@ -670,30 +614,6 @@ JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getWalkableData
  */
 JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBuildableData
   (JNIEnv *, jobject);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    getChokePoints
- * Signature: ()[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getChokePoints
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    getRegions
- * Signature: ()[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRegions
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
- * Method:    getPolygon
- * Signature: (I)[I
- */
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getPolygon
-  (JNIEnv *, jobject, jint);
 
 /*
  * Class:     com_harbinger_jbw_Broodwar

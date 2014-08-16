@@ -1379,10 +1379,7 @@ public class Broodwar {
         final int[] walkable = getWalkableData();
 
         map = new GameMap(mapName, fileName, hash, x, y, z, buildable, walkable);
-
-        // if (enableTerrainAnalysis) {
         loadMapDetails();
-        // }
     }
 
     private void loadMapDetails() {
@@ -1393,10 +1390,6 @@ public class Broodwar {
             try {
                 final FileReader fr = new FileReader(mapDataCacheFile);
                 final BufferedReader br = new BufferedReader(fr);
-
-                final int[] regionMap = readMapData(br);
-                final int[] regions = readMapData(br);
-                final int[] chokePoints = readMapData(br);
                 final int[] bases = readMapData(br);
 
                 int[] data = null;
@@ -1409,7 +1402,7 @@ public class Broodwar {
 
                 br.close();
 
-                map.initialize(regionMap, regions, polygons, chokePoints, bases);
+                map.initialize(bases);
                 return;
 
             } catch (final IOException ex) {
@@ -1419,15 +1412,7 @@ public class Broodwar {
         }
 
         analyzeTerrain();
-        final int[] regionMap = getRegionMap();
-        final int[] regions = getRegions();
-        final int[] chokePoints = getChokePoints();
         final int[] bases = getBaseLocations();
-        final HashMap<Integer, int[]> polygons = new HashMap<>();
-        for (int i = 0; i < regions.length; i += Region.NUM_ATTRIBUTES) {
-            final int id = regions[i];
-            polygons.put(id, getPolygon(id));
-        }
 
         try {
             if (!mapDataCacheFile.getParentFile().exists()) {
@@ -1436,18 +1421,10 @@ public class Broodwar {
             final FileWriter fw = new FileWriter(mapDataCacheFile);
             final BufferedWriter bw = new BufferedWriter(fw);
 
-            writeMapData(bw, regionMap);
-            writeMapData(bw, regions);
-            writeMapData(bw, chokePoints);
             writeMapData(bw, bases);
-            for (final int id : polygons.keySet()) {
-                bw.write("" + id + ",");
-                writeMapData(bw, polygons.get(id));
-            }
-
             bw.close();
 
-            map.initialize(regionMap, regions, polygons, chokePoints, bases);
+            map.initialize(bases);
 
         } catch (final Exception ex) {
             System.err.println("Map data could not be cached.");
@@ -1817,17 +1794,9 @@ public class Broodwar {
 
     private native int[] getMapDepth();
 
-    private native int[] getRegionMap();
-
     private native int[] getWalkableData();
 
     private native int[] getBuildableData();
-
-    private native int[] getChokePoints();
-
-    private native int[] getRegions();
-
-    private native int[] getPolygon(final int regionId);
 
     private native int[] getBaseLocations();
 }
