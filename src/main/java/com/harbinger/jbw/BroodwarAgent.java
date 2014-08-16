@@ -82,9 +82,6 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      * "Run Starcraft on Startup" in the Settings tab of Chaoslauncher. This implementation may not
      * work on some systems and may need to be overridden.
      *
-     * <p>
-     *
-     *
      * @return the Process used to launch Chaoslauncher
      */
     protected Process launchChaosLauncher() {
@@ -108,9 +105,9 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      * Indicates if Broodwar is running.
      *
      * <p>
-     * It should be noted that this implementation uses tasklist, a Windows application, to check if
-     * "StarCraft.exe" is listed as a running process. This implementation may not work on some
-     * systems and may need to be overridden.
+     * This implementation uses tasklist, a Windows application, to check if "StarCraft.exe" is
+     * listed as a running process. This implementation may not work on some systems and may need to
+     * be overridden.
      *
      * @return true if Broodwar is running; false otherwise
      */
@@ -124,13 +121,13 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
             final BufferedReader input = new BufferedReader(inputStreamReader);
 
             String line;
-            String pidInfo = "";
+            final StringBuilder pidInfo = new StringBuilder();
             while ((line = input.readLine()) != null) {
-                pidInfo += line;
+                pidInfo.append(line);
             }
 
             input.close();
-            return pidInfo.contains("StarCraft.exe");
+            return pidInfo.toString().contains("StarCraft.exe");
 
         } catch (final IOException ex) {
             throw new RuntimeException(ex);
@@ -141,10 +138,10 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      * Terminates the Broodwar game.
      *
      * <p>
-     * It should be noted that this implementation uses TASKKILL, a Windows application, to halt
-     * "StarCraft.exe". This may result in phantom icons of Chaoslauncher hanging out in the System
-     * tray. This is due to Chaoslauncher being rudely killed. This implementation may not work (or
-     * be desired) on some systems and may need to be overridden.
+     * This implementation uses TASKKILL, a Windows application, to halt "StarCraft.exe". This may
+     * result in phantom icons of Chaoslauncher hanging out in the System tray. This is due to
+     * Chaoslauncher being rudely killed. This implementation may not work (or be desired) on some
+     * systems and may need to be overridden.
      */
     protected void terminateBroodwar() {
         try {
