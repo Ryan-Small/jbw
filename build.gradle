@@ -1,10 +1,10 @@
 apply plugin: "java"
 
+version = "1.0.0-SNAPSHOT"
 archivesBaseName = "jbw"
 group = "com.harbinger"
-version = "1.0.0-SNAPSHOT"
 
-sourceCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories { 
     mavenCentral() 
@@ -15,4 +15,5 @@ dependencies {
     testCompile group: "org.mockito", name: "mockito-all", version: "1.9.5"
 }
 
+// Generate the JNI header files when compiling the Java project
 compileJava.options.compilerArgs << "-h" << "${projectDir}/src/main/c"
