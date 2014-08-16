@@ -5,7 +5,7 @@ import com.harbinger.jbw.Position.Resolution;
 import java.util.Map;
 
 /**
- * Represents a location on the map where it makes sense to place a base (e.g. near minerals).
+ * Represents a location on the map where it makes sense to place a base (e.g. near resources).
  */
 public class BaseLocation {
 
