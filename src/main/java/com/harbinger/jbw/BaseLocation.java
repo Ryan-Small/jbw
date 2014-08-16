@@ -7,7 +7,7 @@ import com.harbinger.jbw.Position.Resolution;
  */
 public class BaseLocation {
 
-    static final int NUM_ATTRIBUTES = 10;
+    static final int NUM_ATTRIBUTES = 9;
 
     private final Position center;
     private final Position position;
@@ -24,10 +24,6 @@ public class BaseLocation {
         final int tx = data[index++];
         final int ty = data[index++];
         position = new Position(tx, ty, Resolution.BUILD);
-
-        // TODO: The following index represents the region
-        index++;
-
         minerals = data[index++];
         gas = data[index++];
         island = (data[index++] == 1);

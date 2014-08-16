@@ -1087,7 +1087,6 @@ JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getBaseLocations(JNI
 		intBuf[index++] = (*i)->getPosition().y();
 		intBuf[index++] = (*i)->getTilePosition().x();
 		intBuf[index++] = (*i)->getTilePosition().y();
-		intBuf[index++] = regionMap[(*i)->getRegion()];
 		intBuf[index++] = (*i)->minerals();
 		intBuf[index++] = (*i)->gas();
 		intBuf[index++] = (*i)->isIsland() ? 1 : 0;
