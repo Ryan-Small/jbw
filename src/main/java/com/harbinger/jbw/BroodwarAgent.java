@@ -145,8 +145,10 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      */
     protected void terminateBroodwar() {
         try {
-            Runtime.getRuntime().exec(new String[] { "TASKKILL", "/IM", "StarCraft.exe" });
-        } catch (final IOException ex) {
+            final String[] args = new String[] { "TASKKILL", "/IM", "StarCraft.exe" };
+            final Process process = Runtime.getRuntime().exec(args);
+            process.waitFor();
+        } catch (final InterruptedException | IOException ex) {
             throw new RuntimeException(ex);
         }
     }

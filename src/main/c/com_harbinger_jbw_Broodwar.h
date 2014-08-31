@@ -569,14 +569,6 @@ JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getMapFileName
 
 /*
  * Class:     com_harbinger_jbw_Broodwar
- * Method:    getMapHash
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_harbinger_jbw_Broodwar_getMapHash
-  (JNIEnv *, jobject);
-
-/*
- * Class:     com_harbinger_jbw_Broodwar
  * Method:    getMapWidth
  * Signature: ()I
  */

@@ -28,8 +28,6 @@ public class SixPoolAgent extends BroodwarAgent {
         broodwar.setFrameDelay(0);
         broodwar.enableUserInput();
         broodwar.enablePerfectInformation();
-        System.out.println(broodwar.getMap().getName());
-        System.out.println(broodwar.getMap().getFileName());
     }
 
     /**
