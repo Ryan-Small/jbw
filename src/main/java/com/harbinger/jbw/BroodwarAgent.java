@@ -6,7 +6,7 @@ import java.io.*;
  * Provides functionality for launching an agent on a separate thread.
  *
  * <p>
- * Most agents can extend this class and override methods as needed.
+ * Agents can extend this class and override methods as needed.
  */
 public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
 
@@ -17,20 +17,50 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      * Using this object before a match {@link #matchStart() starts} or after a match
      * {@link #matchEnd(boolean) ends} can produce undefined behavior and crash the agent.
      */
-    protected final Broodwar broodwar;
+    protected Broodwar broodwar;
 
     /**
      * Constructs the agent.
      *
      * <p>
-     * The agent will still need to be {@link #start() started} before a match.
+     * The agent will still need to be {@link #connect() connected} before a match begins.
      */
     public BroodwarAgent() {
         broodwar = new Broodwar(this);
     }
 
     /**
-     * Starts the agent on a separate thread.
+     * Starts Broodwar and connects the agent.
+     *
+     * <p>
+     * This implementation uses some system specific commands and may any may not work on some
+     * systems and may need to be overridden.
+     *
+     * @return the Thread that this agent is running on
+     *
+     * @see BroodwarAgent#launchChaosLauncher()
+     * @see BroodwarAgent#isBroodwarRunning()
+     */
+    protected Thread launch() {
+        final Thread agentThread = connect();
+
+        // we need to kill chaoslauncher once broodwar is
+        // running so that we can restart the game later
+        final Process chaosLauncherProcess = launchChaosLauncher();
+        while (!isBroodwarRunning()) {
+            try {
+                Thread.sleep(500);
+            } catch (final InterruptedException ignore) {
+                // just continue to wait
+            }
+        }
+        chaosLauncherProcess.destroy();
+
+        return agentThread;
+    }
+
+    /**
+     * Starts the agent on a separate thread. Broodwar will need to be launched separately.
      *
      * <p>
      * This method needs to be invoked prior to starting a match.
@@ -47,38 +77,12 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
     }
 
     /**
-     * Starts Broodwar and connects this agent.
+     * Launches the ChaosLauncher application which will then automatically launch Broodwar.
      *
      * <p>
-     * It should be noted that this implementation uses some system specific commands and setup.
-     *
-     * @return the Thread that this agent is running on
-     *
-     * @see BroodwarAgent#launchChaosLauncher()
-     * @see BroodwarAgent#isBroodwarRunning()
-     */
-    protected Thread launchWithBroodwar() {
-        final Thread agentThread = connect();
-
-        final Process chaosLauncherProcess = launchChaosLauncher();
-        while (!isBroodwarRunning()) {
-            try {
-                Thread.sleep(1000);
-            } catch (final InterruptedException ignore) {
-                // just continue to wait
-            }
-        }
-        chaosLauncherProcess.destroy();
-        return agentThread;
-    }
-
-    /**
-     * Launches the Broodwar game.
-     *
-     * <p>
-     * It should be noted that this implementation launches Broodwar through Chaoslauncher and
-     * depends on the a CHAOSLAUNCHER_HOME environment variable. Additionally, Chaoslauncher needs
-     * to be configured to automatically launch Broodwar. This can be done by checking the box
+     * This implementation launches Broodwar through Chaoslauncher and depends on the a
+     * CHAOSLAUNCHER_HOME environment variable. Additionally, Chaoslauncher needs to be configured
+     * to automatically launch Broodwar. This can be done by checking the box
      * "Run Starcraft on Startup" in the Settings tab of Chaoslauncher. This implementation may not
      * work on some systems and may need to be overridden.
      *

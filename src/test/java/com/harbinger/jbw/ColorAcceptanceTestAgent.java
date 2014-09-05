@@ -2,6 +2,8 @@ package com.harbinger.jbw;
 
 import static com.harbinger.jbw.Position.Resolution.PIXEL;
 
+import com.harbinger.jbw.util.BroodwarAgentTest;
+
 /**
  * Verifies that text and shapes can be drawn. This test is not automated; it launches Broodwar and
  * the an agent that will invoke the drawing methods. A user will need to verify that they are in
@@ -11,22 +13,27 @@ import static com.harbinger.jbw.Position.Resolution.PIXEL;
  * Some of the drawing methods will drawn directly on the screen, others on the map in the top-left
  * corner. The text and shapes will cycle through all of the available colors.
  */
-public class ColorAcceptanceTestAgent extends BroodwarAgent {
+public class ColorAcceptanceTestAgent extends BroodwarAgentTest {
 
     public static void main(final String[] args) {
-        new ColorAcceptanceTestAgent().launchWithBroodwar();
+        new ColorAcceptanceTestAgent().launchAndWait();
     }
 
     private BWColor getColor() {
         // Rounds the current frame to the nearest value that is divisible by ten and use that value
         // as the color's index. This results in the same color being selected for ten consecutive
         // frames before using the next color.
-        final int colorIndex = ((broodwar.getFrame() + 9) / 10) * 10;
+        final int colorIndex = ((broodwar.getFrame() + 10) / 10) * 10;
         return BWColor.values()[colorIndex % BWColor.values().length];
     }
 
     @Override
     public void matchFrame() {
+
+        if (broodwar.getFrame() > 60) {
+            terminateBroodwar();
+        }
+
         final BWColor color = getColor();
 
         broodwar.drawTextMap(new Position(10, 10, PIXEL), "Text", color);
@@ -53,5 +60,6 @@ public class ColorAcceptanceTestAgent extends BroodwarAgent {
         broodwar.drawEllipseMap(50, 130, 10, 5, color, true);
         broodwar.drawEllipseScreen(new Position(80, 130, PIXEL), 10, 5, color, false);
         broodwar.drawEllipseScreen(110, 130, 10, 5, color, true);
+
     }
 }

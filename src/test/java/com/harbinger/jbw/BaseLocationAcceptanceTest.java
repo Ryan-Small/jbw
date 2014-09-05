@@ -6,15 +6,15 @@ package com.harbinger.jbw;
 
 import static org.junit.Assert.fail;
 
-import com.harbinger.jbw.util.BroodwarTestHarness;
+import com.harbinger.jbw.util.BroodwarAgentTest;
 
 import org.junit.Test;
 
-public class BaseLocationAcceptanceTest extends BroodwarAgent {
+public class BaseLocationAcceptanceTest extends BroodwarAgentTest {
 
     @Test
     public void initialization() {
-        BroodwarTestHarness.launchTest(this);
+        new BaseLocationAcceptanceTest().launchAndWait();
     }
 
     @Override
