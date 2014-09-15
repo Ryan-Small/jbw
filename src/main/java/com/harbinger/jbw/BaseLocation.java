@@ -17,6 +17,17 @@ public class BaseLocation {
     private final boolean mineralOnly;
     private final boolean startLocation;
 
+    BaseLocation(final Position center, final Position position, final int minerals, final int gas,
+            final boolean island, final boolean mineralsOnly, final boolean startLocation) {
+        this.center = center;
+        this.position = position;
+        this.minerals = minerals;
+        this.gas = gas;
+        this.island = island;
+        mineralOnly = mineralsOnly;
+        this.startLocation = startLocation;
+    }
+
     BaseLocation(final int[] data, int index) {
         final int x = data[index++];
         final int y = data[index++];
@@ -80,4 +91,69 @@ public class BaseLocation {
     public boolean isStartLocation() {
         return startLocation;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + ((center == null) ? 0 : center.hashCode());
+        result = (prime * result) + gas;
+        result = (prime * result) + (island ? 1231 : 1237);
+        result = (prime * result) + (mineralOnly ? 1231 : 1237);
+        result = (prime * result) + minerals;
+        result = (prime * result) + ((position == null) ? 0 : position.hashCode());
+        result = (prime * result) + (startLocation ? 1231 : 1237);
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BaseLocation other = (BaseLocation) obj;
+        if (center == null) {
+            if (other.center != null) {
+                return false;
+            }
+        } else if (!center.equals(other.center)) {
+            return false;
+        }
+        if (gas != other.gas) {
+            return false;
+        }
+        if (island != other.island) {
+            return false;
+        }
+        if (mineralOnly != other.mineralOnly) {
+            return false;
+        }
+        if (minerals != other.minerals) {
+            return false;
+        }
+        if (position == null) {
+            if (other.position != null) {
+                return false;
+            }
+        } else if (!position.equals(other.position)) {
+            return false;
+        }
+        if (startLocation != other.startLocation) {
+            return false;
+        }
+        return true;
+    }
+
 }
