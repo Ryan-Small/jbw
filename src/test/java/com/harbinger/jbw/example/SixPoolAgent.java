@@ -17,7 +17,15 @@ import com.harbinger.jbw.Unit;
 public class SixPoolAgent extends BroodwarAgent {
 
     public static void main(final String[] args) {
-        new SixPoolAgent().launchWithBroodwar();
+        new SixPoolAgent().launch();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void matchEnd(final boolean isWinner) {
+        terminateBroodwar();
     }
 
     /**
@@ -28,8 +36,6 @@ public class SixPoolAgent extends BroodwarAgent {
         broodwar.setFrameDelay(0);
         broodwar.enableUserInput();
         broodwar.enablePerfectInformation();
-        System.out.println(broodwar.getMap().getName());
-        System.out.println(broodwar.getMap().getFileName());
     }
 
     /**

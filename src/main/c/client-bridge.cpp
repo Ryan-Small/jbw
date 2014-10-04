@@ -1004,25 +1004,6 @@ JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getMapDepth(JNIEnv* 
 	return result;
 }
 
-// Returns the regionId for each map tile
-JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getRegionMap(JNIEnv* env, jobject jObj)
-{
-	int index = 0;
-	int width = Broodwar->mapWidth();
-	int height = Broodwar->mapHeight();
-
-	for (int ty=0; ty<height; ty++) {
-		for (int tx=0; tx<width; tx++) {
-			BWTA::Region* region = BWTA::getRegion(tx, ty);
-			intBuf[index++] = regionMap[region];
-		}
-	}
-
-	jintArray result =env->NewIntArray(index);
-	env->SetIntArrayRegion(result, 0, index, intBuf);
-	return result;
-}
-
 JNIEXPORT jintArray JNICALL Java_com_harbinger_jbw_Broodwar_getWalkableData(JNIEnv* env, jobject jObj)
 {
 	// Note: walk tiles are 8x8 pixels, build tiles are 32x32 pixels
