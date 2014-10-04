@@ -1,7 +1,3 @@
-/*
- * Copyright 2014 IDEXX Laboratories, Inc. All rights reserved. IDEXX PROPRIETARY/CONFIDENTIAL. Use
- * is subject to license terms.
- */
 package com.harbinger.jbw;
 
 import java.util.Collections;

@@ -155,5 +155,4 @@ public class BaseLocation {
         }
         return true;
     }
-
 }
