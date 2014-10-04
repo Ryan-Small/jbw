@@ -3,7 +3,7 @@ package com.harbinger.jbw;
 import com.harbinger.jbw.Position.Resolution;
 
 /**
- * Represents a location on the map where it makes sense to place a base (e.g. near resources).
+ * Represents a location on the map where a base can be built near resources.
  */
 public class BaseLocation {
 
@@ -17,17 +17,6 @@ public class BaseLocation {
     private final boolean mineralOnly;
     private final boolean startLocation;
 
-    BaseLocation(final Position center, final Position position, final int minerals, final int gas,
-            final boolean island, final boolean mineralsOnly, final boolean startLocation) {
-        this.center = center;
-        this.position = position;
-        this.minerals = minerals;
-        this.gas = gas;
-        this.island = island;
-        mineralOnly = mineralsOnly;
-        this.startLocation = startLocation;
-    }
-
     BaseLocation(final int[] data, int index) {
         final int x = data[index++];
         final int y = data[index++];
@@ -40,6 +29,18 @@ public class BaseLocation {
         island = (data[index++] == 1);
         mineralOnly = (data[index++] == 1);
         startLocation = (data[index++] == 1);
+    }
+
+    public BaseLocation(final Position center, final Position position, final int minerals,
+            final int gas, final boolean island, final boolean mineralsOnly,
+            final boolean startLocation) {
+        this.center = center;
+        this.position = position;
+        this.minerals = minerals;
+        this.gas = gas;
+        this.island = island;
+        mineralOnly = mineralsOnly;
+        this.startLocation = startLocation;
     }
 
     /**

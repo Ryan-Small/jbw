@@ -1,6 +1,7 @@
 package com.harbinger.jbw.util;
 
 import com.harbinger.jbw.*;
+import com.harbinger.jbw.acceptance.*;
 
 /**
  * Provides functionality for launching an agent as a test.

@@ -1,7 +1,9 @@
-package com.harbinger.jbw;
+package com.harbinger.jbw.acceptance;
 
 import static com.harbinger.jbw.Position.Resolution.PIXEL;
 
+import com.harbinger.jbw.BWColor;
+import com.harbinger.jbw.Position;
 import com.harbinger.jbw.util.BroodwarAgentTest;
 
 /**

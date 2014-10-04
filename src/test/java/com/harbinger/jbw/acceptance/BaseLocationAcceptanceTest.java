@@ -1,10 +1,13 @@
-package com.harbinger.jbw;
+package com.harbinger.jbw.acceptance;
 
 import static com.harbinger.jbw.Position.Resolution.PIXEL;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import com.harbinger.jbw.BWColor;
+import com.harbinger.jbw.BaseLocation;
+import com.harbinger.jbw.Position;
 import com.harbinger.jbw.util.BroodwarAgentTest;
 
 import java.util.ArrayList;
