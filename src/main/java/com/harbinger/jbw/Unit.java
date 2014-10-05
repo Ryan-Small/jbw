@@ -42,7 +42,7 @@ public class Unit {
 
     // TODO: Create a null unit
 
-    public static final int NUM_ATTRIBUTES = 123;
+    static final int NUM_ATTRIBUTES = 123;
 
     private static final double FIXED_SCALE = 100.0;
     private static final double TO_DEGREES = 180.0 / Math.PI;

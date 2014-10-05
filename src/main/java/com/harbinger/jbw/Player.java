@@ -12,7 +12,7 @@ import com.harbinger.jbw.Type.Upgrade;
  */
 public class Player {
 
-    public static final int NUM_ATTRIBUTES = 11;
+    static final int NUM_ATTRIBUTES = 11;
 
     private final int id;
     private final int raceId;

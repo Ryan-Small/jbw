@@ -31,6 +31,30 @@ public class BaseLocation {
         startLocation = (data[index++] == 1);
     }
 
+    /**
+     * Constructs the BaseLocation.
+     *
+     * @param center
+     *            the center Position
+     * 
+     * @param position
+     *            the top-left (build) Position
+     * 
+     * @param minerals
+     *            the amount of minerals the location starts with
+     * 
+     * @param gas
+     *            the amount of gas the location starts with
+     *
+     * @param island
+     *            true if the location is on an island; false otherwise
+     * 
+     * @param mineralsOnly
+     *            true if the location only has minerals; false otherwise
+     *
+     * @param startLocation
+     *            true if the location is a potential starting location for a player
+     */
     public BaseLocation(final Position center, final Position position, final int minerals,
             final int gas, final boolean island, final boolean mineralsOnly,
             final boolean startLocation) {
