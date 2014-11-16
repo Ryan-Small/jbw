@@ -5,11 +5,9 @@
 .settings/
 
 build/
-bin/*
+bin/
 
-!bin/Chaoslauncher/
-bin/Chaoslauncher/*.log
-
+*.log
 *.opensdf
 *.sdf
 *.suo

@@ -88,7 +88,7 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      */
     protected Process launchChaosLauncher() {
         try {
-            final File workingDirectory = new File("bin/Chaoslauncher");
+            final File workingDirectory = new File("dependencies/Chaoslauncher");
             final String executablePath = workingDirectory.getAbsolutePath() + "/Chaoslauncher.exe";
             return Runtime.getRuntime().exec(executablePath, new String[0], workingDirectory);
         } catch (final IOException ex) {
