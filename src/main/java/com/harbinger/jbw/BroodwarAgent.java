@@ -80,26 +80,17 @@ public abstract class BroodwarAgent extends BroodwarListener.Adaptor {
      * Launches the ChaosLauncher application which will then automatically launch Broodwar.
      *
      * <p>
-     * This implementation launches Broodwar through Chaoslauncher and depends on the a
-     * CHAOSLAUNCHER_HOME environment variable. Additionally, Chaoslauncher needs to be configured
-     * to automatically launch Broodwar. This can be done by checking the box
-     * "Run Starcraft on Startup" in the Settings tab of Chaoslauncher. This implementation may not
-     * work on some systems and may need to be overridden.
+     * Chaoslauncher needs to be configured to automatically launch Broodwar. This can be done by
+     * checking the box "Run Starcraft on Startup" in the Settings tab of Chaoslauncher. This
+     * implementation may not work on some systems and may need to be overridden.
      *
-     * @return the Process used to launch Chaoslauncher
+     * @return the Process that launched Chaoslauncher
      */
     protected Process launchChaosLauncher() {
         try {
-            final String chaoslauncherEnv = "CHAOSLAUNCHER_HOME";
-            final String workingDirectoryPath = System.getenv(chaoslauncherEnv);
-            if (workingDirectoryPath != null) {
-                final File workingDirectory = new File(workingDirectoryPath);
-                final String executablePath = workingDirectoryPath + "\\Chaoslauncher.exe";
-                return Runtime.getRuntime().exec(executablePath, new String[0], workingDirectory);
-            } else {
-                final String msg = chaoslauncherEnv + " environment variable has not been set";
-                throw new RuntimeException(msg);
-            }
+            final File workingDirectory = new File("bin/Chaoslauncher");
+            final String executablePath = workingDirectory.getAbsolutePath() + "/Chaoslauncher.exe";
+            return Runtime.getRuntime().exec(executablePath, new String[0], workingDirectory);
         } catch (final IOException ex) {
             throw new RuntimeException(ex);
         }

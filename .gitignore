@@ -5,7 +5,10 @@
 .settings/
 
 build/
-bin/
+bin/*
+
+!bin/Chaoslauncher/
+bin/Chaoslauncher/*.log
 
 *.opensdf
 *.sdf
@@ -15,4 +18,4 @@ ipch
 
 *.jbwta
 *.pdb
-
+/bin/
