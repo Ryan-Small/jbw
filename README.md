@@ -14,3 +14,7 @@ Getting Started
   - Select (4)Blood Bath.scm
   - Select the Zerg race for the agent
   - Select Ok
+
+Credit:
+  - Forked from JNI-BWAPI (https://code.google.com/p/jnibwapi/)
+  
