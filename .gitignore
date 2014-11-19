@@ -12,8 +12,7 @@ bin/
 *.sdf
 *.suo
 *.user
-ipch
+*.ipch
 
 *.jbwta
 *.pdb
-/bin/
