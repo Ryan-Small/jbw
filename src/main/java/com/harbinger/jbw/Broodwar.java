@@ -27,7 +27,7 @@ import java.util.*;
 public class Broodwar {
 
     static {
-        loadNativeLibrary();
+        loadNativeDependencies();
     }
 
     private static final Charset CHARACTER_SET = getKoreanCharset();
@@ -1190,8 +1190,16 @@ public class Broodwar {
     // Static Methods
     // *********************************************************************************************
 
-    private static void loadNativeLibrary() {
-        final File dll = new File("src/main/resources/", "client-bridge-x86.dll");
+    private static void loadNativeDependencies() {
+        final String base = "src/main/resources/x86/dll";
+
+        // the order is important
+        loadNativeLibrary(new File(base, "gmp-vc90-mt.dll"));
+        loadNativeLibrary(new File(base, "mpfr-vc90-mt.dll"));
+        loadNativeLibrary(new File(base, "client-bridge-x86.dll"));
+    }
+
+    private static void loadNativeLibrary(final File dll) {
         try {
             System.load(dll.getAbsolutePath());
         } catch (final UnsatisfiedLinkError ex) {
