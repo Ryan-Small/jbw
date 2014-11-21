@@ -1196,7 +1196,7 @@ public class Broodwar {
         // the order is important
         loadNativeLibrary(new File(base, "gmp-vc90-mt.dll"));
         loadNativeLibrary(new File(base, "mpfr-vc90-mt.dll"));
-        loadNativeLibrary(new File(base, "client-bridge-x86.dll"));
+        loadNativeLibrary(new File(base, "client-bridge.dll"));
     }
 
     private static void loadNativeLibrary(final File dll) {
