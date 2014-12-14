@@ -17,9 +17,10 @@ This library is a fork of [JNIBWAPI](https://code.google.com/p/jnibwapi/) which 
     * Note that you can use a 64-bit version of Eclipse, but the project will need a 32-bit version of Java to run.
   2. Install the Gradle IDE Pack plugin from the Eclipse marketplace.
   3. Import the project into Eclipse as a Gradle project.
+  4. Copy the *bwapi-data* folder, from the *dependencies* directory, and paste it into the directory where *Starcraft* is installed.
   4. Create a new project in Eclipse and add the JBW project to the build path under the project's settings.
   5. Create a class that implements the [BroodwarListener](src/main/java/com/harbinger/jbw/BroodwarListener.java) interface or extend the adaptor.
-  6. Implement/override the relevant methods with your impeccable logic.
+  6. Provide the relevant methods with your agent's impeccable logic.
 
 #### Running an Agent
 
