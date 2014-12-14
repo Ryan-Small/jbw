@@ -21,20 +21,26 @@ This library is a fork of [JNIBWAPI](https://code.google.com/p/jnibwapi/) which 
   4. Create a new project in Eclipse and add the JBW project to the build path under the project's settings.
   5. Create a class that implements the [BroodwarListener](src/main/java/com/harbinger/jbw/BroodwarListener.java) interface or extend the adaptor.
   6. Provide the relevant methods with your agent's impeccable logic.
+  7. Create a singple player ID.
+    1. manually launch Starcraft Brood War
+    2. Select *Single Player*
+    3. Select the *Expansion* game type
+    4. Specify an ID for the agent to use.
+  
+###### BWAPI.ini Notes
 
-#### Running an Agent
+  * The *bwapi.ini* file copied in step 4 tells BWAPI how to configure the game.
+  * The [auto-menu](https://code.google.com/p/bwapi/wiki/MenuAutomation) section of the file focuses on automating the setup of the match.
+  * This allows you to specify the map, race, enemies and more. However, this file is shared between all agents using BWAPI.
 
-  - Ensure that a id has been created in single player mode.
-  - Move dependencies/bwapi-data to the Starcraft installation directory.
-  - Launch the SixPoolAgent
-  - Ensure that the BWAPI Injector and W-Mode plugin are selected within Chaoslauncher.
-    - Optionally, enable the "Run Starcraft on Startup" option under Chaoslauncher settings.
+###### Chaoslauncher Notes
 
-  - Select Single Player
-  - Select the Broodwar expansion
-  - Create a new character name
-  - Select Play Custom
-  - Select [Up One Level]
-  - Select (4)Blood Bath.scm
-  - Select the Zerg race for the agent
-  - Select Ok
+  * JBW includes the Chaoslauncher application which is needed for injecting the BWAPI's dll files.
+  * Running an agent requires that Starcraft be started through Chaoslauncher. This step can be automated by enabling the *Run Starcraft on Startup* option in the settings tag of Chaoslauncher. This option combined with the auto-menu can greatly simplify the launching of your agent.
+  * Ensure that the *BWAPI Injector* and *W-Mode* plugins are enabled on the Plugins tab of Chaoslauncher.
+
+#### Running the example SixPoolAgent
+
+  1. Simply launch the *com.harbinger.jbw.example.SixPoolAgent*.
+    * The *bwapi-data/bwapi.ini* file, copied over from step 4 in Installation, has the auto-menu enabled and will automatically configure the game as needed (i.e. Zerg race, Blood Bath map, one enemy, etc.). As mentioned under *BWAPI.ini Notes*, if the *bwapi.ini* file has been changed (e.g. race changed to Protoss) it may prevent the example agents from working properly.
+
