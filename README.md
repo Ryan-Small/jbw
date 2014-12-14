@@ -4,7 +4,7 @@ JBW is a Java library for interfacing with Starcraft: Brood War.
 
 JBW only reveals the visible parts of the game state and prohibits user input by default. This enables developers to write competitive non-cheating agents that must plan and operate under partial information conditions. 
 
-This library is a fork of [JNIBWAPI](https://code.google.com/p/jnibwapi/) which uses JNI to interface with ([BWAPI] (https://github.com/bwapi/bwapi)). This library has received significant structural and API changes in order to reduce complexity. These changes make are not compatible with JNIBWAPI.
+This library is a fork of [JNIBWAPI](https://code.google.com/p/jnibwapi/) which uses JNI to interface with [BWAPI] (https://github.com/bwapi/bwapi) (specifically version [3.7.4](https://github.com/bwapi/bwapi/tree/c15a6ffdc0867c360fe4c59d8327b2007a96017b)). This library has received significant structural and API changes in order to reduce complexity. These changes are not compatible with JNIBWAPI. 
 
 #### Requirements
 
@@ -21,7 +21,8 @@ This library is a fork of [JNIBWAPI](https://code.google.com/p/jnibwapi/) which 
   5. Create a class that implements the [BroodwarListener](src/main/java/com/harbinger/jbw/BroodwarListener.java) interface or extend the adaptor.
   6. Implement/override the relevant methods with your impeccable logic.
 
-#### Getting Started
+#### Running an Agent
+
   - Ensure that a id has been created in single player mode.
   - Move dependencies/bwapi-data to the Starcraft installation directory.
   - Launch the SixPoolAgent
