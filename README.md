@@ -46,7 +46,8 @@ This library is a fork of [JNIBWAPI](https://code.google.com/p/jnibwapi/) which 
 
 #### Creating an Agent
 
-  Use the *com.harbinger.jbw.example.SixPoolAgent* class from the *test* directory as a concrete example.
+  * Use the *com.harbinger.jbw.example.SixPoolAgent* class from the *test* directory as a concrete example.
+  * At the moment it may be easier to write the code directly within the JBW project as dll and Chaoslauncher are required.
   
   1. Create a new project and add JBW to the classpath.
   2. Create a class that extends the *com.harbinger.jbw.BroodwarAgent* class.
