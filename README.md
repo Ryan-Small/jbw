@@ -44,3 +44,11 @@ This library is a fork of [JNIBWAPI](https://code.google.com/p/jnibwapi/) which 
   1. Simply launch the *com.harbinger.jbw.example.SixPoolAgent*.
     * The *bwapi-data/bwapi.ini* file, copied over from step 4 in Installation, has the auto-menu enabled and will automatically configure the game as needed (i.e. Zerg race, Blood Bath map, one enemy, etc.). As mentioned under *BWAPI.ini Notes*, if the *bwapi.ini* file has been changed (e.g. race changed to Protoss) it may prevent the example agents from working properly.
 
+#### Creating an Agent
+
+  Use the *com.harbinger.jbw.example.SixPoolAgent* class from the *test* directory as a concrete example.
+  
+  1. Create a new project and add JBW to the classpath.
+  2. Create a class that extends the *com.harbinger.jbw.BroodwarAgent* class.
+  3. Override the *matchFrame* method and any other relevant methods from the class.
+  4. Have the *main* method invoke the *launch* method of your agent.
